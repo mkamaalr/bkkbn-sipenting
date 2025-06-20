@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <!-- Fragment Home (Tujuan Awal untuk Navigasi Bawah) -->
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.home.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home" />
+
+    <!-- Fragment Daftar Ibu Hamil (Tujuan Tingkat Atas untuk Navigasi Bawah) -->
+    <fragment
+        android:id="@+id/pregnantMotherListFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.pregnantmother.PregnantMotherListFragment"
+        android:label="Ibu Hamil"
+        tools:layout="@layout/fragment_pregnant_mother_list" >
+        <action
+            android:id="@+id/action_pregnantMotherListFragment_to_pregnantMotherRegistrationFragment1"
+            app:destination="@id/pregnantMotherRegistrationFragment1" />
+    </fragment>
+
+    <!-- Fragment Daftar Ibu Menyusui (Tujuan Tingkat Atas untuk Navigasi Bawah) -->
+    <fragment
+        android:id="@+id/breastfeedingMotherListFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.breastfeedingmother.BreastfeedingMotherListFragment"
+        android:label="Ibu Menyusui"
+        tools:layout="@layout/fragment_breastfeeding_mother_list" />
+
+    <!-- Fragment Daftar Anak (Tujuan Tingkat Atas untuk Navigasi Bawah) -->
+    <fragment
+        android:id="@+id/childListFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.child.ChildListFragment"
+        android:label="Balita"
+        tools:layout="@layout/fragment_child_list" />
+
+
+    <!-- Fragment Formulir Pendaftaran Ibu Hamil (Langkah-langkah) -->
+    <fragment
+        android:id="@+id/pregnantMotherRegistrationFragment1"
+        android:name="com.bkkbnjabar.sipenting.ui.pregnantmother.registration.PregnantMotherRegistrationFragment1"
+        android:label="Daftar Ibu Hamil (1/X)"
+        tools:layout="@layout/fragment_pregnant_mother_registration_1" >
+        <action
+            android:id="@+id/action_pregnantMotherRegistrationFragment1_to_pregnantMotherRegistrationFragment2"
+            app:destination="@id/pregnantMotherRegistrationFragment2" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pregnantMotherRegistrationFragment2"
+        android:name="com.bkkbnjabar.sipenting.ui.pregnantmother.registration.PregnantMotherRegistrationFragment2"
+        android:label="Daftar Ibu Hamil (2/X)"
+        tools:layout="@layout/fragment_pregnant_mother_registration_2" >
+        <action
+            android:id="@+id/action_pregnantMotherRegistrationFragment2_to_pregnantMotherListFragment"
+            app:destination="@id/pregnantMotherListFragment"
+            app:popUpTo="@id/pregnantMotherListFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- TODO: Tambahkan fragmen formulir lainnya untuk Ibu Hamil (3, 4, dll.) -->
+    <!-- TODO: Tambahkan fragmen dan tindakan untuk formulir/daftar Ibu Menyusui dan Anak -->
+
+</navigation>

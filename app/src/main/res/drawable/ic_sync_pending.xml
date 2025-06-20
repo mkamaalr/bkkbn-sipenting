@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#757575"> <!-- Warna abu-abu untuk pending -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M12,4V1L8,5l4,4V6c3.31,0 6,2.69 6,6 0,1.01 -0.25,1.97 -0.7,2.8L17.29,15.8C17.71,15.01 18,14.04 18,13c0,-3.31 -2.69,-6 -6,-6zM6,12c0,-1.01 0.25,-1.97 0.7,-2.8L6.71,8.2C6.29,9.01 6,9.96 6,11c0,3.31 2.69,6 6,6V22l4,-4 -4,-4V16c-3.31,0 -6,-2.69 -6,-6z"/>
+</vector>
