@@ -45,6 +45,7 @@
                         android:id="@+id/et_husband_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="kamal"
                         android:inputType="textPersonName" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -61,6 +62,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textMultiLine"
                         android:lines="3"
+                        android:text="macan6"
                         android:gravity="top" />
                 </com.google.android.material.textfield.TextInputLayout>
 

@@ -1,271 +1,103 @@
 package com.bkkbnjabar.sipenting.data.repository
 
+import android.util.Log
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherDao
-import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherEntity
-import com.bkkbnjabar.sipenting.data.local.entity.SyncStatus
+import com.bkkbnjabar.sipenting.data.local.mapper.toPregnantMotherEntity
+import com.bkkbnjabar.sipenting.data.local.mapper.toPregnantMotherRegistrationData
 import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherRegistrationData
-import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherUploadRequest
-import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherUploadResponse // Pastikan ini diimpor
-import com.bkkbnjabar.sipenting.data.remote.PregnantMotherApiService
 import com.bkkbnjabar.sipenting.domain.repository.PregnantMotherRepository
 import com.bkkbnjabar.sipenting.utils.Resource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import okio.IOException
-import retrofit2.HttpException
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.flow // Penting: Import flow builder
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PregnantMotherRepositoryImpl @Inject constructor(
-    private val pregnantMotherDao: PregnantMotherDao, // DAO untuk operasi Room
-    private val pregnantMotherApiService: PregnantMotherApiService // API Service untuk operasi server
+    private val pregnantMotherDao: PregnantMotherDao
 ) : PregnantMotherRepository {
 
-    /**
-     * Menyimpan data ibu hamil yang baru ke database lokal (Room) dengan status PENDING_UPLOAD.
-     * Ini memastikan data tersedia secara offline segera.
-     */
     override suspend fun createPregnantMother(data: PregnantMotherRegistrationData): Resource<String> {
         return try {
-            // Konversi domain model ke Room Entity baru. localId akan di-auto-generate.
-            val entity = data.toNewEntity()
-            val localId = pregnantMotherDao.insert(entity)
-            Resource.Success("Pendaftaran ibu hamil berhasil disimpan secara lokal (ID: $localId). Menunggu upload.")
-        } catch (e: Exception) {
-            Resource.Error("Gagal menyimpan pendaftaran ibu hamil secara lokal: ${e.localizedMessage}")
-        }
-    }
+            val entity = data.toPregnantMotherEntity()
+            Log.d("PMR_REPO", "createPregnantMother: Processing data with localId: ${entity.localId}")
 
-    /**
-     * Memperbarui data ibu hamil yang sudah ada di database lokal (Room).
-     * Jika data sudah diunggah sebelumnya, statusnya akan diubah menjadi PENDING_UPLOAD jika ada perubahan.
-     */
-    override suspend fun updatePregnantMother(localId: Int, data: PregnantMotherRegistrationData): Resource<String> {
-        return try {
-            val existingEntity = pregnantMotherDao.getPregnantMotherById(localId)
-            if (existingEntity == null) {
-                return Resource.Error("Data ibu hamil dengan ID lokal $localId tidak ditemukan untuk diperbarui.")
+            val resultId = if (entity.localId == null || entity.localId == 0) {
+                val newId = pregnantMotherDao.insertPregnantMother(entity)
+                Log.d("PMR_REPO", "createPregnantMother: Inserted new record with localId: $newId")
+                newId
+            } else {
+                pregnantMotherDao.updatePregnantMother(entity)
+                Log.d("PMR_REPO", "createPregnantMother: Updated existing record with localId: ${entity.localId}")
+                entity.localId.toLong()
             }
-
-            // Perbarui entitas yang sudah ada dengan data baru dari domain model
-            val updatedEntity = existingEntity.copy(
-                name = data.name,
-                nik = data.nik,
-                dateOfBirth = data.dateOfBirth,
-                phoneNumber = data.phoneNumber,
-                husbandName = data.husbandName,
-                fullAddress = data.fullAddress,
-                registrationDate = data.registrationDate, // Pastikan ini juga diupdate
-
-                provinsiName = data.provinsiName,
-                provinsiId = data.provinsiId,
-                kabupatenName = data.kabupatenName,
-                kabupatenId = data.kabupatenId,
-                kecamatanName = data.kecamatanName,
-                kecamatanId = data.kecamatanId,
-                kelurahanName = data.kelurahanName,
-                kelurahanId = data.kelurahanId,
-                rwName = data.rwName,
-                rwId = data.rwId,
-                rtName = data.rtName,
-                rtId = data.rtId,
-
-                updatedAt = System.currentTimeMillis(),
-                // Ubah status menjadi PENDING_UPLOAD jika data berubah dan sebelumnya sudah UPLOADED
-                syncStatus = if (existingEntity.syncStatus == SyncStatus.UPLOADED) SyncStatus.PENDING_UPLOAD else existingEntity.syncStatus
-            )
-            pregnantMotherDao.update(updatedEntity)
-            Resource.Success("Data ibu hamil (ID: $localId) berhasil diperbarui secara lokal.")
+            Resource.Success("Data ibu hamil berhasil disimpan dengan ID: $resultId")
         } catch (e: Exception) {
-            Resource.Error("Gagal memperbarui pendaftaran ibu hamil secara lokal: ${e.localizedMessage}")
+            Log.e("PMR_REPO", "Error saving/updating pregnant mother: ${e.message}", e)
+            Resource.Error("Gagal menyimpan/memperbarui data ibu hamil: ${e.localizedMessage}")
         }
     }
 
-    /**
-     * Menghapus data ibu hamil dari database lokal (Room).
-     */
-    override suspend fun deletePregnantMother(localId: Int): Resource<String> {
-        return try {
-            pregnantMotherDao.deletePregnantMother(localId)
-            Resource.Success("Data ibu hamil (ID: $localId) berhasil dihapus secara lokal.")
-        } catch (e: Exception) {
-            Resource.Error("Gagal menghapus data ibu hamil lokal: ${e.localizedMessage}")
-        }
+    override suspend fun updatePregnantMother(
+        localId: Int,
+        data: PregnantMotherRegistrationData
+    ): Resource<String> {
+        TODO("Not yet implemented")
     }
 
-    /**
-     * Mendapatkan semua data ibu hamil dari database lokal (Room) sebagai Flow.
-     * Data yang dikembalikan adalah model domain (PregnantMotherRegistrationData)
-     * sehingga UI tidak perlu tahu tentang Room Entity.
-     */
-    override fun getAllPregnantMothers(): Flow<Resource<List<PregnantMotherRegistrationData>>> {
-        return pregnantMotherDao.getAllPregnantMothers().map { entities ->
-            val domainList = entities.map { it.toDomainModel() } // Konversi Room Entity ke domain model
-            Resource.Success(domainList)
-        }
-    }
+    // --- FIX DI SINI ---
+    override fun getAllPregnantMothers(): Flow<Resource<List<PregnantMotherRegistrationData>>> = flow {
+        // 1. Memancarkan status Loading terlebih dahulu
+        emit(Resource.Loading())
+        Log.d("PMR_REPO", "getAllPregnantMothers: Emitting Loading state.")
 
-    /**
-     * Mengunggah data ibu hamil yang berstatus PENDING_UPLOAD atau ERROR_UPLOAD ke server.
-     * Setelah berhasil diunggah, status di database lokal akan diperbarui menjadi UPLOADED.
-     */
-    override suspend fun uploadPendingPregnantMothers(): Resource<String> {
-        val pendingUploads = pregnantMotherDao.getPregnantMothersBySyncStatus(SyncStatus.PENDING_UPLOAD) +
-                pregnantMotherDao.getPregnantMothersBySyncStatus(SyncStatus.ERROR_UPLOAD)
-
-        if (pendingUploads.isEmpty()) {
-            return Resource.Success("Tidak ada data ibu hamil yang tertunda untuk diunggah.")
-        }
-
-        var successCount = 0
-        var errorCount = 0
-        val errorMessages = mutableListOf<String>()
-
-        for (entity in pendingUploads) {
-            try {
-                // Konversi Room Entity ke DTO yang sesuai untuk permintaan API upload
-                val uploadRequest = entity.toUploadRequest()
-                val response = pregnantMotherApiService.uploadPregnantMother(uploadRequest)
-
-                if (response.isSuccessful) {
-                    val serverResponse = response.body()
-                    // PERBAIKAN: Pastikan serverId diambil dengan benar dan cocok tipenya (Int?)
-                    val serverId = serverResponse?.id?.toIntOrNull() // Menggunakan toIntOrNull()
-                    val updatedEntity = entity.copy(syncStatus = SyncStatus.UPLOADED, serverId = serverId)
-                    pregnantMotherDao.update(updatedEntity) // Perbarui status di lokal
-                    successCount++
-                } else {
-                    val errorMessage = "Gagal mengunggah data ID lokal ${entity.localId}: ${response.message() ?: response.errorBody()?.string() ?: "Unknown error"}"
-                    val updatedEntity = entity.copy(syncStatus = SyncStatus.ERROR_UPLOAD)
-                    pregnantMotherDao.update(updatedEntity)
-                    errorCount++
-                    errorMessages.add(errorMessage)
+        try {
+            // 2. Mengambil data dari DAO dan memetakannya
+            pregnantMotherDao.getAllPregnantMothers()
+                .map { entities ->
+                    // Konversi entities ke data model
+                    entities.map { it.toPregnantMotherRegistrationData() }
                 }
-            } catch (e: IOException) {
-                val errorMessage = "Gagal mengunggah data ID lokal ${entity.localId} (Jaringan): ${e.localizedMessage}"
-                val updatedEntity = entity.copy(syncStatus = SyncStatus.ERROR_UPLOAD)
-                pregnantMotherDao.update(updatedEntity)
-                errorCount++
-                errorMessages.add(errorMessage)
-            } catch (e: HttpException) {
-                val errorMessage = "Gagal mengunggah data ID lokal ${entity.localId} (Server): ${e.localizedMessage}"
-                val updatedEntity = entity.copy(syncStatus = SyncStatus.ERROR_UPLOAD)
-                pregnantMotherDao.update(updatedEntity)
-                errorCount++
-                errorMessages.add(errorMessage)
-            } catch (e: Exception) {
-                val errorMessage = "Gagal mengunggah data ID lokal ${entity.localId} (Umum): ${e.localizedMessage}"
-                val updatedEntity = entity.copy(syncStatus = SyncStatus.ERROR_UPLOAD)
-                pregnantMotherDao.update(updatedEntity)
-                errorCount++
-                errorMessages.add(errorMessage)
-            }
-        }
-
-        return if (errorCount == 0) {
-            Resource.Success("$successCount data ibu hamil berhasil diunggah.")
-        } else {
-            Resource.Error("$successCount berhasil diunggah, $errorCount gagal. Detail: ${errorMessages.joinToString("; ")}")
+                .collect { data ->
+                    // 3. Memancarkan data yang berhasil dalam Resource.Success
+                    emit(Resource.Success(data))
+                    Log.d("PMR_REPO", "getAllPregnantMothers: Emitting Success state with ${data.size} items.")
+                }
+        } catch (e: Exception) {
+            // 4. Menangkap error dan memancarkan Resource.Error
+            emit(Resource.Error("Gagal memuat daftar ibu hamil: ${e.localizedMessage}"))
+            Log.e("PMR_REPO", "Error getting all pregnant mothers: ${e.message}", e)
         }
     }
 
-    /**
-     * Mendapatkan detail ibu hamil berdasarkan ID lokal dari database Room.
-     */
+    override suspend fun uploadPendingPregnantMothers(): Resource<String> {
+        TODO("Not yet implemented")
+    }
+    // --- FIX BERAKHIR DI SINI ---
+
+
     override suspend fun getPregnantMotherById(localId: Int): Resource<PregnantMotherRegistrationData> {
         return try {
             val entity = pregnantMotherDao.getPregnantMotherById(localId)
             if (entity != null) {
-                Resource.Success(entity.toDomainModel())
+                Resource.Success(entity.toPregnantMotherRegistrationData())
             } else {
-                Resource.Error("Data ibu hamil dengan ID lokal $localId tidak ditemukan.")
+                Resource.Error("Data ibu hamil dengan ID $localId tidak ditemukan.")
             }
         } catch (e: Exception) {
-            Resource.Error("Gagal mendapatkan data ibu hamil lokal: ${e.localizedMessage}")
+            Resource.Error("Gagal mengambil data ibu hamil: ${e.localizedMessage}")
         }
     }
 
-    // --- Fungsi Pemetaan (Mapper Functions) ---
-    // Fungsi ekstensi untuk mengonversi PregnantMotherRegistrationData (domain model) ke PregnantMotherEntity (Room entity)
-    // untuk entitas BARU (dengan localId otomatis)
-    private fun PregnantMotherRegistrationData.toNewEntity(): PregnantMotherEntity {
-        return PregnantMotherEntity(
-            // localId akan di-auto-generate oleh Room
-            // serverId akan null saat pertama disimpan
-            // syncStatus sudah default PENDING_UPLOAD
-            name = this.name,
-            nik = this.nik,
-            dateOfBirth = this.dateOfBirth,
-            phoneNumber = this.phoneNumber,
-            husbandName = this.husbandName,
-            fullAddress = this.fullAddress,
-            registrationDate = this.registrationDate,
-
-            provinsiName = this.provinsiName,
-            provinsiId = this.provinsiId,
-            kabupatenName = this.kabupatenName,
-            kabupatenId = this.kabupatenId,
-            kecamatanName = this.kecamatanName,
-            kecamatanId = this.kecamatanId,
-            kelurahanName = this.kelurahanName,
-            kelurahanId = this.kelurahanId,
-            rwName = this.rwName,
-            rwId = this.rwId,
-            rtName = this.rtName,
-            rtId = this.rtId,
-
-            syncStatus = SyncStatus.PENDING_UPLOAD, // Selalu PENDING_UPLOAD saat membuat baru
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
-        )
-    }
-
-    // Fungsi ekstensi untuk mengonversi PregnantMotherEntity (Room entity) ke PregnantMotherRegistrationData (domain model)
-    private fun PregnantMotherEntity.toDomainModel(): PregnantMotherRegistrationData {
-        return PregnantMotherRegistrationData(
-            localId = this.localId.toLong(), // Map localId
-            remoteId = this.serverId?.toString(), // Map serverId ke remoteId
-            syncStatus = this.syncStatus, // Map syncStatus
-
-            name = this.name,
-            nik = this.nik,
-            dateOfBirth = this.dateOfBirth,
-            phoneNumber = this.phoneNumber,
-            husbandName = this.husbandName,
-            fullAddress = this.fullAddress,
-            registrationDate = this.registrationDate,
-
-            provinsiName = this.provinsiName,
-            provinsiId = this.provinsiId,
-            kabupatenName = this.kabupatenName,
-            kabupatenId = this.kabupatenId,
-            kecamatanName = this.kecamatanName,
-            kecamatanId = this.kecamatanId,
-            kelurahanName = this.kelurahanName,
-            kelurahanId = this.kelurahanId,
-            rwName = this.rwName,
-            rwId = this.rwId,
-            rtName = this.rtName,
-            rtId = this.rtId
-        )
-    }
-
-    // Fungsi ekstensi untuk mengonversi PregnantMotherEntity (Room entity) ke PregnantMotherUploadRequest (DTO untuk API)
-    private fun PregnantMotherEntity.toUploadRequest(): PregnantMotherUploadRequest {
-        return PregnantMotherUploadRequest(
-            name = this.name ?: "", // Handle nullability jika model domain mengizinkan null
-            nik = this.nik ?: "",
-            dateOfBirth = this.dateOfBirth ?: "",
-            phoneNumber = this.phoneNumber ?: "",
-            kecamatanId = this.kecamatanId,
-            kelurahanId = this.kelurahanId,
-            rwId = this.rwId,
-            rtId = this.rtId,
-            fullAddress = this.fullAddress ?: "",
-            registrationDate = this.registrationDate ?: "",
-            husbandName = this.husbandName ?: ""
-            // Tambahkan bidang lain yang diperlukan oleh API Anda
-        )
+    override suspend fun deletePregnantMother(localId: Int): Resource<String> {
+        return try {
+            pregnantMotherDao.deletePregnantMother(localId)
+            Resource.Success("Data ibu hamil berhasil dihapus.")
+        } catch (e: Exception) {
+            Resource.Error("Gagal menghapus data ibu hamil: ${e.localizedMessage}")
+        }
     }
 }

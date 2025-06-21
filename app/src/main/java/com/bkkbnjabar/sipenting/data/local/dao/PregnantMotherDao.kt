@@ -12,12 +12,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PregnantMotherDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(pregnantMother: PregnantMotherEntity): Long // Mengembalikan ID lokal yang baru
+    suspend fun insertPregnantMother(pregnantMother: PregnantMotherEntity): Long // Nama diubah dari 'insert'
 
     @Update
-    suspend fun update(pregnantMother: PregnantMotherEntity)
+    suspend fun updatePregnantMother(pregnantMother: PregnantMotherEntity) // Nama diubah dari 'update'
 
-    @Query("SELECT * FROM pregnant_mothers ORDER BY createdAt DESC")
+    @Query("SELECT * FROM pregnant_mothers ORDER BY createdAt DESC") // Membutuhkan field createdAt di entity
     fun getAllPregnantMothers(): Flow<List<PregnantMotherEntity>>
 
     @Query("SELECT * FROM pregnant_mothers WHERE syncStatus = :status")
