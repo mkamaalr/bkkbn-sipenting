@@ -1,68 +1,46 @@
 package com.bkkbnjabar.sipenting.ui.splash
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bkkbnjabar.sipenting.data.model.Kecamatan
-import com.bkkbnjabar.sipenting.domain.repository.LookupRepository
-import com.bkkbnjabar.sipenting.domain.usecase.auth.ValidateTokenUseCase
+import com.bkkbnjabar.sipenting.data.repository.LookupRepository
 import com.bkkbnjabar.sipenting.utils.Resource
-import com.bkkbnjabar.sipenting.utils.SharedPrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val validateTokenUseCase: ValidateTokenUseCase,
-    private val lookupRepository: LookupRepository,
-    private val sharedPrefsManager: SharedPrefsManager
+    private val lookupRepository: LookupRepository
 ) : ViewModel() {
 
-    enum class NavigationDestination {
-        LOGIN, MAIN
+    // NEW: LiveData untuk status pemuatan data lookup
+    private val _lookupDataLoadResult = MutableLiveData<Resource<Unit>>() // Unit karena kita hanya peduli status sukses/error
+    val lookupDataLoadResult: LiveData<Resource<Unit>> = _lookupDataLoadResult
+
+    init {
+        Log.d("SplashViewModel", "SplashViewModel initialized. Starting initial data load.")
+        _lookupDataLoadResult.value = Resource.Idle // Inisialisasi awal
+        loadInitialLookupData()
     }
 
-    private val _navigateTo = MutableLiveData<NavigationDestination>()
-    val navigateTo: LiveData<NavigationDestination> = _navigateTo
-
-    fun checkAuthentication() {
+    // NEW: Fungsi untuk memuat data lookup awal
+    fun loadInitialLookupData() {
+        _lookupDataLoadResult.value = Resource.Loading()
         viewModelScope.launch {
-            val isValid = validateTokenUseCase.execute()
-            if (isValid) {
-                // 1. Coba ambil dan simpan data lokasi pengguna (Kelurahan user)
-                when (val userLocationResult = lookupRepository.getUserLocationDataFromApi()) {
-                    is Resource.Success -> {
-                        userLocationResult.data?.let { kelurahan ->
-                            sharedPrefsManager.saveUserLocation(kelurahan)
-                            println("User location data saved: ${kelurahan.name}")
-                        } ?: run {
-                            println("User location data is null.")
-                        }
-                    }
-                    is Resource.Error -> {
-                        println("Error fetching user location data: ${userLocationResult.message}")
-                        // Lanjutkan meskipun ada error, tapi mungkin perlu ditangani di UI utama
-                    }
-                    is Resource.Loading -> { /* Tidak relevan di sini */ }
+            try {
+                // Panggil repository untuk memuat data lookup
+                // Asumsi lookupRepository memiliki fungsi untuk memuat/menyinkronkan data
+                val result = lookupRepository.preloadAllLocationAndLookupData() // Contoh: fungsi ini memuat dari API dan menyimpan ke Room
+                if (result is Resource.Success) {
+                    _lookupDataLoadResult.postValue(Resource.Success(Unit))
+                } else if (result is Resource.Error) {
+                    _lookupDataLoadResult.postValue(Resource.Error(result.message ?: "Unknown error loading lookup data"))
                 }
-
-                // 2. Preload semua data lokasi (Provinsi, Kabupaten, Kecamatan, Kelurahan, RW, RT)
-                when (val preloadResult = lookupRepository.preloadAllLocationData()) {
-                    is Resource.Success -> {
-                        println("All location data preloaded successfully!")
-                    }
-                    is Resource.Error -> {
-                        println("Failed to preload all location data: ${preloadResult.message}")
-                        // Anda bisa menampilkan Toast atau log ini jika perlu
-                    }
-                    is Resource.Loading -> { /* Tidak relevan di sini */ }
-                }
-
-                _navigateTo.postValue(NavigationDestination.MAIN)
-            } else {
-                _navigateTo.postValue(NavigationDestination.LOGIN)
+            } catch (e: Exception) {
+                _lookupDataLoadResult.postValue(Resource.Error("Exception loading lookup data: ${e.localizedMessage}"))
             }
         }
     }

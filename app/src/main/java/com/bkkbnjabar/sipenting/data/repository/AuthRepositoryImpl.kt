@@ -1,107 +1,157 @@
 package com.bkkbnjabar.sipenting.data.repository
 
-import com.bkkbnjabar.sipenting.data.model.auth.AuthResponse
 import com.bkkbnjabar.sipenting.data.model.auth.LoginRequest
+import com.bkkbnjabar.sipenting.data.model.request.RefreshTokenRequest
+import com.bkkbnjabar.sipenting.data.model.response.LoginResponse
 import com.bkkbnjabar.sipenting.data.remote.AuthApiService
+import com.bkkbnjabar.sipenting.data.remote.mapper.toUserSession
+import com.bkkbnjabar.sipenting.domain.model.AuthResponse
+import com.bkkbnjabar.sipenting.domain.model.UserSession
 import com.bkkbnjabar.sipenting.domain.repository.AuthRepository
 import com.bkkbnjabar.sipenting.utils.Resource
 import com.bkkbnjabar.sipenting.utils.SharedPrefsManager
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import okio.IOException
-import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
-    private val api: AuthApiService,
+    private val authApiService: AuthApiService,
     private val sharedPrefsManager: SharedPrefsManager
 ) : AuthRepository {
 
-    override suspend fun login(username: String?, email: String?, password: String): Resource<AuthResponse> {
+    override suspend fun login(request: LoginRequest): Resource<UserSession> {
         return try {
-            val request = LoginRequest(username, email, password)
-            val response = api.login(request)
+            val response = authApiService.login(request)
             if (response.isSuccessful) {
-                response.body()?.let { authResponse ->
-                    sharedPrefsManager.saveAuthToken(authResponse.accessToken)
-                    sharedPrefsManager.saveUserId(authResponse.user.id.toString())
-                    Resource.Success(authResponse)
-                } ?: Resource.Error("Terjadi kesalahan tidak dikenal")
-            } else {
-                val errorBody = response.errorBody()?.string()
-                val errorMessage = try {
-                    // Coba parsing body error jika itu adalah struktur error yang diketahui
-                    // Asumsi AuthResponse Anda juga dapat digunakan untuk pesan error, atau buat ErrorResponseDto spesifik
-                    val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
-                    val adapter = moshi.adapter(AuthResponse::class.java) // Sesuaikan jika Anda memiliki ErrorResponseDto umum
-                    adapter.fromJson(errorBody ?: "")?.message ?: "Login gagal: ${response.message()}"
-                } catch (e: Exception) {
-                    "Login gagal: ${response.message()} (Gagal parsing respons)"
+                val loginResponse = response.body() // This is your LoginResponse DTO
+                if (loginResponse != null) {
+                    val userSession = loginResponse.toUserSession() // Convert DTO to Domain Model using AuthMapper
+                    // --- INI PERBAIKAN KRUSIALNYA: Panggil saveUserSession() ---
+                    // Peta AuthResponse ke UserSession untuk penyimpanan lokal
+                    sharedPrefsManager.saveUserSession(userSession) // <<< Dipanggil di sini!
+                    Resource.Success(userSession)
+                } else {
+                    Resource.Error("Login response body is empty.")
                 }
+            } else {
+                // Login failed based on HTTP status code (e.g., 401 Unauthorized, 400 Bad Request)
+                val errorMessage = response.errorBody()?.string() ?: "Login failed: Unknown error"
                 Resource.Error(errorMessage)
             }
         } catch (e: IOException) {
-            Resource.Error("Tidak dapat mencapai server. Periksa koneksi internet Anda.")
-        } catch (e: HttpException) {
-            Resource.Error("Terjadi kesalahan tak terduga: ${e.message()}")
+            // Network-related errors (no internet, timeout)
+            Resource.Error("Network error during login: ${e.localizedMessage}")
+        } catch (e: Exception) {
+            // Any other unexpected errors
+            Resource.Error("An unexpected error occurred during login: ${e.localizedMessage}")
         }
     }
 
-    override suspend fun logout(): Resource<Unit> {
+    override suspend fun validateToken(): Resource<Boolean> {
         return try {
-            val response = api.logout()
+            val accessToken = sharedPrefsManager.getAccessToken()
+            if (accessToken.isNullOrEmpty()) {
+                // No token saved locally, so it's not valid.
+                // Tidak ada token yang tersimpan secara lokal, jadi tidak valid.
+                return Resource.Success(false)
+            }
+
+            // Call API to validate the token on the server.
+            // Panggil API untuk memvalidasi token di server.
+            // Asumsi: If API responds with HTTP 200 OK, the token is considered valid.
+            // If it responds with 401, 403, or any other error, the token is invalid.
+            // Asumsi: Jika API merespons dengan HTTP 200 OK, token dianggap valid.
+            // Jika merespons 401, 403, atau error lainnya, token tidak valid.
+            val response = authApiService.validateToken("Bearer $accessToken")
+
             if (response.isSuccessful) {
-                sharedPrefsManager.clearAuthData()
-                Resource.Success(Unit)
+                // API responded with 2xx OK. Token is valid.
+                // API merespons 2xx OK. Token valid.
+                Resource.Success(true)
             } else {
-                Resource.Error("Logout gagal: ${response.message()}")
+                // API responded with non-2xx (e.g., 401 Unauthorized, 403 Forbidden).
+                // Token is considered invalid or expired.
+                // Clear the local session as the token is no longer valid.
+                // API merespons non-2xx (misalnya 401 Unauthorized, 403 Forbidden).
+                // Token dianggap tidak valid atau kadaluarsa.
+                // Hapus sesi lokal karena token sudah tidak berlaku.
+                clearSession()
+                Resource.Success(false)
             }
         } catch (e: IOException) {
-            Resource.Error("Tidak dapat mencapai server. Periksa koneksi internet Anda.")
-        } catch (e: HttpException) {
-            Resource.Error("Terjadi kesalahan tak terduga: ${e.message()}")
+            // Network issues (no internet, timeout, etc.).
+            // Assume token cannot be validated at this time.
+            // Masalah jaringan (tidak ada koneksi, timeout, dll).
+            // Anggap token tidak dapat divalidasi saat ini.
+            Resource.Error("Network error during token validation: ${e.localizedMessage}", data = false)
+        } catch (e: Exception) {
+            // Any other unexpected errors.
+            // Kesalahan tak terduga lainnya.
+            Resource.Error("An unexpected error occurred during token validation: ${e.localizedMessage}", data = false)
         }
     }
 
-    override suspend fun refreshToken(): String? {
+    override suspend fun clearSession() {
+        // Hapus semua data sesi dari Shared Preferences
+        sharedPrefsManager.clearAllSessionData()
+        // Atau hanya yang spesifik seperti:
+        // sharedPrefsManager.removeAccessToken()
+        // sharedPrefsManager.removeRefreshToken()
+        // sharedPrefsManager.removeUserSession()
+    }
+
+    /**
+     * Mengambil access token saat ini yang tersimpan secara lokal.
+     * Mengimplementasikan fungsi dari AuthRepository.
+     */
+    override suspend fun getAccessToken(): String? {
+        return sharedPrefsManager.getAccessToken()
+    }
+
+    /**
+     * Mencoba untuk me-refresh access token menggunakan refresh token (jika tersedia).
+     * Mengimplementasikan fungsi dari AuthRepository.
+     */
+    override suspend fun refreshAccessToken(): Resource<String> {
         return try {
-            val response = api.refreshToken()
+            val refreshToken = sharedPrefsManager.getRefreshToken()
+            if (refreshToken.isNullOrEmpty()) {
+                // Tidak ada refresh token, tidak bisa me-refresh.
+                clearSession() // Hapus sesi karena tidak bisa mendapatkan token baru
+                return Resource.Error("No refresh token available. Please log in again.", data = null)
+            }
+
+            // NEW: Buat RefreshTokenRequest
+            val refreshRequest = RefreshTokenRequest(refreshToken = refreshToken)
+            // NEW: Panggil API refresh token
+            val response = authApiService.refreshToken(refreshRequest)
+
             if (response.isSuccessful) {
-                response.body()?.let { authResponse ->
-                    sharedPrefsManager.saveAuthToken(authResponse.accessToken)
-                    authResponse.accessToken
+                val loginResponse = response.body()
+                if (loginResponse != null && !loginResponse.accessToken.isNullOrEmpty()) {
+                    // Simpan access token baru
+                    sharedPrefsManager.saveAccessToken(loginResponse.accessToken)
+                    // NEW: Jika API refresh token juga memberikan refresh token baru, simpan juga
+                    // if (loginResponse.refreshToken != null) {
+                    //     sharedPrefsManager.saveRefreshToken(loginResponse.refreshToken)
+                    // }
+                    Resource.Success(loginResponse.accessToken)
+                } else {
+                    // Respons kosong atau tidak ada access token baru
+                    clearSession()
+                    Resource.Error("Failed to get new access token from refresh response.", data = null)
                 }
             } else {
-                sharedPrefsManager.clearAuthData() // Hapus token lama jika penyegaran gagal
-                null
+                // Refresh token gagal di server (misalnya refresh token kadaluarsa atau tidak valid)
+                val errorMessage = response.errorBody()?.string() ?: "Failed to refresh token: Unknown error"
+                clearSession() // Hapus sesi karena refresh token juga tidak valid
+                Resource.Error(errorMessage, data = null)
             }
+        } catch (e: IOException) {
+            Resource.Error("Network error during token refresh: ${e.localizedMessage}", data = null)
         } catch (e: Exception) {
-            sharedPrefsManager.clearAuthData()
-            null
-        }
-    }
-
-    override suspend fun validateToken(): Boolean {
-        val token = sharedPrefsManager.getAuthToken()
-        if (token.isNullOrEmpty()) {
-            return false
-        }
-        // Dalam aplikasi nyata, Anda mungkin memiliki endpoint API khusus seperti /api/v1/user atau /api/v1/validate-token
-        // Untuk kesederhanaan, kita akan mengasumsikan permintaan dummy yang berhasil (misalnya, ke /user atau endpoint yang diautentikasi)
-        // menunjukkan token yang valid atau dapat disegarkan. Solusi yang lebih kuat akan memanggil endpoint validasi khusus.
-        return try {
-            // Ini adalah placeholder. Anda idealnya harus memanggil endpoint yang diautentikasi yang mengembalikan informasi pengguna,
-            // atau endpoint validasi token tertentu yang disediakan oleh API Laravel Anda.
-            // Jika panggilan berhasil, berarti token valid/disegarkan. Jika gagal (misalnya, 401), berarti tidak valid.
-            // TODO: Check this one, turning off logout
-//            val response = api.logout() // Menggunakan logout hanya sebagai panggilan terautentikasi dummy. GANTI INI.
-//            response.isSuccessful // Jika ini berhasil, berarti token valid (atau disegarkan oleh Authenticator)
-            return true
-        } catch (e: Exception) {
-            sharedPrefsManager.clearAuthData() // Hapus token jika validasi gagal
-            false
+            Resource.Error("An unexpected error occurred during token refresh: ${e.localizedMessage}", data = null)
         }
     }
 }

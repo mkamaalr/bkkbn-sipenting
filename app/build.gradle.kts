@@ -47,7 +47,7 @@ android {
 dependencies {
     // Core Android KTX
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
     implementation("androidx.activity:activity-ktx:1.9.0")
     implementation("androidx.fragment:fragment-ktx:1.8.0")
 
@@ -57,8 +57,8 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
     // ViewModel and LiveData
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.1")
 
     // Navigation Component (highly recommended for multi-screen apps)
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
@@ -84,6 +84,7 @@ dependencies {
     // Dukungan coroutine untuk Room
     implementation("androidx.room:room-ktx:2.7.2")
 
+    implementation("com.google.code.gson:gson:2.13.1") // Pastikan versi terbaru jika ada
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")

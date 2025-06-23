@@ -1,27 +1,35 @@
 package com.bkkbnjabar.sipenting.ui.pregnantmother.registration
 
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.EditText // PENTING: Import EditText
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.bkkbnjabar.sipenting.R
-import com.bkkbnjabar.sipenting.data.model.Kecamatan
-import com.bkkbnjabar.sipenting.data.model.Kelurahan
-import com.bkkbnjabar.sipenting.data.model.Rt
-import com.bkkbnjabar.sipenting.data.model.Rw
 import com.bkkbnjabar.sipenting.databinding.FragmentPregnantMotherRegistration1Binding
+import com.bkkbnjabar.sipenting.domain.model.Kabupaten
+import com.bkkbnjabar.sipenting.domain.model.Kecamatan
+import com.bkkbnjabar.sipenting.domain.model.Kelurahan
+import com.bkkbnjabar.sipenting.domain.model.Provinsi
+import com.bkkbnjabar.sipenting.domain.model.Rt
+import com.bkkbnjabar.sipenting.domain.model.Rw
 import com.bkkbnjabar.sipenting.utils.Resource
+import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 @AndroidEntryPoint
@@ -30,11 +38,16 @@ class PregnantMotherRegistrationFragment1 : Fragment() {
     private var _binding: FragmentPregnantMotherRegistration1Binding? = null
     private val binding get() = _binding!!
 
+    // Menggunakan activityViewModels() untuk berbagi ViewModel antar Fragment dalam Activity yang sama
     private val registrationViewModel: PregnantMotherRegistrationViewModel by activityViewModels()
 
-    private var selectedKelurahan: Kelurahan? = null
-    private var selectedRw: Rw? = null
-    private var selectedRt: Rt? = null
+    // Data untuk Spinner/AutoCompleteTextView
+    private var currentProvinsis: List<Provinsi> = emptyList()
+    private var currentKabupatens: List<Kabupaten> = emptyList()
+    private var currentKecamatans: List<Kecamatan> = emptyList()
+    private var currentKelurahans: List<Kelurahan> = emptyList()
+    private var currentRws: List<Rw> = emptyList()
+    private var currentRts: List<Rt> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,303 +64,489 @@ class PregnantMotherRegistrationFragment1 : Fragment() {
         Log.d("PMR_FRAG1_LIFECYCLE", "onViewCreated called.")
         setupListeners()
         observeViewModel()
+        loadFormData() // Memuat data awal dari ViewModel ke UI
     }
 
     private fun setupListeners() {
-        binding.etDateOfBirth.setOnClickListener {
-            showDatePickerDialog()
-        }
-
         binding.btnNext.setOnClickListener {
-            Log.d("PMR_FRAG1_ACTION", "Next button clicked. Saving form data for Fragment 1.")
+            Log.d("PMR_FRAG1_ACTION", "Next button clicked. Calling saveFormData().")
             saveFormData() // Simpan data terbaru ke ViewModel
             if (validateForm()) {
-                Log.d("PMR_FRAG1_ACTION", "Form validated successfully. Navigating to Fragment 2.")
                 findNavController().navigate(R.id.action_pregnantMotherRegistrationFragment1_to_pregnantMotherRegistrationFragment2)
+                Log.d("PMR_FRAG1_ACTION", "Validation successful. Navigating to Fragment 2.")
             } else {
                 Log.w("PMR_FRAG1_ACTION", "Form validation failed.")
                 Toast.makeText(context, "Silakan lengkapi semua bidang yang diperlukan", Toast.LENGTH_SHORT).show()
             }
         }
 
-        binding.autocompleteRw.setOnItemClickListener { parent, _, position, _ ->
-            val selectedName = parent.getItemAtPosition(position).toString()
-            val selectedItem = registrationViewModel.rws.value?.data?.find { it.name == selectedName }
+        // FIXED: etRegistrationDate sekarang akan menggunakan showDatePickerDialog(EditText)
+        binding.etRegistrationDate.setOnClickListener { showDatePickerDialog(binding.etRegistrationDate) }
+        // FIXED: etDateOfBirth sekarang akan menggunakan showDatePickerDialog(EditText)
+        binding.etDateOfBirth.setOnClickListener { showDatePickerDialog(binding.etDateOfBirth) }
 
-            selectedRw = selectedItem
-            selectedRt = null // Kosongkan RT saat RW berubah
-            binding.autocompleteRt.setText("", false) // Kosongkan visual RT
-
-            Log.d("PMR_FRAG1_ACTION", "RW selected: ${selectedItem?.name} (ID: ${selectedItem?.id}). Updating ViewModel.")
-            registrationViewModel.updatePregnantMotherPart1(
-                name = binding.etName.text.toString().trim(),
-                nik = binding.etNik.text.toString().trim(),
-                dateOfBirth = binding.etDateOfBirth.text.toString().trim(),
-                phoneNumber = binding.etPhoneNumber.text.toString().trim(),
-                rwName = selectedItem?.name,
-                rwId = selectedItem?.id,
-                rtName = null,
-                rtId = null
+        // Listener untuk AutoCompleteTextView Lokasi
+        binding.etProvinsi.setOnItemClickListener { adapterView, _, position, _ ->
+            val selectedProvinsi = adapterView.getItemAtPosition(position) as Provinsi
+            registrationViewModel.updatePregnantMotherData(
+                provinsiId = selectedProvinsi.id,
+                provinsiName = selectedProvinsi.name,
+                kabupatenId = null, kabupatenName = null, // Reset when parent changes
+                kecamatanId = null, kecamatanName = null,
+                kelurahanId = null, kelurahanName = null,
+                rwId = null, rwName = null,
+                rtId = null, rtName = null
             )
-            selectedItem?.id?.let { registrationViewModel.getRTS(it) }
+            binding.etKabupaten.setText("")
+            binding.etKecamatan.setText("")
+            binding.etKelurahan.setText("")
+            binding.etRw.setText("")
+            binding.etRt.setText("")
         }
 
-        binding.autocompleteRt.setOnItemClickListener { parent, _, position, _ ->
-            val selectedName = parent.getItemAtPosition(position).toString()
-            val selectedItem = registrationViewModel.rts.value?.data?.find { it.name == selectedName }
+        binding.etKabupaten.setOnItemClickListener { adapterView, _, position, _ ->
+            val selectedKabupaten = adapterView.getItemAtPosition(position) as Kabupaten
+            registrationViewModel.updatePregnantMotherData(
+                kabupatenId = selectedKabupaten.id,
+                kabupatenName = selectedKabupaten.name,
+                kecamatanId = null, kecamatanName = null, // Reset when parent changes
+                kelurahanId = null, kelurahanName = null,
+                rwId = null, rwName = null,
+                rtId = null, rtName = null
+            )
+            binding.etKecamatan.setText("")
+            binding.etKelurahan.setText("")
+            binding.etRw.setText("")
+            binding.etRt.setText("")
+            selectedKabupaten.id?.let { registrationViewModel.getKecamatans(it) }
+        }
 
-            selectedRt = selectedItem
-            Log.d("PMR_FRAG1_ACTION", "RT selected: ${selectedItem?.name} (ID: ${selectedItem?.id}). Updating ViewModel.")
-            registrationViewModel.updatePregnantMotherPart1(
-                name = binding.etName.text.toString().trim(),
-                nik = binding.etNik.text.toString().trim(),
-                dateOfBirth = binding.etDateOfBirth.text.toString().trim(),
-                phoneNumber = binding.etPhoneNumber.text.toString().trim(),
-                rwName = registrationViewModel.currentPregnantMother.value?.rwName,
-                rwId = registrationViewModel.currentPregnantMother.value?.rwId,
-                rtName = selectedItem?.name,
-                rtId = selectedItem?.id
+        binding.etKecamatan.setOnItemClickListener { adapterView, _, position, _ ->
+            val selectedKecamatan = adapterView.getItemAtPosition(position) as Kecamatan
+            registrationViewModel.updatePregnantMotherData(
+                kecamatanId = selectedKecamatan.id,
+                kecamatanName = selectedKecamatan.name,
+                kelurahanId = null, kelurahanName = null, // Reset when parent changes
+                rwId = null, rwName = null,
+                rtId = null, rtName = null
+            )
+            binding.etKelurahan.setText("")
+            binding.etRw.setText("")
+            binding.etRt.setText("")
+            selectedKecamatan.id?.let { registrationViewModel.getKelurahans(it) }
+        }
+
+        binding.etKelurahan.setOnItemClickListener { adapterView, _, position, _ ->
+            val selectedKelurahan = adapterView.getItemAtPosition(position) as Kelurahan
+            registrationViewModel.updatePregnantMotherData(
+                kelurahanId = selectedKelurahan.id,
+                kelurahanName = selectedKelurahan.name,
+                rwId = null, rwName = null, // Reset when parent changes
+                rtId = null, rtName = null
+            )
+            binding.etRw.setText("")
+            binding.etRt.setText("")
+            selectedKelurahan.id?.let { registrationViewModel.getRWS(it) }
+        }
+
+        binding.etRw.setOnItemClickListener { adapterView, _, position, _ ->
+            val selectedRw = adapterView.getItemAtPosition(position) as Rw
+            registrationViewModel.updatePregnantMotherData(
+                rwId = selectedRw.id,
+                rwName = selectedRw.name,
+                rtId = null, rtName = null // Reset when parent changes
+            )
+            binding.etRt.setText("")
+            selectedRw.id?.let { registrationViewModel.getRTS(it) }
+        }
+
+        binding.etRt.setOnItemClickListener { adapterView, _, position, _ ->
+            val selectedRt = adapterView.getItemAtPosition(position) as Rt
+            registrationViewModel.updatePregnantMotherData(
+                rtId = selectedRt.id,
+                rtName = selectedRt.name
             )
         }
     }
 
-    private fun showDatePickerDialog() {
-        val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
+    // FIXED: Mengubah tipe parameter menjadi EditText
+    private fun showDatePickerDialog(editText: EditText) {
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Pilih Tanggal")
+            .build()
 
-        val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
-            val selectedDate = Calendar.getInstance().apply {
-                set(selectedYear, selectedMonth, selectedDay)
-            }
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            binding.etDateOfBirth.setText(dateFormat.format(selectedDate.time))
-            Log.d("PMR_FRAG1_ACTION", "Date of birth set to: ${binding.etDateOfBirth.text}")
-        }, year, month, day)
+        datePicker.addOnPositiveButtonClickListener { selection ->
+            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val date = sdf.format(Date(selection))
+            editText.setText(date)
+        }
+        datePicker.show(parentFragmentManager, "DATE_PICKER")
+    }
 
-        datePickerDialog.show()
+    private fun loadFormData() {
+        Log.d("PMR_FRAG1_LOAD", "loadFormData: Attempting to load mother data from ViewModel into UI.")
+        registrationViewModel.currentPregnantMother.value?.let { data ->
+            binding.etName.setText(data.name ?: "")
+            binding.etNik.setText(data.nik ?: "")
+            binding.etDateOfBirth.setText(data.dateOfBirth ?: "")
+            binding.etPhoneNumber.setText(data.phoneNumber ?: "")
+            binding.etProvinsi.setText(data.provinsiName ?: "", false)
+            binding.etKabupaten.setText(data.kabupatenName ?: "", false)
+            binding.etKecamatan.setText(data.kecamatanName ?: "", false)
+            binding.etKelurahan.setText(data.kelurahanName ?: "", false)
+            binding.etRw.setText(data.rwName ?: "", false)
+            binding.etRt.setText(data.rtName ?: "", false)
+            binding.etFullAddress.setText(data.fullAddress ?: "")
+            binding.etRegistrationDate.setText(data.registrationDate ?: "")
+
+            Log.d("PMR_FRAG1_LOAD", "Mother data loaded: Name=${data.name}, NIK=${data.nik}, Provinsi=${data.provinsiName}, LocalId=${data.localId}")
+
+        } ?: run {
+            Log.d("PMR_FRAG1_LOAD", "currentPregnantMother is null. Clearing all UI fields.")
+            // Clear all fields if data is null
+            binding.etName.setText("")
+            binding.etNik.setText("")
+            binding.etDateOfBirth.setText("")
+            binding.etPhoneNumber.setText("")
+            binding.etProvinsi.setText("", false)
+            binding.etKabupaten.setText("", false)
+            binding.etKecamatan.setText("", false)
+            binding.etKelurahan.setText("", false)
+            binding.etRw.setText("", false)
+            binding.etRt.setText("", false)
+            binding.etFullAddress.setText("")
+            // Default tanggal pendaftaran hari ini untuk form baru
+            val today = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+            binding.etRegistrationDate.setText(today)
+        }
     }
 
     private fun saveFormData() {
-        Log.d("PMR_FRAG1_ACTION", "saveFormData: Capturing current UI input and updating ViewModel for Part 1.")
-        registrationViewModel.updatePregnantMotherPart1(
+        Log.d("PMR_FRAG1_ACTION", "saveFormData: Capturing current UI input and updating ViewModel for Mother Data.")
+        val currentMotherData = registrationViewModel.currentPregnantMother.value
+
+        registrationViewModel.updatePregnantMotherData(
             name = binding.etName.text.toString().trim(),
             nik = binding.etNik.text.toString().trim(),
             dateOfBirth = binding.etDateOfBirth.text.toString().trim(),
             phoneNumber = binding.etPhoneNumber.text.toString().trim(),
-            provinsiName = registrationViewModel.currentPregnantMother.value?.provinsiName,
-            provinsiId = registrationViewModel.currentPregnantMother.value?.provinsiId,
-            kabupatenName = registrationViewModel.currentPregnantMother.value?.kabupatenName,
-            kabupatenId = registrationViewModel.currentPregnantMother.value?.kabupatenId,
-            kecamatanName = registrationViewModel.currentPregnantMother.value?.kecamatanName,
-            kecamatanId = registrationViewModel.currentPregnantMother.value?.kecamatanId,
-            kelurahanName = registrationViewModel.currentPregnantMother.value?.kelurahanName,
-            kelurahanId = registrationViewModel.currentPregnantMother.value?.kelurahanId,
-            rwName = selectedRw?.name,
-            rwId = selectedRw?.id,
-            rtName = selectedRt?.name,
-            rtId = selectedRt?.id
+            fullAddress = binding.etFullAddress.text.toString().trim(),
+            registrationDate = binding.etRegistrationDate.text.toString().trim()
         )
-        Log.d("PMR_FRAG1_ACTION", "saveFormData: ViewModel updated for Part 1. Current ViewModel name: ${registrationViewModel.currentPregnantMother.value?.name}, LocalId: ${registrationViewModel.currentPregnantMother.value?.localId}")
+        Log.d("PMR_FRAG1_ACTION", "saveFormData: ViewModel updated for Mother. Current ViewModel Name: ${registrationViewModel.currentPregnantMother.value?.name}, NIK: ${registrationViewModel.currentPregnantMother.value?.nik}, LocalId: ${registrationViewModel.currentPregnantMother.value?.localId}")
     }
 
     private fun validateForm(): Boolean {
-        // ... (validation logic remains the same) ...
-        return true // TEMPORARY: Return true for now to skip validation during debugging
+        var isValid = true
+
+        if (binding.etName.text.isNullOrBlank()) {
+            binding.tilName.error = "Nama tidak boleh kosong"
+            isValid = false
+        } else {
+            binding.tilName.error = null
+        }
+
+        if (binding.etNik.text.isNullOrBlank()) {
+            binding.tilNik.error = "NIK tidak boleh kosong"
+            isValid = false
+        } else if (binding.etNik.text.toString().length != 16) {
+            binding.tilNik.error = "NIK harus 16 digit"
+            isValid = false
+        } else {
+            binding.tilNik.error = null
+        }
+
+        if (binding.etDateOfBirth.text.isNullOrBlank()) {
+            binding.tilDateOfBirth.error = "Tanggal Lahir tidak boleh kosong"
+            isValid = false
+        } else {
+            binding.tilDateOfBirth.error = null
+        }
+
+        if (binding.etPhoneNumber.text.isNullOrBlank()) {
+            binding.tilPhoneNumber.error = "Nomor Telepon tidak boleh kosong"
+            isValid = false
+        } else {
+            binding.tilPhoneNumber.error = null
+        }
+
+        // Validasi AutoCompleteTextViews untuk lokasi
+        if (binding.etProvinsi.text.isNullOrBlank()) {
+            binding.tilProvinsi.error = "Provinsi tidak boleh kosong"
+            isValid = false
+        } else {
+            binding.tilProvinsi.error = null
+        }
+        if (binding.etKabupaten.text.isNullOrBlank()) {
+            binding.tilKabupaten.error = "Kabupaten tidak boleh kosong"
+            isValid = false
+        } else {
+            binding.tilKabupaten.error = null
+        }
+        if (binding.etKecamatan.text.isNullOrBlank()) {
+            binding.tilKecamatan.error = "Kecamatan tidak boleh kosong"
+            isValid = false
+        } else {
+            binding.tilKecamatan.error = null
+        }
+        if (binding.etKelurahan.text.isNullOrBlank()) {
+            binding.tilKelurahan.error = "Kelurahan tidak boleh kosong"
+            isValid = false
+        } else {
+            binding.tilKelurahan.error = null
+        }
+        if (binding.etRw.text.isNullOrBlank()) {
+            binding.tilRw.error = "RW tidak boleh kosong"
+            isValid = false
+        } else {
+            binding.tilRw.error = null
+        }
+        if (binding.etRt.text.isNullOrBlank()) {
+            binding.tilRt.error = "RT tidak boleh kosong"
+            isValid = false
+        } else {
+            binding.tilRt.error = null
+        }
+        if (binding.etFullAddress.text.isNullOrBlank()) {
+            binding.tilFullAddress.error = "Alamat Lengkap tidak boleh kosong"
+            isValid = false
+        } else {
+            binding.tilFullAddress.error = null
+        }
+        if (binding.etRegistrationDate.text.isNullOrBlank()) {
+            binding.tilRegistrationDate.error = "Tanggal Pendaftaran tidak boleh kosong"
+            isValid = false
+        } else {
+            binding.tilRegistrationDate.error = null
+        }
+
+        return isValid
     }
 
+
     private fun observeViewModel() {
-        Log.d("PMR_FRAG1_OBSERVE", "observeViewModel: Setting up observers for currentPregnantMother, RWs, RTs.")
+        Log.d("PMR_FRAG1_OBSERVE", "observeViewModel: Setting up observers.")
+
+        // Menggunakan viewLifecycleOwner.lifecycleScope.launch untuk observasi Flow
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Observasi provinsis
+                // FIXED: Mengubah .collect menjadi .observe(viewLifecycleOwner)
+                registrationViewModel.provinsis.observe(viewLifecycleOwner) { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "Loading provinsis...")
+                        }
+                        is Resource.Success -> {
+                            resource.data?.let {
+                                currentProvinsis = it
+                                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, it.map { p -> p.name })
+                                binding.etProvinsi.setAdapter(adapter)
+                                Log.d("PMR_FRAG1_OBSERVE", "Provinsis loaded: ${it.size} items.")
+                            }
+                        }
+                        is Resource.Error -> {
+                            Toast.makeText(context, "Error loading provinsis: ${resource.message}", Toast.LENGTH_SHORT).show()
+                            Log.e("PMR_FRAG1_OBSERVE", "Error loading provinsis: ${resource.message}")
+                        }
+                        Resource.Idle -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "Provinsis idle.")
+                        }
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Observasi kabupatens
+                // FIXED: Mengubah .collect menjadi .observe(viewLifecycleOwner)
+                registrationViewModel.kabupatens.observe(viewLifecycleOwner) { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "Loading kabupatens...")
+                        }
+                        is Resource.Success -> {
+                            resource.data?.let {
+                                currentKabupatens = it
+                                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, it.map { k -> k.name })
+                                binding.etKabupaten.setAdapter(adapter)
+                                Log.d("PMR_FRAG1_OBSERVE", "Kabupatens loaded: ${it.size} items.")
+                            }
+                        }
+                        is Resource.Error -> {
+                            Toast.makeText(context, "Error loading kabupatens: ${resource.message}", Toast.LENGTH_SHORT).show()
+                            Log.e("PMR_FRAG1_OBSERVE", "Error loading kabupatens: ${resource.message}")
+                        }
+                        Resource.Idle -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "Kabupatens idle.")
+                        }
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Observasi kecamatans
+                // FIXED: Mengubah .collect menjadi .observe(viewLifecycleOwner)
+                registrationViewModel.kecamatans.observe(viewLifecycleOwner) { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "Loading kecamatans...")
+                        }
+                        is Resource.Success -> {
+                            resource.data?.let {
+                                currentKecamatans = it
+                                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, it.map { k -> k.name })
+                                binding.etKecamatan.setAdapter(adapter)
+                                Log.d("PMR_FRAG1_OBSERVE", "Kecamatans loaded: ${it.size} items.")
+                            }
+                        }
+                        is Resource.Error -> {
+                            Toast.makeText(context, "Error loading kecamatans: ${resource.message}", Toast.LENGTH_SHORT).show()
+                            Log.e("PMR_FRAG1_OBSERVE", "Error loading kecamatans: ${resource.message}")
+                        }
+                        Resource.Idle -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "Kecamatans idle.")
+                        }
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Observasi kelurahans
+                // FIXED: Mengubah .collect menjadi .observe(viewLifecycleOwner)
+                registrationViewModel.kelurahans.observe(viewLifecycleOwner) { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "Loading kelurahans...")
+                        }
+                        is Resource.Success -> {
+                            resource.data?.let {
+                                currentKelurahans = it
+                                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, it.map { k -> k.name })
+                                binding.etKelurahan.setAdapter(adapter)
+                                Log.d("PMR_FRAG1_OBSERVE", "Kelurahans loaded: ${it.size} items.")
+                            }
+                        }
+                        is Resource.Error -> {
+                            Toast.makeText(context, "Error loading kelurahans: ${resource.message}", Toast.LENGTH_SHORT).show()
+                            Log.e("PMR_FRAG1_OBSERVE", "Error loading kelurahans: ${resource.message}")
+                        }
+                        Resource.Idle -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "Kelurahans idle.")
+                        }
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Observasi RWs
+                // FIXED: Mengubah .collect menjadi .observe(viewLifecycleOwner)
+                registrationViewModel.rws.observe(viewLifecycleOwner) { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "Loading RWs...")
+                        }
+                        is Resource.Success -> {
+                            resource.data?.let {
+                                currentRws = it
+                                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, it.map { r -> r.name })
+                                binding.etRw.setAdapter(adapter)
+                                Log.d("PMR_FRAG1_OBSERVE", "RWs loaded: ${it.size} items.")
+                            }
+                        }
+                        is Resource.Error -> {
+                            Toast.makeText(context, "Error loading RWs: ${resource.message}", Toast.LENGTH_SHORT).show()
+                            Log.e("PMR_FRAG1_OBSERVE", "Error loading RWs: ${resource.message}")
+                        }
+                        Resource.Idle -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "RWs idle.")
+                        }
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Observasi RTs
+                // FIXED: Mengubah .collect menjadi .observe(viewLifecycleOwner)
+                registrationViewModel.rts.observe(viewLifecycleOwner) { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "Loading RTs...")
+                        }
+                        is Resource.Success -> {
+                            resource.data?.let {
+                                currentRts = it
+                                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, it.map { r -> r.name })
+                                binding.etRt.setAdapter(adapter)
+                                Log.d("PMR_FRAG1_OBSERVE", "RTs loaded: ${it.size} items.")
+                            }
+                        }
+                        is Resource.Error -> {
+                            Toast.makeText(context, "Error loading RTs: ${resource.message}", Toast.LENGTH_SHORT).show()
+                            Log.e("PMR_FRAG1_OBSERVE", "Error loading RTs: ${resource.message}")
+                        }
+                        Resource.Idle -> {
+                            Log.d("PMR_FRAG1_OBSERVE", "RTs idle.")
+                        }
+                    }
+                }
+            }
+        }
+
+        // Observing currentPregnantMother to update UI fields
         registrationViewModel.currentPregnantMother.observe(viewLifecycleOwner) { pregnantMotherData ->
-            Log.d("PMR_FRAG1_OBSERVE", "currentPregnantMother observed. Data: Name=${pregnantMotherData?.name}, NIK=${pregnantMotherData?.nik}, RW=${pregnantMotherData?.rwName}, RT=${pregnantMotherData?.rtName}, LocalId=${pregnantMotherData?.localId}")
+            Log.d("PMR_FRAG1_OBSERVE", "currentPregnantMother observed. Data: Name=${pregnantMotherData?.name}, NIK=${pregnantMotherData?.nik}, LocalId=${pregnantMotherData?.localId}")
             pregnantMotherData?.let { data ->
-                // Update field input utama hanya jika nilai di ViewModel berbeda
+                // Perbarui UI hanya jika nilai berbeda untuk menghindari loop atau reset fokus
                 if (binding.etName.text.toString() != (data.name ?: "")) {
                     binding.etName.setText(data.name ?: "")
-                    Log.d("PMR_FRAG1_OBSERVE", "UI Name updated to: ${data.name ?: "EMPTY"}")
                 }
                 if (binding.etNik.text.toString() != (data.nik ?: "")) {
                     binding.etNik.setText(data.nik ?: "")
-                    Log.d("PMR_FRAG1_OBSERVE", "UI NIK updated to: ${data.nik ?: "EMPTY"}")
                 }
                 if (binding.etDateOfBirth.text.toString() != (data.dateOfBirth ?: "")) {
                     binding.etDateOfBirth.setText(data.dateOfBirth ?: "")
-                    Log.d("PMR_FRAG1_OBSERVE", "UI DoB updated to: ${data.dateOfBirth ?: "EMPTY"}")
                 }
                 if (binding.etPhoneNumber.text.toString() != (data.phoneNumber ?: "")) {
                     binding.etPhoneNumber.setText(data.phoneNumber ?: "")
-                    Log.d("PMR_FRAG1_OBSERVE", "UI Phone updated to: ${data.phoneNumber ?: "EMPTY"}")
                 }
-
-                // Isi data lokasi read-only
-                binding.etProvinsi.setText(data.provinsiName ?: "")
-                binding.etKabupaten.setText(data.kabupatenName ?: "")
-                binding.etKecamatanReadonly.setText(data.kecamatanName ?: "")
-                binding.etKelurahanReadonly.setText(data.kelurahanName ?: "")
-                Log.d("PMR_FRAG1_OBSERVE", "UI Location fields updated from ViewModel.")
-
-                // Isi AutoCompleteTextView untuk RW & RT
-                if (binding.autocompleteRw.text.toString() != (data.rwName ?: "")) {
-                    binding.autocompleteRw.setText(data.rwName ?: "", false)
-                    Log.d("PMR_FRAG1_OBSERVE", "UI RW updated to: ${data.rwName ?: "EMPTY"}")
+                // Khusus untuk AutoCompleteTextViews, setText(text, false) agar tidak memicu listener
+                if (binding.etProvinsi.text.toString() != (data.provinsiName ?: "")) {
+                    binding.etProvinsi.setText(data.provinsiName ?: "", false)
                 }
-                if (binding.autocompleteRt.text.toString() != (data.rtName ?: "")) {
-                    binding.autocompleteRt.setText(data.rtName ?: "", false)
-                    Log.d("PMR_FRAG1_OBSERVE", "UI RT updated to: ${data.rtName ?: "EMPTY"}")
+                if (binding.etKabupaten.text.toString() != (data.kabupatenName ?: "")) {
+                    binding.etKabupaten.setText(data.kabupatenName ?: "", false)
                 }
-
-                // Inisialisasi selectedKelurahan, selectedRw, selectedRt saat data dimuat
-                // dan picu pemuatan daftar RW/RT jika ID tersedia
-                if (data.kelurahanId != null && data.kecamatanId != null && selectedKelurahan?.id != data.kelurahanId) {
-                    selectedKelurahan = Kelurahan(data.kelurahanId, data.kelurahanName ?: "", data.kecamatanId, null)
-                    Log.d("PMR_FRAG1_OBSERVE", "Selected Kelurahan initialized/updated: ${selectedKelurahan?.name}. Triggering getRWS.")
-                    registrationViewModel.getRWS(data.kelurahanId) // PENTING: Panggil getRWS di sini
-                } else if (data.kelurahanId == null) {
-                    selectedKelurahan = null
-                    Log.d("PMR_FRAG1_OBSERVE", "Selected Kelurahan reset to null.")
+                if (binding.etKecamatan.text.toString() != (data.kecamatanName ?: "")) {
+                    binding.etKecamatan.setText(data.kecamatanName ?: "", false)
                 }
-
-                if (data.rwId != null && data.kelurahanId != null && selectedRw?.id != data.rwId) {
-                    selectedRw = Rw(data.rwId, data.rwName ?: "", data.kelurahanId)
-                    Log.d("PMR_FRAG1_OBSERVE", "Selected RW initialized/updated: ${selectedRw?.name}. Triggering getRTS.")
-                    registrationViewModel.getRTS(data.rwId) // PENTING: Panggil getRTS di sini
-                } else if (data.rwId == null) {
-                    selectedRw = null
-                    Log.d("PMR_FRAG1_OBSERVE", "Selected RW reset to null.")
+                if (binding.etKelurahan.text.toString() != (data.kelurahanName ?: "")) {
+                    binding.etKelurahan.setText(data.kelurahanName ?: "", false)
                 }
-
-                if (data.rtId != null && data.rwId != null && selectedRt?.id != data.rtId) {
-                    selectedRt = Rt(data.rtId, data.rtName ?: "", data.rwId)
-                    Log.d("PMR_FRAG1_OBSERVE", "Selected RT initialized/updated: ${selectedRt?.name}.")
-                } else if (data.rtId == null) {
-                    selectedRt = null
-                    Log.d("PMR_FRAG1_OBSERVE", "Selected RT reset to null.")
-                } else {
-
+                if (binding.etRw.text.toString() != (data.rwName ?: "")) {
+                    binding.etRw.setText(data.rwName ?: "", false)
                 }
-
+                if (binding.etRt.text.toString() != (data.rtName ?: "")) {
+                    binding.etRt.setText(data.rtName ?: "", false)
+                }
+                if (binding.etFullAddress.text.toString() != (data.fullAddress ?: "")) {
+                    binding.etFullAddress.setText(data.fullAddress ?: "")
+                }
+                if (binding.etRegistrationDate.text.toString() != (data.registrationDate ?: "")) {
+                    binding.etRegistrationDate.setText(data.registrationDate ?: "")
+                }
             } ?: run {
-                // If pregnantMotherData is null, explicitly clear all fields
-                Log.d("PMR_FRAG1_OBSERVE", "currentPregnantMother is NULL. Clearing all UI fields.")
-                binding.etName.setText("")
-                binding.etNik.setText("")
-                binding.etDateOfBirth.setText("")
-                binding.etPhoneNumber.setText("")
-                binding.etProvinsi.setText("")
-                binding.etKabupaten.setText("")
-                binding.etKecamatanReadonly.setText("")
-                binding.etKelurahanReadonly.setText("")
-                binding.autocompleteRw.setText("", false)
-                binding.autocompleteRt.setText("", false)
-                selectedKelurahan = null
-                selectedRw = null
-                selectedRt = null
-            }
-        }
-
-        // Observasi daftar RW dari ViewModel
-        registrationViewModel.rws.observe(viewLifecycleOwner) { resource ->
-            Log.d("PMR_FRAG1_OBSERVE", "RWS observed. Status: ${resource.javaClass.simpleName}")
-            when (resource) {
-                is Resource.Loading -> {
-                    binding.tilRw.helperText = "Memuat RW..."
-                    // Hanya reset adapter, jangan kosongkan selectedRw/selectedRt terlalu dini
-                    binding.autocompleteRw.setAdapter(null)
-                    binding.autocompleteRt.setText("", false) // Kosongkan visual RT saat RW loading
-                    binding.autocompleteRt.setAdapter(null)
-                }
-                is Resource.Success -> {
-                    val rws = resource.data ?: emptyList()
-                    val adapter = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_dropdown_item_1line,
-                        rws.map { it.name }
-                    )
-                    binding.autocompleteRw.setAdapter(adapter)
-                    binding.tilRw.helperText = null
-
-                    val currentRwId = registrationViewModel.currentPregnantMother.value?.rwId
-                    val matchedRw = rws.find { it.id == currentRwId }
-                    if (matchedRw != null) {
-                        selectedRw = matchedRw
-                        if (binding.autocompleteRw.text.toString() != matchedRw.name) {
-                            binding.autocompleteRw.setText(matchedRw.name, false)
-                        }
-                        Log.d("PMR_FRAG1_OBSERVE", "RWS: Matched and set selectedRw to ${matchedRw.name} (ID: ${matchedRw.id}). Triggering getRTS.")
-                        registrationViewModel.getRTS(matchedRw.id) // PENTING: Panggil getRTS di sini
-                    } else {
-                        // Jika tidak ada RW yang cocok dengan ID di ViewModel, kosongkan UI dan selectedRw
-                        if (binding.autocompleteRw.text.toString().isNotBlank() || selectedRw != null) {
-                            binding.autocompleteRw.setText("", false)
-                            selectedRw = null
-                            Log.d("PMR_FRAG1_OBSERVE", "RWS: No match for RW ID $currentRwId. Clearing UI RW and selectedRw.")
-                        }
-                        // Juga kosongkan RT jika RW tidak cocok
-                        if (binding.autocompleteRt.text.toString().isNotBlank() || selectedRt != null) {
-                            binding.autocompleteRt.setText("", false)
-                            binding.autocompleteRt.setAdapter(null)
-                            selectedRt = null
-                            Log.d("PMR_FRAG1_OBSERVE", "RWS: Clearing UI RT and selectedRt as well.")
-                        }
-                    }
-                }
-                is Resource.Error -> {
-                    binding.tilRw.error = "Gagal memuat RW: ${resource.message}"
-                    Toast.makeText(context, "Gagal memuat RW: ${resource.message}", Toast.LENGTH_SHORT).show()
-                    binding.autocompleteRw.setText("", false)
-                    binding.autocompleteRw.setAdapter(null)
-                    binding.autocompleteRt.setText("", false)
-                    binding.autocompleteRt.setAdapter(null)
-                    selectedRw = null
-                    selectedRt = null
-                    Log.e("PMR_FRAG1_OBSERVE", "RWS: Error: ${resource.message}")
-                }
-            }
-        }
-
-        // Observasi daftar RT dari ViewModel
-        registrationViewModel.rts.observe(viewLifecycleOwner) { resource ->
-            Log.d("PMR_FRAG1_OBSERVE", "RTS observed. Status: ${resource.javaClass.simpleName}")
-            when (resource) {
-                is Resource.Loading -> {
-                    binding.tilRt.helperText = "Memuat RT..."
-                    binding.autocompleteRt.setAdapter(null)
-                }
-                is Resource.Success -> {
-                    val rts = resource.data ?: emptyList()
-                    val adapter = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_dropdown_item_1line,
-                        rts.map { it.name }
-                    )
-                    binding.autocompleteRt.setAdapter(adapter)
-                    binding.tilRt.helperText = null
-
-                    val currentRtId = registrationViewModel.currentPregnantMother.value?.rtId
-                    val matchedRt = rts.find { it.id == currentRtId }
-                    if (matchedRt != null) {
-                        selectedRt = matchedRt
-                        if (binding.autocompleteRt.text.toString() != matchedRt.name) {
-                            binding.autocompleteRt.setText(matchedRt.name, false)
-                        }
-                        Log.d("PMR_FRAG1_OBSERVE", "RTS: Matched and set selectedRt to ${matchedRt.name} (ID: ${matchedRt.id})")
-                    } else {
-                        if (binding.autocompleteRt.text.toString().isNotBlank()) {
-                            binding.autocompleteRt.setText("", false)
-                            Log.d("PMR_FRAG1_OBSERVE", "RTS: No match for RT ID $currentRtId. Clearing UI RT.")
-                        }
-                        selectedRt = null
-                    }
-                }
-                is Resource.Error -> {
-                    binding.tilRt.error = "Gagal memuat RT: ${resource.message}"
-                    Toast.makeText(context, "Gagal memuat RT: ${resource.message}", Toast.LENGTH_SHORT).show()
-                    binding.autocompleteRt.setText("", false)
-                    binding.autocompleteRt.setAdapter(null)
-                    selectedRt = null
-                    Log.e("PMR_FRAG1_OBSERVE", "RTS: Error: ${resource.message}")
-                }
+                Log.d("PMR_FRAG1_OBSERVE", "currentPregnantMother is NULL. Re-initializing form.")
+                loadFormData()
             }
         }
     }
@@ -356,15 +555,5 @@ class PregnantMotherRegistrationFragment1 : Fragment() {
         super.onDestroyView()
         _binding = null
         Log.d("PMR_FRAG1_LIFECYCLE", "onDestroyView called.")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d("PMR_FRAG1_LIFECYCLE", "onResume called.")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d("PMR_FRAG1_LIFECYCLE", "onPause called.")
     }
 }

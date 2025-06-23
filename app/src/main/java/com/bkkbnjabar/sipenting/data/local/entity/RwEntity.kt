@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "rws",
+@Entity(tableName = "rw_table",
     foreignKeys = [
         ForeignKey(entity = KelurahanEntity::class,
             parentColumns = ["id"],

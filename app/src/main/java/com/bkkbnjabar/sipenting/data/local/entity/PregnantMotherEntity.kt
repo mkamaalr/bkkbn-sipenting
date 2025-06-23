@@ -2,12 +2,13 @@ package com.bkkbnjabar.sipenting.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
 
-@Entity(tableName = "pregnant_mothers")
+@Entity(tableName = "pregnant_mother_table")
 data class PregnantMotherEntity(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = true) // Biarkan Room mengelola ID
     val localId: Int? = null,
-    val registrationDate: String?, // Tanggal pendaftaran (format ISO_LOCAL_DATE YYYY-MM-DD)
+    val registrationDate: String?, // Tanggal pendaftaran (format ISO_LOCAL_DATEYYYY-MM-DD)
     val name: String?,
     val nik: String?,
     val dateOfBirth: String?,
@@ -29,6 +30,6 @@ data class PregnantMotherEntity(
     // Data dari Fragment 2
     val husbandName: String?,
     val fullAddress: String?,
-    val syncStatus: SyncStatus = SyncStatus.PENDING_UPLOAD,
+    val syncStatus: SyncStatus, // Tipe Enum langsung di sini
     val createdAt: String? = null // BARU: Menambahkan field createdAt untuk sorting
 )

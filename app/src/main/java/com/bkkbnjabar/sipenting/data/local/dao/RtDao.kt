@@ -10,17 +10,20 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface RtDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(rts: List<RtEntity>)
+    suspend fun insertRt(rt: RtEntity) // Method for single insert
 
-    @Query("SELECT * FROM rts ORDER BY name ASC")
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllRTS(rts: List<RtEntity>) // Method for bulk insert
+
+    @Query("SELECT * FROM rt_table")
     fun getAllRTS(): Flow<List<RtEntity>>
 
-    @Query("SELECT * FROM rts WHERE rwId = :rwId ORDER BY name ASC")
+    @Query("SELECT * FROM rt_table WHERE rwId = :rwId")
     fun getRTSByRw(rwId: Int): Flow<List<RtEntity>>
 
-    @Query("SELECT * FROM rts WHERE id = :rtId")
+    @Query("SELECT * FROM rt_table WHERE id = :rtId")
     suspend fun getRtById(rtId: Int): RtEntity?
 
-    @Query("DELETE FROM rts")
-    suspend fun deleteAll()
+    @Query("DELETE FROM rt_table")
+    suspend fun deleteAllRTS()
 }

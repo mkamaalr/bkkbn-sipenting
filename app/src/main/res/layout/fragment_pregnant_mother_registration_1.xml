@@ -4,31 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <!-- Data binding for ViewModel, if you want to directly bind later -->
-        <!-- <variable
-            name="viewModel"
-            type="com.bkkbnjabar.sipenting.ui.pregnantmother.registration.PregnantMotherRegistrationViewModel" /> -->
+        <!-- Anda bisa menambahkan variabel data binding di sini jika diperlukan,
+             tetapi untuk contoh ini, kita akan mengelola UI dari Fragment. -->
     </data>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.pregnantmother.registration.PregnantMotherRegistrationFragment1">
+        android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:padding="16dp"
+            tools:context=".ui.pregnantmother.registration.PregnantMotherRegistrationFragment1">
 
-            <!-- Title: Identitas Ibu Hamil -->
+            <!-- Title -->
             <TextView
-                android:id="@+id/tv_title_identitas"
+                android:id="@+id/tv_title_fragment1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Identitas Ibu Hamil"
-                android:textSize="20sp"
+                android:text="Pendaftaran Ibu Hamil (Data Ibu)"
+                android:textSize="24sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:paddingBottom="16dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -36,237 +36,259 @@
             <!-- Nama -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_name"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="Nama Ibu Hamil"
-                app:layout_constraintTop_toBottomOf="@id/tv_title_identitas"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_fragment1">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Kamal"
-                    android:inputType="textPersonName" />
+                    android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- NIK -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_nik"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:hint="NIK"
-                app:layout_constraintTop_toBottomOf="@id/til_name"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_name">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_nik"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="number"
-                    android:text="1234567812345671"
                     android:maxLength="16" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Tanggal Lahir -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_date_of_birth"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:hint="Tanggal Lahir (DD/MM/YYYY)"
-                app:layout_constraintTop_toBottomOf="@id/til_nik"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:endIconDrawable="@drawable/ic_calendar"
                 app:endIconMode="custom"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_nik">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_date_of_birth"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="false"
-                    android:clickable="true"
                     android:inputType="date" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Nomor Telepon -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_phone_number"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Nomor Telepon"
-                app:layout_constraintTop_toBottomOf="@id/til_date_of_birth"
-                app:layout_constraintStart_toStartOf="parent"
+                android:hint="Nomor Telepon (misal: 0812...)"
                 app:layout_constraintEnd_toEndOf="parent"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_date_of_birth">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_phone_number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="123"
                     android:inputType="phone" />
             </com.google.android.material.textfield.TextInputLayout>
 
-
-            <!-- Title: Domisili -->
-            <TextView
-                android:id="@+id/tv_title_domisili"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Domisili"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="16dp"
-                app:layout_constraintTop_toBottomOf="@id/til_phone_number"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-            <!-- Provinsi (Read-Only) -->
+            <!-- Provinsi -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_provinsi"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="Provinsi"
-                app:layout_constraintTop_toBottomOf="@id/tv_title_domisili"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                <com.google.android.material.textfield.TextInputEditText
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_phone_number">
+
+                <AutoCompleteTextView
                     android:id="@+id/et_provinsi"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:clickable="false"
-                    android:longClickable="false"
                     android:inputType="none"
-                    android:textStyle="bold" />
+                    tools:ignore="LabelFor" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Kabupaten (Read-Only) -->
+            <!-- Kabupaten -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_kabupaten"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Kabupaten"
-                app:layout_constraintTop_toBottomOf="@id/til_provinsi"
-                app:layout_constraintStart_toStartOf="parent"
+                android:hint="Kabupaten/Kota"
                 app:layout_constraintEnd_toEndOf="parent"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                <com.google.android.material.textfield.TextInputEditText
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_provinsi">
+
+                <AutoCompleteTextView
                     android:id="@+id/et_kabupaten"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:clickable="false"
-                    android:longClickable="false"
                     android:inputType="none"
-                    android:textStyle="bold" />
+                    tools:ignore="LabelFor" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Kecamatan (Read-Only) -->
+            <!-- Kecamatan -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/til_kecamatan_readonly"
+                android:id="@+id/til_kecamatan"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:hint="Kecamatan"
-                app:layout_constraintTop_toBottomOf="@id/til_kabupaten"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_kecamatan_readonly"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_kabupaten">
+
+                <AutoCompleteTextView
+                    android:id="@+id/et_kecamatan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:clickable="false"
-                    android:longClickable="false"
                     android:inputType="none"
-                    android:textStyle="bold" />
+                    tools:ignore="LabelFor" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Kelurahan (Read-Only) -->
+            <!-- Kelurahan -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/til_kelurahan_readonly"
+                android:id="@+id/til_kelurahan"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Kelurahan"
-                app:layout_constraintTop_toBottomOf="@id/til_kecamatan_readonly"
-                app:layout_constraintStart_toStartOf="parent"
+                android:hint="Kelurahan/Desa"
                 app:layout_constraintEnd_toEndOf="parent"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_kelurahan_readonly"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_kecamatan">
+
+                <AutoCompleteTextView
+                    android:id="@+id/et_kelurahan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:clickable="false"
-                    android:longClickable="false"
                     android:inputType="none"
-                    android:textStyle="bold" />
+                    tools:ignore="LabelFor" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- RW (Selectable) -->
+            <!-- RW -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_rw"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:hint="RW"
-                app:layout_constraintTop_toBottomOf="@id/til_kelurahan_readonly"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:endIconDrawable="@drawable/ic_arrow_drop_down"
-                app:endIconMode="dropdown_menu"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_kelurahan">
+
                 <AutoCompleteTextView
-                    android:id="@+id/autocomplete_rw"
+                    android:id="@+id/et_rw"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none" />
+                    android:inputType="none"
+                    tools:ignore="LabelFor" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- RT (Selectable) -->
+            <!-- RT -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_rt"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:hint="RT"
-                app:layout_constraintTop_toBottomOf="@id/til_rw"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:endIconDrawable="@drawable/ic_arrow_drop_down"
-                app:endIconMode="dropdown_menu"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_rw">
+
                 <AutoCompleteTextView
-                    android:id="@+id/autocomplete_rt"
+                    android:id="@+id/et_rt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none" />
+                    android:inputType="none"
+                    tools:ignore="LabelFor" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Alamat Lengkap -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_full_address"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Alamat Lengkap (Jl. ..., No. ...)"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_rt">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_full_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:lines="3"
+                    android:gravity="top" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Tanggal Pendaftaran -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_registration_date"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Tanggal Pendaftaran (DD/MM/YYYY)"
+                app:endIconDrawable="@drawable/ic_calendar"
+                app:endIconMode="custom"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_full_address">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_registration_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:inputType="date" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Next Button -->
             <Button
                 android:id="@+id/btn_next"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Lanjut"
                 android:layout_marginTop="24dp"
-                app:layout_constraintTop_toBottomOf="@id/til_rt"
+                android:text="Lanjut"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/til_registration_date" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </ScrollView>
 </layout>

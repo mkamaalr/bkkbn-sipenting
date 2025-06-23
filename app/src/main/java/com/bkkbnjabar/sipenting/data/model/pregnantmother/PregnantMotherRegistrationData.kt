@@ -1,14 +1,13 @@
 package com.bkkbnjabar.sipenting.data.model.pregnantmother
 
 import android.os.Parcelable
-import com.bkkbnjabar.sipenting.data.local.entity.SyncStatus
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Parcelize
 data class PregnantMotherRegistrationData(
-    val localId: Int? = null,
+    val localId: Int? = null, // Ini akan menjadi Primary Key dari Room (Entity)
     val registrationDate: String? = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE), // Default ke tanggal hari ini
     val name: String? = null,
     val nik: String? = null,
@@ -31,3 +30,15 @@ data class PregnantMotherRegistrationData(
     val syncStatus: SyncStatus = SyncStatus.PENDING_UPLOAD,
     val createdAt: String? = null // BARU: Menambahkan field createdAt
 ) : Parcelable
+
+enum class SyncStatus {
+    PENDING_UPLOAD,
+    UPLOADED,
+    FAILED_UPLOAD,
+    PENDING_UPDATE,
+    UPDATED,
+    FAILED_UPDATE,
+    PENDING_DELETE,
+    DELETED,
+    FAILED_DELETE
+}

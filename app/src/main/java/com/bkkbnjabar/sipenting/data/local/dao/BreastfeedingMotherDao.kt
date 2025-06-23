@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.bkkbnjabar.sipenting.data.local.entity.BreastfeedingMotherEntity
-import com.bkkbnjabar.sipenting.data.local.entity.SyncStatus
+import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
 import kotlinx.coroutines.flow.Flow
 
 @Dao

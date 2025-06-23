@@ -10,17 +10,20 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface KecamatanDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(kecamatans: List<KecamatanEntity>)
+    suspend fun insertKecamatan(kecamatan: KecamatanEntity) // Method for single insert
 
-    @Query("SELECT * FROM kecamatans ORDER BY name ASC")
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllKecamatans(kecamatans: List<KecamatanEntity>) // Method for bulk insert
+
+    @Query("SELECT * FROM kecamatan_table")
     fun getAllKecamatans(): Flow<List<KecamatanEntity>>
 
-    @Query("SELECT * FROM kecamatans WHERE kabupatenId = :kabupatenId ORDER BY name ASC")
+    @Query("SELECT * FROM kecamatan_table WHERE kabupatenId = :kabupatenId")
     fun getKecamatansByKabupaten(kabupatenId: Int): Flow<List<KecamatanEntity>>
 
-    @Query("SELECT * FROM kecamatans WHERE id = :kecamatanId")
+    @Query("SELECT * FROM kecamatan_table WHERE id = :kecamatanId")
     suspend fun getKecamatanById(kecamatanId: Int): KecamatanEntity?
 
-    @Query("DELETE FROM kecamatans")
-    suspend fun deleteAll()
+    @Query("DELETE FROM kecamatan_table")
+    suspend fun deleteAllKecamatans()
 }

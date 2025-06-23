@@ -2,6 +2,7 @@ package com.bkkbnjabar.sipenting.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
 
 @Entity(tableName = "breastfeeding_mothers")
 data class BreastfeedingMotherEntity(

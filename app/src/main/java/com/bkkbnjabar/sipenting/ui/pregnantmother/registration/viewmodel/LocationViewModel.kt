@@ -4,11 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bkkbnjabar.sipenting.data.model.Kecamatan
-import com.bkkbnjabar.sipenting.data.model.Kelurahan
-import com.bkkbnjabar.sipenting.data.model.Rw
-import com.bkkbnjabar.sipenting.data.model.Rt
-import com.bkkbnjabar.sipenting.domain.repository.LookupRepository
+import com.bkkbnjabar.sipenting.data.repository.LookupRepository
+import com.bkkbnjabar.sipenting.domain.model.Kelurahan
+import com.bkkbnjabar.sipenting.domain.model.Rt
+import com.bkkbnjabar.sipenting.domain.model.Rw
 import com.bkkbnjabar.sipenting.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

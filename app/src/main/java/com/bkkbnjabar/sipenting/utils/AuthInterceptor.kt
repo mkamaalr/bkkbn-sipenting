@@ -5,19 +5,24 @@ import okhttp3.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class AuthInterceptor @Inject constructor(
-    private val sharedPrefsManager: SharedPrefsManager,
-) : Interceptor  {
+/**
+ * Interceptor kustom untuk menambahkan token otentikasi (Bearer Token) ke setiap permintaan API.
+ * Mengambil token dari SharedPrefsManager.
+ */
+@Singleton
+class AuthInterceptor @Inject constructor( // <<< PASTIKAN ADA @Inject constructor DI SINI
+    private val sharedPrefsManager: SharedPrefsManager
+) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
-        val token = sharedPrefsManager.getAuthToken()
+        val accessToken = sharedPrefsManager.getAccessToken() // Menggunakan getAccessToken()
 
         val requestBuilder = originalRequest.newBuilder()
-
-        token?.let {
-            requestBuilder.header("Authorization", "Bearer $it")
+        if (!accessToken.isNullOrEmpty()) { // Cek null/empty saja, tidak ada "No-Authentication"
+            requestBuilder.header("Authorization", "Bearer $accessToken")
         }
 
-        return chain.proceed(requestBuilder.build())
+        val modifiedRequest = requestBuilder.build()
+        return chain.proceed(modifiedRequest)
     }
 }

@@ -1,597 +1,511 @@
 package com.bkkbnjabar.sipenting.data.repository
 
-import com.bkkbnjabar.sipenting.data.local.dao.KabupatenDao
-import com.bkkbnjabar.sipenting.data.local.dao.KecamatanDao
-import com.bkkbnjabar.sipenting.data.local.dao.KelurahanDao
-import com.bkkbnjabar.sipenting.data.local.dao.ProvinsiDao
-import com.bkkbnjabar.sipenting.data.local.dao.RtDao
-import com.bkkbnjabar.sipenting.data.local.dao.RwDao
-import com.bkkbnjabar.sipenting.data.local.entity.KabupatenEntity
-import com.bkkbnjabar.sipenting.data.local.entity.KecamatanEntity
-import com.bkkbnjabar.sipenting.data.local.entity.KelurahanEntity
-import com.bkkbnjabar.sipenting.data.local.entity.ProvinsiEntity
-import com.bkkbnjabar.sipenting.data.local.entity.RtEntity
-import com.bkkbnjabar.sipenting.data.local.entity.RwEntity
-import com.bkkbnjabar.sipenting.data.model.Kabupaten
-import com.bkkbnjabar.sipenting.data.model.Kecamatan
-import com.bkkbnjabar.sipenting.data.model.Kelurahan
-import com.bkkbnjabar.sipenting.data.model.Provinsi
-import com.bkkbnjabar.sipenting.data.model.Rt
-import com.bkkbnjabar.sipenting.data.model.Rw
-import com.bkkbnjabar.sipenting.data.model.lookup.KecamatanDto
-import com.bkkbnjabar.sipenting.data.model.lookup.KabupatenDto
-import com.bkkbnjabar.sipenting.data.model.lookup.ProvinsiDto
-import com.bkkbnjabar.sipenting.data.model.lookup.KelurahanDto
-import com.bkkbnjabar.sipenting.data.model.lookup.RwDto
-import com.bkkbnjabar.sipenting.data.model.lookup.RtDto
-import com.bkkbnjabar.sipenting.data.model.lookup.LookupItemDto
-
-import com.bkkbnjabar.sipenting.data.model.lookup.ProvinsiListResponse
-import com.bkkbnjabar.sipenting.data.model.lookup.KabupatenListResponse
-import com.bkkbnjabar.sipenting.data.model.lookup.KecamatanListResponse
-import com.bkkbnjabar.sipenting.data.model.lookup.KelurahanListResponse
-import com.bkkbnjabar.sipenting.data.model.lookup.RwListResponse
-import com.bkkbnjabar.sipenting.data.model.lookup.RtListResponse
-import com.bkkbnjabar.sipenting.data.model.lookup.SingleKelurahanResponse // Digunakan
-import com.bkkbnjabar.sipenting.data.model.lookup.SingleKecamatanResponse // Masih diimpor jika ada endpoint lain yang mengembalikan ini
-import com.bkkbnjabar.sipenting.data.model.lookup.LookupItemListResponse
-
+import android.util.Log
+import com.bkkbnjabar.sipenting.data.local.dao.LookupDao
+import com.bkkbnjabar.sipenting.data.local.mapper.toKabupaten
+import com.bkkbnjabar.sipenting.data.local.mapper.toKabupatenEntity
+import com.bkkbnjabar.sipenting.data.local.mapper.toKecamatan
+import com.bkkbnjabar.sipenting.data.local.mapper.toKecamatanEntity
+import com.bkkbnjabar.sipenting.data.local.mapper.toKelurahan
+import com.bkkbnjabar.sipenting.data.local.mapper.toKelurahanEntity
+import com.bkkbnjabar.sipenting.data.local.mapper.toProvinsi
+import com.bkkbnjabar.sipenting.data.local.mapper.toProvinsiEntity
+import com.bkkbnjabar.sipenting.data.local.mapper.toRt
+import com.bkkbnjabar.sipenting.data.local.mapper.toRtEntity
+import com.bkkbnjabar.sipenting.data.local.mapper.toRw
+import com.bkkbnjabar.sipenting.data.local.mapper.toRwEntity
 import com.bkkbnjabar.sipenting.data.remote.LookupApiService
-import com.bkkbnjabar.sipenting.domain.repository.LookupRepository
+import com.bkkbnjabar.sipenting.data.remote.mapper.toKabupaten
+import com.bkkbnjabar.sipenting.data.remote.mapper.toKecamatan
+import com.bkkbnjabar.sipenting.data.remote.mapper.toKelurahan
+import com.bkkbnjabar.sipenting.data.remote.mapper.toProvinsi
+import com.bkkbnjabar.sipenting.data.remote.mapper.toRt
+import com.bkkbnjabar.sipenting.data.remote.mapper.toRw
+import com.bkkbnjabar.sipenting.domain.model.Kabupaten
+import com.bkkbnjabar.sipenting.domain.model.Kecamatan
+import com.bkkbnjabar.sipenting.domain.model.Kelurahan
+import com.bkkbnjabar.sipenting.domain.model.LocationDetails
+import com.bkkbnjabar.sipenting.domain.model.LookupItemDto
+import com.bkkbnjabar.sipenting.domain.model.Provinsi
+import com.bkkbnjabar.sipenting.domain.model.Rt
+import com.bkkbnjabar.sipenting.domain.model.Rw
 import com.bkkbnjabar.sipenting.utils.Resource
+import com.bkkbnjabar.sipenting.utils.SharedPrefsManager
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import okio.IOException
-import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.awaitAll
 
 @Singleton
 class LookupRepositoryImpl @Inject constructor(
-    private val api: LookupApiService,
-    private val provinsiDao: ProvinsiDao,
-    private val kabupatenDao: KabupatenDao,
-    private val kecamatanDao: KecamatanDao,
-    private val kelurahanDao: KelurahanDao,
-    private val rwDao: RwDao,
-    private val rtDao: RtDao
+    private val apiService: LookupApiService,
+    private val lookupDao: LookupDao,
+    private val sharedPrefsManager: SharedPrefsManager
 ) : LookupRepository {
 
-    /**
-     * Helper function untuk memanggil API yang mengembalikan LIST data dan memetakan ke domain model,
-     * lalu menyimpan ke Room.
-     * @param apiCall Fungsi suspend yang memanggil API dan mengembalikan Response<T> (T bisa berupa List<DTO> atau Wrapper DTO).
-     * @param dtoExtractor Fungsi untuk mengekstrak List<Any> dari body respons T.
-     * @param dtoToDomainMapper Mapper dari Any (tipe item DTO generik) ke domain model R.
-     * @param domainToEntityMapper Mapper dari domain model R ke Room Entity E.
-     * @param insertToRoom Fungsi suspend untuk menyimpan List<E> ke Room DAO.
-     * @return Resource<List<R>> yang berisi daftar domain model atau error.
-     */
-    private suspend inline fun <T, R, E> safeApiCallAndMapList(
-        apiCall: suspend () -> retrofit2.Response<T>,
-        crossinline dtoExtractor: (T) -> List<Any>?, // Fungsi untuk mengekstrak List<Any> dari respons
-        crossinline dtoToDomainMapper: (Any) -> R, // Mapper dari Any (tipe item DTO generik) ke domain model
-        crossinline domainToEntityMapper: (R) -> E,
-        crossinline insertToRoom: suspend (List<E>) -> Unit // Menggunakan crossinline untuk fungsi suspend
-    ): Resource<List<R>> {
-        return try {
-            val response = apiCall()
-            if (response.isSuccessful) {
-                response.body()?.let { responseBody ->
-                    val dtoList = dtoExtractor(responseBody)
-                    dtoList?.filterIsInstance<Any>()?.map(dtoToDomainMapper)?.let { domainList ->
-                        val entityList = domainList.map(domainToEntityMapper)
-                        insertToRoom(entityList)
-                        Resource.Success(domainList)
-                    } ?: Resource.Success(emptyList())
-                } ?: Resource.Success(emptyList())
-            } else {
-                Resource.Error("Gagal mengambil data: ${response.message()}")
-            }
-        } catch (e: IOException) {
-            Resource.Error("Kesalahan jaringan: ${e.message}")
-        } catch (e: HttpException) {
-            Resource.Error("Kesalahan API: ${e.message()}")
-        } catch (e: Exception) {
-            Resource.Error("Kesalahan umum: ${e.message}")
-        }
-    }
+    // --- API Fetch Methods (Mengembalikan Domain Model jika ada mapper, atau DTO jika langsung) ---
 
-    /**
-     * Helper function untuk memanggil API yang mengembalikan SINGLE data dan memetakan ke domain model.
-     * @param apiCall Fungsi suspend yang memanggil API dan mengembalikan Response<T> (T bisa berupa DTO atau Wrapper DTO).
-     * @param dtoExtractor Fungsi untuk mengekstrak single DTO dari body respons T.
-     * @param mapper Mapper dari Any (tipe DTO generik) ke domain model R.
-     * @return Resource<R> yang berisi domain model tunggal atau error.
-     */
-    private suspend inline fun <T, R> safeApiCallAndMapSingle(
-        apiCall: suspend () -> retrofit2.Response<T>,
-        crossinline dtoExtractor: (T) -> Any?, // Fungsi untuk mengekstrak single DTO dari respons
-        crossinline mapper: (Any) -> R // Mapper dari Any (tipe item DTO generik) ke domain model
-    ): Resource<R> {
-        return try {
-            val response = apiCall()
-            if (response.isSuccessful) {
-                response.body()?.let { responseBody ->
-                    val dto = dtoExtractor(responseBody)
-                    dto?.let {
-                        Resource.Success(mapper(it))
-                    } ?: Resource.Error("Data kosong atau tidak valid.")
-                } ?: Resource.Error("Data kosong.")
-            } else {
-                Resource.Error("Gagal mengambil data: ${response.message()}")
-            }
-        } catch (e: IOException) {
-            Resource.Error("Kesalahan jaringan: ${e.message}")
-        } catch (e: HttpException) {
-            Resource.Error("Kesalahan API: ${e.message()}")
-        } catch (e: Exception) {
-            Resource.Error("Kesalahan umum: ${e.message}")
-        }
-    }
-
-
-    // --- API Fetch and Save to Room Methods ---
-
-    /**
-     * Mengambil daftar Provinsi dari API dan menyimpannya ke database lokal.
-     * Menggunakan DTO `ProvinsiDto` yang dibungkus dalam `ProvinsiListResponse` (`{"data": [...]}`).
-     */
     override suspend fun getProvinsisFromApi(): Resource<List<Provinsi>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getProvinsis() },
-            dtoExtractor = { response -> response.data }, // Mengambil dari 'data'
-            dtoToDomainMapper = { dto ->
-                dto as ProvinsiDto
-                Provinsi(id = dto.id, name = dto.name)
-            },
-            domainToEntityMapper = { domain ->
-                ProvinsiEntity(id = domain.id, name = domain.name)
-            },
-            insertToRoom = { entities -> provinsiDao.insertAll(entities) }
-        )
-    }
-
-    /**
-     * Mengambil daftar Kabupaten dari API dan menyimpannya ke database lokal.
-     * Menggunakan DTO `KabupatenDto` yang dibungkus dalam `KabupatenListResponse` (`{"data": [...]}`).
-     */
-    override suspend fun getKabupatensFromApi(provinsiId: Int?): Resource<List<Kabupaten>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getKabupatens(provinsiId) },
-            dtoExtractor = { response -> response.data }, // Mengambil dari 'data'
-            dtoToDomainMapper = { dto ->
-                dto as KabupatenDto
-                Kabupaten(
-                    id = dto.id,
-                    name = dto.name,
-                    provinsiId = dto.provinsiId,
-                    provinsi = dto.provinsi?.let { provDto ->
-                        Provinsi(id = provDto.id, name = provDto.name)
-                    }
-                )
-            },
-            domainToEntityMapper = { domain ->
-                KabupatenEntity(id = domain.id, name = domain.name, provinsiId = domain.provinsiId)
-            },
-            insertToRoom = { entities -> kabupatenDao.insertAll(entities) }
-        )
-    }
-
-    /**
-     * Mengambil daftar Kecamatan dari API dan menyimpannya ke database lokal.
-     * Menggunakan DTO `KecamatanDto` yang dibungkus dalam `KecamatanListResponse` (`{"data": [...]}`).
-     */
-    override suspend fun getKecamatansFromApi(kabupatenId: Int?): Resource<List<Kecamatan>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getKecamatans(kabupatenId) }, // Menggunakan parameter kabupatenId
-            dtoExtractor = { response -> response.data }, // Mengambil dari 'data'
-            dtoToDomainMapper = { dto ->
-                dto as KecamatanDto
-                Kecamatan(
-                    id = dto.id, name = dto.name, // Menggunakan 'name' dari DTO Kecamatan
-                    kabupatenId = dto.kabupatenId,
-                    kabupaten = dto.kabupaten?.let { kabDto ->
-                        Kabupaten(
-                            id = kabDto.id, name = kabDto.name,
-                            provinsiId = kabDto.provinsiId,
-                            provinsi = kabDto.provinsi?.let { provDto ->
-                                Provinsi(id = provDto.id, name = provDto.name)
-                            }
-                        )
-                    }
-                )
-            },
-            domainToEntityMapper = { domain ->
-                KecamatanEntity(id = domain.id, name = domain.name, kabupatenId = domain.kabupatenId)
-            },
-            insertToRoom = { entities -> kecamatanDao.insertAll(entities) }
-        )
-    }
-
-    /**
-     * Mengambil daftar Kelurahan dari API dan menyimpannya ke database lokal.
-     * Menggunakan DTO `KelurahanDto` yang dibungkus dalam `KelurahanListResponse` (`{"data": [...]}`).
-     */
-    override suspend fun getKelurahansFromApi(kecamatanId: Int?): Resource<List<Kelurahan>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getKelurahans(kecamatanId) },
-            dtoExtractor = { response -> response.data }, // Mengambil dari 'data'
-            dtoToDomainMapper = { dto ->
-                dto as KelurahanDto
-                Kelurahan(
-                    id = dto.id, name = dto.name, // Menggunakan 'name' dari DTO Kelurahan
-                    kecamatanId = dto.kecamatanId,
-                    kecamatan = dto.kecamatan?.let { kecDto ->
-                        Kecamatan(
-                            id = kecDto.id, name = kecDto.name,  // Menggunakan 'name' Kecamatan
-                            kabupatenId = kecDto.kabupatenId,
-                            kabupaten = kecDto.kabupaten?.let { kabDto ->
-                                Kabupaten(id = kabDto.id, name = kabDto.name,
-                                    provinsiId = kabDto.provinsiId,
-                                    provinsi = kabDto.provinsi?.let { provDto ->
-                                        Provinsi(id = provDto.id, name = provDto.name)
-                                    }
-                                )
-                            }
-                        )
-                    }
-                )
-            },
-            domainToEntityMapper = { domain ->
-                KelurahanEntity(id = domain.id, name = domain.name, kecamatanId = domain.kecamatanId)
-            },
-            insertToRoom = { entities -> kelurahanDao.insertAll(entities) }
-        )
-    }
-
-    /**
-     * Mengambil daftar RW dari API dan menyimpannya ke database lokal.
-     * Menggunakan DTO `RwDto` yang dibungkus dalam `RwListResponse` (`{"data": [...]}`).
-     */
-    override suspend fun getRWSFromApi(kelurahanId: Int?): Resource<List<Rw>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getRWS(kelurahanId) },
-            dtoExtractor = { response -> response.data }, // Mengambil dari 'data'
-            dtoToDomainMapper = { dto ->
-                dto as RwDto
-                Rw(id = dto.id, name = dto.name, kelurahanId = dto.kelurahanId) // Menggunakan 'name' dari DTO Rw
-            },
-            domainToEntityMapper = { domain ->
-                RwEntity(id = domain.id, name = domain.name, kelurahanId = domain.kelurahanId)
-            },
-            insertToRoom = { entities -> rwDao.insertAll(entities) }
-        )
-    }
-
-    /**
-     * Mengambil daftar RT dari API dan menyimpannya ke database lokal.
-     * Menggunakan DTO `RtDto` yang dibungkus dalam `RtListResponse` (`{"data": [...]}`).
-     */
-    override suspend fun getRTSFromApi(rwId: Int?): Resource<List<Rt>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getRTS(rwId) },
-            dtoExtractor = { response -> response.data }, // Mengambil dari 'data'
-            dtoToDomainMapper = { dto ->
-                dto as RtDto
-                Rt(id = dto.id, name = dto.name, rwId = dto.rwId) // Menggunakan 'name' dari DTO Rt
-            },
-            domainToEntityMapper = { domain ->
-                RtEntity(id = domain.id, name = domain.name, rwId = domain.rwId)
-            },
-            insertToRoom = { entities -> rtDao.insertAll(entities) }
-        )
-    }
-
-    /**
-     * Mengambil data lokasi pengguna (Kelurahan) dari API.
-     * Menggunakan DTO `SingleKelurahanResponse` (`{"data": {}}`) dan memetakan ke `Kelurahan` domain model.
-     *
-     * PERBAIKAN: Mengembalikan `Resource<Kelurahan>` karena API user/location mengembalikan data Kelurahan.
-     */
-    override suspend fun getUserLocationDataFromApi(): Resource<Kelurahan> {
-        return safeApiCallAndMapSingle(
-            apiCall = { api.getUserLocationDataFromApi() }, // Memanggil API yang mengembalikan SingleKelurahanResponse
-            dtoExtractor = { response -> response.data }, // Mengekstrak data KelurahanDto
-            mapper = { dto ->
-                dto as KelurahanDto
-                Kelurahan(
-                    id = dto.id,
-                    name = dto.name,
-                    kecamatanId = dto.kecamatanId,
-                    kecamatan = dto.kecamatan?.let { kecDto ->
-                        Kecamatan(
-                            id = kecDto.id,
-                            name = kecDto.name,
-                            kabupatenId = kecDto.kabupatenId,
-                            kabupaten = kecDto.kabupaten?.let { kabDto ->
-                                Kabupaten(
-                                    id = kabDto.id,
-                                    name = kabDto.name,
-                                    provinsiId = kabDto.provinsiId,
-                                    provinsi = kabDto.provinsi?.let { provDto ->
-                                        Provinsi(id = provDto.id, name = provDto.name)
-                                    }
-                                )
-                            }
-                        )
-                    }
-                )
+        return try {
+            val response = apiService.getProvinsis()
+            if (response.isSuccessful) {
+                // Menggunakan mapper dari data/remote/mapper
+                val provinsisDto = response.body()?.data ?: emptyList()
+                val provinsis = provinsisDto.map { it.toProvinsi() }
+                Resource.Success(provinsis)
+            } else {
+                Resource.Error("Failed to fetch provinces from API: ${response.code()} - ${response.message()}")
             }
-        )
-    }
-
-    // --- Other Lookup Items (Existing) ---
-    override suspend fun getBirthAssistants(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getBirthAssistants() },
-            dtoExtractor = { response -> response.data }, // Mengambil dari 'data' di LookupItemListResponse
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain ->
-                LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) // Dummy untuk kompilasi
-            },
-            insertToRoom = { entities -> /* Tidak ada Room DAO spesifik untuk ini secara default, kosongkan */ }
-        )
-    }
-
-    override suspend fun getContraceptionOptions(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getContraceptionOptions() },
-            dtoExtractor = { response -> response.data },
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain -> LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) },
-            insertToRoom = { entities -> }
-        )
-    }
-
-    override suspend fun getCounselingTypes(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getCounselingTypes() },
-            dtoExtractor = { response -> response.data },
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain -> LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) },
-            insertToRoom = { entities -> }
-        )
-    }
-
-    override suspend fun getDefecationFacilities(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getDefecationFacilities() },
-            dtoExtractor = { response -> response.data },
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain -> LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) },
-            insertToRoom = { entities -> }
-        )
-    }
-
-    override suspend fun getDeliveryPlaces(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getDeliveryPlaces() },
-            dtoExtractor = { response -> response.data },
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain -> LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) },
-            insertToRoom = { entities -> }
-        )
-    }
-
-    override suspend fun getDiseaseHistories(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getDiseaseHistories() },
-            dtoExtractor = { response -> response.data },
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain -> LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) },
-            insertToRoom = { entities -> }
-        )
-    }
-
-    override suspend fun getGivenBirthStatuses(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getGivenBirthStatuses() },
-            dtoExtractor = { response -> response.data },
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain -> LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) },
-            insertToRoom = { entities -> }
-        )
-    }
-
-    override suspend fun getImmunizationOptions(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getImmunizationOptions() },
-            dtoExtractor = { response -> response.data },
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain -> LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) },
-            insertToRoom = { entities -> }
-        )
-    }
-
-    override suspend fun getMainSourceOfDrinkingWaters(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getMainSourceOfDrinkingWaters() },
-            dtoExtractor = { response -> response.data },
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain -> LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) },
-            insertToRoom = { entities -> }
-        )
-    }
-
-    override suspend fun getPostpartumComplicationOptions(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getPostpartumComplicationOptions() },
-            dtoExtractor = { response -> response.data },
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain -> LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) },
-            insertToRoom = { entities -> }
-        )
-    }
-
-    override suspend fun getPregnantMotherStatuses(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getPregnantMotherStatuses() },
-            dtoExtractor = { response -> response.data },
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain -> LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) },
-            insertToRoom = { entities -> }
-        )
-    }
-
-    override suspend fun getSocialAssistanceFacilitationOptions(): Resource<List<LookupItemDto>> {
-        return safeApiCallAndMapList(
-            apiCall = { api.getSocialAssistanceFacilitationOptions() },
-            dtoExtractor = { response -> response.data },
-            dtoToDomainMapper = { dto ->
-                dto as LookupItemDto
-                LookupItemDto(id = dto.id, name = dto.name, isActive = dto.isActive, sortOrder = dto.sortOrder)
-            },
-            domainToEntityMapper = { domain -> LookupItemDto(id = domain.id, name = domain.name, isActive = domain.isActive, sortOrder = domain.sortOrder) },
-            insertToRoom = { entities -> }
-        )
-    }
-
-
-    // --- Room Data Methods (Implementasi) ---
-    override suspend fun saveProvinsisToRoom(provinsis: List<Provinsi>) {
-        val entities = provinsis.map { ProvinsiEntity(it.id, it.name) }
-        provinsiDao.insertAll(entities)
-    }
-    override fun getAllProvinsisFromRoom(): Flow<List<Provinsi>> {
-        return provinsiDao.getAllProvinsis().map { entities ->
-            entities.map { Provinsi(it.id, it.name) }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching provinces from API: ${e.localizedMessage}")
         }
+    }
+
+    override suspend fun getKabupatensFromApi(provinsiId: Int?): Resource<List<Kabupaten>> {
+        return try {
+            val response = apiService.getKabupatens(provinsiId)
+            if (response.isSuccessful) {
+                val kabupatensDto = response.body()?.data ?: emptyList()
+                val kabupatens = kabupatensDto.map { it.toKabupaten() }
+                Resource.Success(kabupatens)
+            } else {
+                Resource.Error("Failed to fetch kabupatens from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching kabupatens from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getKecamatansFromApi(kabupatenId: Int?): Resource<List<Kecamatan>> {
+        return try {
+            val response = apiService.getKecamatans(kabupatenId)
+            if (response.isSuccessful) {
+                val kecamatansDto = response.body()?.data ?: emptyList()
+                val kecamatans = kecamatansDto.map { it.toKecamatan() }
+                Resource.Success(kecamatans)
+            } else {
+                Resource.Error("Failed to fetch kecamatans from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching kecamatans from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getKelurahansFromApi(kecamatanId: Int?): Resource<List<Kelurahan>> {
+        return try {
+            val response = apiService.getKelurahans(kecamatanId)
+            if (response.isSuccessful) {
+                val kelurahansDto = response.body()?.data ?: emptyList()
+                val kelurahans = kelurahansDto.map { it.toKelurahan() }
+                Resource.Success(kelurahans)
+            } else {
+                Resource.Error("Failed to fetch kelurahans from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching kelurahans from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getRWSFromApi(kelurahanId: Int?): Resource<List<Rw>> {
+        return try {
+            val response = apiService.getRWS(kelurahanId)
+            if (response.isSuccessful) {
+                val rwsDto = response.body()?.data ?: emptyList()
+                val rws = rwsDto.map { it.toRw() }
+                Resource.Success(rws)
+            } else {
+                Resource.Error("Failed to fetch RWs from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching RWs from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getRTSFromApi(rwId: Int?): Resource<List<Rt>> {
+        return try {
+            val response = apiService.getRTS(rwId)
+            if (response.isSuccessful) {
+                val rtsDto = response.body()?.data ?: emptyList()
+                val rts = rtsDto.map { it.toRt() }
+                Resource.Success(rts)
+            } else {
+                Resource.Error("Failed to fetch RTs from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching RTs from API: ${e.localizedMessage}")
+        }
+    }
+
+    // NEW: Metode getUserLocationData() yang lama dihapus karena user location sekarang diambil dari SharedPrefs/Room
+    // (Melalui kelurahanId di UserSession dan LookupRepository.getLocationDetailsByKelurahanId)
+
+    override suspend fun getBirthAssistantsFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getBirthAssistants()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch birth assistants from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching birth assistants from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getContraceptionOptionsFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getContraceptionOptions()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch contraception options from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching contraception options from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getCounselingTypesFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getCounselingTypes()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch counseling types from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching counseling types from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getDefecationFacilitiesFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getDefecationFacilities()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch defecation facilities from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching defecation facilities from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getDeliveryPlacesFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getDeliveryPlaces()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch delivery places from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching delivery places from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getDiseaseHistoriesFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getDiseaseHistories()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch disease histories from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching disease histories from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getGivenBirthStatusesFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getGivenBirthStatuses()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch given birth statuses from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching given birth statuses from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getImmunizationOptionsFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getImmunizationOptions()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch immunization options from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching immunization options from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getMainSourceOfDrinkingWatersFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getMainSourceOfDrinkingWaters()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch main sources of drinking water from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching main sources of drinking water from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getPostpartumComplicationOptionsFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getPostpartumComplicationOptions()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch postpartum complication options from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching postpartum complication options from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getPregnantMotherStatusesFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getPregnantMotherStatuses()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch pregnant mother statuses from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching pregnant mother statuses from API: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun getSocialAssistanceFacilitationOptionsFromApi(): Resource<List<LookupItemDto>> {
+        return try {
+            val response = apiService.getSocialAssistanceFacilitationOptions()
+            if (response.isSuccessful) {
+                Resource.Success(response.body() ?: emptyList())
+            } else {
+                Resource.Error("Failed to fetch social assistance facilitation options from API: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Error fetching social assistance facilitation options from API: ${e.localizedMessage}")
+        }
+    }
+
+
+    // --- Room Data Methods (Local persistence operations) ---
+    override suspend fun saveProvinsisToRoom(provinsis: List<Provinsi>) {
+        lookupDao.clearProvinsi() // Pastikan method clear ini ada di DAO
+        lookupDao.insertAllProvinsi(provinsis.map { it.toProvinsiEntity() })
+    }
+
+    override fun getAllProvinsisFromRoom(): Flow<List<Provinsi>> {
+        return lookupDao.getAllProvinsi().map { entities ->
+            entities.map { it.toProvinsi() } // Menggunakan alias toProvinsiDomain
+        }.catch { emit(emptyList()) }
     }
 
     override suspend fun saveKabupatensToRoom(kabupatens: List<Kabupaten>) {
-        val entities = kabupatens.map { KabupatenEntity(it.id, it.name, it.provinsiId) }
-        kabupatenDao.insertAll(entities)
+        lookupDao.clearKabupaten() // Pastikan method clear ini ada di DAO
+        lookupDao.insertAllKabupaten(kabupatens.map { it.toKabupatenEntity() })
     }
+
     override fun getAllKabupatensFromRoom(): Flow<List<Kabupaten>> {
-        return kabupatenDao.getAllKabupatens().map { entities ->
-            entities.map { Kabupaten(it.id, it.name,  it.provinsiId, null) }
-        }
+        return lookupDao.getAllKabupaten().map { entities ->
+            entities.map { it.toKabupaten() }
+        }.catch { emit(emptyList()) }
     }
 
     override suspend fun saveKecamatansToRoom(kecamatans: List<Kecamatan>) {
-        val entities = kecamatans.map { KecamatanEntity(it.id, it.name, it.kabupatenId) }
-        kecamatanDao.insertAll(entities)
+        lookupDao.clearKecamatan() // Pastikan method clear ini ada di DAO
+        lookupDao.insertAllKecamatan(kecamatans.map { it.toKecamatanEntity() })
     }
+
     override fun getAllKecamatansFromRoom(): Flow<List<Kecamatan>> {
-        return kecamatanDao.getAllKecamatans().map { entities ->
-            entities.map { Kecamatan(it.id, it.name,  it.kabupatenId, null) }
-        }
+        return lookupDao.getAllKecamatan().map { entities ->
+            entities.map { it.toKecamatan() }
+        }.catch { emit(emptyList()) }
     }
+
     override fun getKecamatansByKabupatenFromRoom(kabupatenId: Int): Flow<List<Kecamatan>> {
-        return kecamatanDao.getKecamatansByKabupaten(kabupatenId).map { entities ->
-            entities.map { Kecamatan(it.id, it.name,  it.kabupatenId, null) }
-        }
+        return lookupDao.getKecamatansByKabupatenId(kabupatenId).map { entities ->
+            entities.map { it.toKecamatan() }
+        }.catch { emit(emptyList()) }
     }
 
     override suspend fun saveKelurahansToRoom(kelurahans: List<Kelurahan>) {
-        val entities = kelurahans.map { KelurahanEntity(it.id, it.name, it.kecamatanId) }
-        kelurahanDao.insertAll(entities)
+        lookupDao.clearKelurahan() // Pastikan method clear ini ada di DAO
+        lookupDao.insertAllKelurahan(kelurahans.map { it.toKelurahanEntity() })
     }
+
     override fun getAllKelurahansFromRoom(): Flow<List<Kelurahan>> {
-        return kelurahanDao.getAllKelurahans().map { entities ->
-            entities.map { Kelurahan(it.id, it.name,  it.kecamatanId, null) }
-        }
+        return lookupDao.getAllKelurahan().map { entities ->
+            entities.map { it.toKelurahan() }
+        }.catch { emit(emptyList()) }
     }
+
     override fun getKelurahansByKecamatanFromRoom(kecamatanId: Int): Flow<List<Kelurahan>> {
-        return kelurahanDao.getKelurahansByKecamatan(kecamatanId).map { entities ->
-            entities.map { Kelurahan(it.id, it.name,  it.kecamatanId, null) }
-        }
+        return lookupDao.getKelurahansByKecamatanId(kecamatanId).map { entities ->
+            entities.map { it.toKelurahan() }
+        }.catch { emit(emptyList()) }
     }
 
     override suspend fun saveRWSToRoom(rws: List<Rw>) {
-        val entities = rws.map { RwEntity(it.id, it.name, it.kelurahanId) }
-        rwDao.insertAll(entities)
+        lookupDao.clearRw() // Pastikan method clear ini ada di DAO
+        lookupDao.insertAllRw(rws.map { it.toRwEntity() })
     }
+
     override fun getAllRWSFromRoom(): Flow<List<Rw>> {
-        return rwDao.getAllRWS().map { entities ->
-            entities.map { Rw(it.id, it.name, it.kelurahanId) }
-        }
+        return lookupDao.getAllRw().map { entities ->
+            entities.map { it.toRw() }
+        }.catch { emit(emptyList()) }
     }
+
     override fun getRWSByKelurahanFromRoom(kelurahanId: Int): Flow<List<Rw>> {
-        return rwDao.getRWSByKelurahan(kelurahanId).map { entities ->
-            entities.map { Rw(it.id, it.name, it.kelurahanId) }
-        }
+        return lookupDao.getRwsByKelurahanId(kelurahanId).map { entities -> // Memanggil getRwByKelurahanId
+            entities.map { it.toRw() }
+        }.catch { emit(emptyList()) }
     }
 
     override suspend fun saveRTSToRoom(rts: List<Rt>) {
-        val entities = rts.map { RtEntity(it.id, it.name, it.rwId) }
-        rtDao.insertAll(entities)
+        lookupDao.clearRt() // Pastikan method clear ini ada di DAO
+        lookupDao.insertAllRt(rts.map { it.toRtEntity() })
     }
+
     override fun getAllRTSFromRoom(): Flow<List<Rt>> {
-        return rtDao.getAllRTS().map { entities ->
-            entities.map { Rt(it.id, it.name, it.rwId) }
-        }
+        return lookupDao.getAllRt().map { entities ->
+            entities.map { it.toRt() }
+        }.catch { emit(emptyList()) }
     }
+
     override fun getRTSByRwFromRoom(rwId: Int): Flow<List<Rt>> {
-        return rtDao.getRTSByRw(rwId).map { entities ->
-            entities.map { Rt(it.id, it.name, it.rwId) }
+        return lookupDao.getRtsByRwId(rwId).map { entities -> // Memanggil getRtByRwId
+            entities.map { it.toRt() }
+        }.catch { emit(emptyList()) }
+    }
+
+
+    // Preloading/Synchronization Method
+    override suspend fun preloadAllLocationAndLookupData(): Resource<Unit> {
+        return try {
+            coroutineScope {
+                // Fetch and save Provinsis
+                val provincesResult = async { getProvinsisFromApi() }
+                provincesResult.await().data?.let { saveProvinsisToRoom(it) }
+
+                // Fetch and save Kabupatens
+                val kabupatensResult = async { getKabupatensFromApi() }
+                kabupatensResult.await().data?.let { saveKabupatensToRoom(it) }
+
+                // Fetch and save Kecamatans
+                val kecamatansResult = async { getKecamatansFromApi() }
+                kecamatansResult.await().data?.let { saveKecamatansToRoom(it) }
+
+                // Fetch and save Kelurahans
+                val kelurahansResult = async { getKelurahansFromApi() }
+                kelurahansResult.await().data?.let { saveKelurahansToRoom(it) }
+
+                // Fetch and save RWs
+                val rwsResult = async { getRWSFromApi() }
+                rwsResult.await().data?.let { saveRWSToRoom(it) }
+
+                // Fetch and save RTs
+                val rtsResult = async { getRTSFromApi() }
+                rtsResult.await().data?.let { saveRTSToRoom(it) }
+
+                // NEW: Hapus panggilan getUserLocationData() karena sudah tidak relevan
+                // (kelurahanId kini di UserSession dan detail lokasi dari Room)
+                // getUserLocationData() // <-- BARIS INI DIHAPUS
+
+                // Concurrently fetch and cache other lookup lists
+                val deferreds = listOf(
+                    async { cacheLookupListNamesFromApi(apiService.getBirthAssistants(), SharedPrefsManager.KEY_BIRTH_ASSISTANTS_OPTIONS) },
+                    async { cacheLookupListNamesFromApi(apiService.getContraceptionOptions(), SharedPrefsManager.KEY_CONTRACEPTION_OPTIONS) },
+                    async { cacheLookupListNamesFromApi(apiService.getCounselingTypes(), SharedPrefsManager.KEY_COUNSELING_TYPES_OPTIONS) },
+                    async { cacheLookupListNamesFromApi(apiService.getDefecationFacilities(), SharedPrefsManager.KEY_DEFECATION_FACILITY_OPTIONS) },
+                    async { cacheLookupListNamesFromApi(apiService.getDeliveryPlaces(), SharedPrefsManager.KEY_DELIVERY_PLACES_OPTIONS) },
+                    async { cacheLookupListNamesFromApi(apiService.getDiseaseHistories(), SharedPrefsManager.KEY_DISEASE_HISTORY_OPTIONS) },
+                    async { cacheLookupListNamesFromApi(apiService.getGivenBirthStatuses(), SharedPrefsManager.KEY_GIVEN_BIRTH_STATUSES_OPTIONS) },
+                    async { cacheLookupListNamesFromApi(apiService.getImmunizationOptions(), SharedPrefsManager.KEY_IMMUNIZATION_OPTIONS) },
+                    async { cacheLookupListNamesFromApi(apiService.getMainSourceOfDrinkingWaters(), SharedPrefsManager.KEY_DRINKING_WATER_OPTIONS) },
+                    async { cacheLookupListNamesFromApi(apiService.getPostpartumComplicationOptions(), SharedPrefsManager.KEY_POSTPARTUM_COMPLICATION_OPTIONS) },
+                    async { cacheLookupListNamesFromApi(apiService.getPregnantMotherStatuses(), SharedPrefsManager.KEY_PREGNANT_MOTHER_STATUSES_OPTIONS) },
+                    async { cacheLookupListNamesFromApi(apiService.getSocialAssistanceFacilitationOptions(), SharedPrefsManager.KEY_SOCIAL_ASSISTANCE_OPTIONS) }
+                )
+                deferreds.awaitAll()
+                Resource.Success(Unit)
+            }
+        } catch (e: Exception) {
+            Resource.Error("Failed to preload lookup data: ${e.localizedMessage}")
         }
     }
 
-    override suspend fun preloadAllLocationData(): Resource<Unit> {
-        return try {
-            val provinsisResource = getProvinsisFromApi()
-            if (provinsisResource is Resource.Error) {
-                return Resource.Error("Gagal memuat Provinsi: ${provinsisResource.message}")
+
+    // --- Cached Lookup Options (Mengembalikan List<String> dari SharedPrefs) ---
+    override fun getDiseaseHistoryOptions(): Flow<List<String>> {
+        return flow { emit(sharedPrefsManager.getStringList(SharedPrefsManager.KEY_DISEASE_HISTORY_OPTIONS)) }
+            .catch { emit(emptyList()) }
+    }
+
+    override fun getMainSourceOfDrinkingWaterOptions(): Flow<List<String>> {
+        return flow { emit(sharedPrefsManager.getStringList(SharedPrefsManager.KEY_DRINKING_WATER_OPTIONS)) }
+            .catch { emit(emptyList()) }
+    }
+
+    override fun getDefecationFacilityOptions(): Flow<List<String>> {
+        return flow { emit(sharedPrefsManager.getStringList(SharedPrefsManager.KEY_DEFECATION_FACILITY_OPTIONS)) }
+            .catch { emit(emptyList()) }
+    }
+
+    override fun getSocialAssistanceFacilitationOptions(): Flow<List<String>> {
+        return flow { emit(sharedPrefsManager.getStringList(SharedPrefsManager.KEY_SOCIAL_ASSISTANCE_OPTIONS)) }
+            .catch { emit(emptyList()) }
+    }
+
+    // --- Private Helper Functions for Caching ---
+    private suspend fun cacheLookupListNamesFromApi(apiCall: retrofit2.Response<List<LookupItemDto>>, prefKey: String) {
+        val response = apiCall
+        if (response.isSuccessful) {
+            response.body()?.let { list ->
+                val names = list.map { it.name }
+                sharedPrefsManager.saveStringList(prefKey, names)
             }
-            // Mengambil kabupaten untuk setiap provinsi jika diperlukan, atau ambil semua
-            val kabupatenResource = getKabupatensFromApi(null) // Mengambil semua kabupaten
-            if (kabupatenResource is Resource.Error) {
-                return Resource.Error("Gagal memuat Kabupaten: ${kabupatenResource.message}")
-            }
-            val kecamatanResource = getKecamatansFromApi(null) // Mengambil semua kecamatan
-            if (kecamatanResource is Resource.Error) {
-                return Resource.Error("Gagal memuat Kecamatan: ${kecamatanResource.message}")
-            }
-            val kelurahanResource = getKelurahansFromApi(null) // Mengambil semua kelurahan
-            if (kelurahanResource is Resource.Error) {
-                return Resource.Error("Gagal memuat Kelurahan: ${kelurahanResource.message}")
-            }
-            val rwResource = getRWSFromApi(null) // Mengambil semua RW
-            if (rwResource is Resource.Error) {
-                return Resource.Error("Gagal memuat RW: ${rwResource.message}")
-            }
-            val rtResource = getRTSFromApi(null) // Mengambil semua RT
-            if (rtResource is Resource.Error) {
-                return Resource.Error("Gagal memuat RT: ${rtResource.message}")
-            }
-            Resource.Success(Unit)
-        } catch (e: Exception) {
-            Resource.Error("Kesalahan umum saat preloading data lokasi: ${e.message}")
+        } else {
+            throw IOException("Failed to cache lookup list for $prefKey: ${response.code()} - ${response.message()}")
         }
+    }
+
+    // Implementasi fungsi untuk mendapatkan detail lokasi lengkap
+    override suspend fun getLocationDetailsByKelurahanId(kelurahanId: Int): LocationDetails? { // <<< ID sekarang Int
+        val kelurahan = lookupDao.getKelurahanById(kelurahanId) // Menggunakan Int
+        if (kelurahan == null) {
+            Log.w("LookupRepository", "Kelurahan with ID $kelurahanId not found in local DB.")
+            return null
+        }
+
+        val kecamatan = lookupDao.getKecamatanById(kelurahan.kecamatanId)
+        val kabupaten = kecamatan?.let { lookupDao.getKabupatenById(it.kabupatenId) }
+        val provinsi = kabupaten?.let { lookupDao.getProvinsiById(it.provinsiId) }
+
+        return LocationDetails(
+            provinsiId = provinsi?.id?.toString(), // Konversi Int ke String untuk LocationDetails
+            provinsiName = provinsi?.name,
+            kabupatenId = kabupaten?.id?.toString(),
+            kabupatenName = kabupaten?.name,
+            kecamatanId = kecamatan?.id?.toString(),
+            kecamatanName = kecamatan?.name,
+            kelurahanId = kelurahan.id.toString(), // Konversi Int ke String
+            kelurahanName = kelurahan.name
+        )
     }
 }

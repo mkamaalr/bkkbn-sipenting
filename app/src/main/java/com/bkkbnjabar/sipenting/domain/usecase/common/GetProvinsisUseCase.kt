@@ -1,7 +1,7 @@
 package com.bkkbnjabar.sipenting.domain.usecase.common
 
-import com.bkkbnjabar.sipenting.data.model.Provinsi
-import com.bkkbnjabar.sipenting.domain.repository.LookupRepository
+import com.bkkbnjabar.sipenting.data.repository.LookupRepository
+import com.bkkbnjabar.sipenting.domain.model.Provinsi
 import com.bkkbnjabar.sipenting.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

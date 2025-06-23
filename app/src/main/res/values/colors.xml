@@ -1,8 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="sipenting_primary">#AE862E</color>           <!-- Main Primary Color -->
+    <color name="sipenting_primary_lightest">#F7EF8A</color>  <!-- Lighter Primary Shade -->
+    <color name="sipenting_primary_light">#EDC968</color>    <!-- Light Primary Shade -->
+    <color name="sipenting_primary_medium">#D2AC47</color>    <!-- Medium Primary Shade -->
+    <color name="sipenting_primary_dark">#8A6B25</color>      <!-- Derived: Darker variant for status bar or deeper accents -->
+    <color name="sipenting_on_primary">#FFFFFF</color>       <!-- Text/Icons on Primary background -->
+
+    <!-- Secondary Colors (Blue Tones) -->
+    <color name="sipenting_secondary">#1D71B8</color>         <!-- Main Secondary Color -->
+    <color name="sipenting_secondary_light">#89CFE8</color>  <!-- Lighter Secondary Shade -->
+    <color name="sipenting_secondary_dark">#0B1A3A</color>   <!-- Darker Secondary Shade -->
+    <color name="sipenting_on_secondary">#FFFFFF</color>     <!-- Text/Icons on Secondary background -->
+
+    <!-- System Colors (standard Material Design) -->
+
+    <!-- Additional/Utility Colors -->
+    <color name="sipenting_status_bar_color">@color/sipenting_primary_dark</color> <!-- Using the darker primary for status bar -->
+    <color name="sipenting_background">#F5F5F5</color>       <!-- Light background for main content -->
+    <color name="sipenting_surface">#FFFFFF</color>          <!-- Surface color for cards, sheets etc. -->
+    <color name="sipenting_on_surface">#000000</color>       <!-- Text/Icons on Surface background -->
+    <color name="sipenting_error">#B00020</color>            <!-- Standard error red -->
+    <color name="sipenting_on_error">#FFFFFF</color>        <!-- Text/Icons on Error background -->
+
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
     <!-- Material Design 3 Color Palette -->
     <!-- Light theme colors -->
     <color name="md_theme_light_primary">#006C4C</color>

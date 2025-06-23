@@ -10,17 +10,20 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface RwDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(rws: List<RwEntity>)
+    suspend fun insertRw(rw: RwEntity) // Method for single insert
 
-    @Query("SELECT * FROM rws ORDER BY name ASC")
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllRWS(rws: List<RwEntity>) // Method for bulk insert
+
+    @Query("SELECT * FROM rw_table")
     fun getAllRWS(): Flow<List<RwEntity>>
 
-    @Query("SELECT * FROM rws WHERE kelurahanId = :kelurahanId ORDER BY name ASC")
+    @Query("SELECT * FROM rw_table WHERE kelurahanId = :kelurahanId")
     fun getRWSByKelurahan(kelurahanId: Int): Flow<List<RwEntity>>
 
-    @Query("SELECT * FROM rws WHERE id = :rwId")
+    @Query("SELECT * FROM rw_table WHERE id = :rwId")
     suspend fun getRwById(rwId: Int): RwEntity?
 
-    @Query("DELETE FROM rws")
-    suspend fun deleteAll()
+    @Query("DELETE FROM rw_table")
+    suspend fun deleteAllRWS()
 }

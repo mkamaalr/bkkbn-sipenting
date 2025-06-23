@@ -1,12 +1,9 @@
 package com.bkkbnjabar.sipenting.di
 
 import com.bkkbnjabar.sipenting.data.remote.AuthApiService
-import com.bkkbnjabar.sipenting.data.remote.PregnantMotherApiService
-import com.bkkbnjabar.sipenting.data.remote.BreastfeedingMotherApiService // Import ini
-import com.bkkbnjabar.sipenting.data.remote.ChildApiService // Import ini
 import com.bkkbnjabar.sipenting.data.remote.LookupApiService
+import com.bkkbnjabar.sipenting.data.remote.PregnantMotherApiService
 import com.bkkbnjabar.sipenting.utils.AuthInterceptor
-import com.bkkbnjabar.sipenting.utils.Constants
 import com.bkkbnjabar.sipenting.utils.TokenAuthenticator
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -20,95 +17,87 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
-import javax.inject.Provider
-import kotlin.jvm.JvmStatic
 
 @Module
 @InstallIn(SingletonComponent::class)
-class NetworkModule {
+object NetworkModule {
 
-    companion object {
+    // BASE URL hanya didefinisikan di sini
+    private const val BASE_URL = "http://192.168.1.10:8000/api/" // <<< GANTI DENGAN BASE URL API ANDA!
 
-        @Provides
-        @Singleton
-        @JvmStatic
-        fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
-            return HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            }
+    @Provides
+    @Singleton
+    fun provideBaseUrl(): String = BASE_URL // Menyediakan BASE_URL sebagai String
+
+    @Provides
+    @Singleton
+    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
+        return HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY // Atur level logging sesuai kebutuhan
         }
+    }
 
-        @Provides
-        @Singleton
-        @JvmStatic
-        fun provideOkHttpClient(
-            loggingInterceptor: HttpLoggingInterceptor,
-            authInterceptor: AuthInterceptor,
-            tokenAuthenticator: TokenAuthenticator
-        ): OkHttpClient {
-            return OkHttpClient.Builder()
-                .addInterceptor(authInterceptor)
-                .addInterceptor(loggingInterceptor)
-                .authenticator(tokenAuthenticator)
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .build()
-        }
+    @Provides
+    @Singleton
+    fun provideMoshi(): Moshi { // Moshi disediakan di sini karena terkait dengan konversi Retrofit
+        return Moshi.Builder()
+            .addLast(KotlinJsonAdapterFactory())
+            .build()
+    }
 
-        @Provides
-        @Singleton
-        @JvmStatic
-        fun provideMoshi(): Moshi {
-            return Moshi.Builder()
-                .addLast(KotlinJsonAdapterFactory())
-                .build()
-        }
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        authInterceptor: AuthInterceptor, // Disediakan Hilt via @Inject constructor
+        tokenAuthenticator: TokenAuthenticator // Disediakan Hilt via @Inject constructor
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor(authInterceptor)
+            .authenticator(tokenAuthenticator)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
 
-        @Provides
-        @Singleton
-        @JvmStatic
-        fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-            return Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
-                .client(okHttpClient)
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
-                .build()
-        }
+    @Provides
+    @Singleton
+    fun provideMoshiConverterFactory(moshi: Moshi): MoshiConverterFactory {
+        return MoshiConverterFactory.create(moshi)
+    }
 
-        @Provides
-        @Singleton
-        @JvmStatic
-        fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
-            return retrofit.create(AuthApiService::class.java)
-        }
+    @Provides
+    @Singleton
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+        baseUrl: String, // Mengambil dari provideBaseUrl()
+        moshiConverterFactory: MoshiConverterFactory
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(okHttpClient)
+            .addConverterFactory(moshiConverterFactory)
+            .build()
+    }
 
-        @Provides
-        @Singleton
-        @JvmStatic
-        fun providePregnantMotherApiService(retrofit: Retrofit): PregnantMotherApiService {
-            return retrofit.create(PregnantMotherApiService::class.java)
-        }
+    // --- Semua API Services disediakan di NetworkModule ---
+    @Provides
+    @Singleton
+    fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
+        return retrofit.create(AuthApiService::class.java)
+    }
 
-        @Provides
-        @Singleton
-        @JvmStatic
-        fun provideBreastfeedingMotherApiService(retrofit: Retrofit): BreastfeedingMotherApiService {
-            return retrofit.create(BreastfeedingMotherApiService::class.java)
-        }
+    @Provides
+    @Singleton
+    fun provideLookupApiService(retrofit: Retrofit): LookupApiService {
+        return retrofit.create(LookupApiService::class.java)
+    }
 
-        @Provides
-        @Singleton
-        @JvmStatic
-        fun provideChildApiService(retrofit: Retrofit): ChildApiService {
-            return retrofit.create(ChildApiService::class.java)
-        }
-
-        @Provides
-        @Singleton
-        @JvmStatic
-        fun provideLookupApiService(retrofit: Retrofit): LookupApiService {
-            return retrofit.create(LookupApiService::class.java)
-        }
+    @Provides
+    @Singleton
+    fun providePregnantMotherApiService(retrofit: Retrofit): PregnantMotherApiService {
+        return retrofit.create(PregnantMotherApiService::class.java)
     }
 }

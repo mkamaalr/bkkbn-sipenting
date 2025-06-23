@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/auth_nav_graph"
+    app:startDestination="@id/loginFragment"> <!-- LoginFragment adalah titik awal otentikasi -->
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <!-- Tambahkan aksi navigasi ke RegisterFragment atau ForgotPasswordFragment di sini jika ada -->
+        <!--
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment" />
+        -->
+    </fragment>
+
+    <!-- Contoh fragment lain dalam alur otentikasi (jika ada) -->
+    <!--
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.auth.RegisterFragment"
+        android:label="Daftar Akun"
+        tools:layout="@layout/fragment_register" />
+
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.auth.ForgotPasswordFragment"
+        android:label="Lupa Kata Sandi"
+        tools:layout="@layout/fragment_forgot_password" />
+    -->
+</navigation>

@@ -10,14 +10,17 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ProvinsiDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(provinsis: List<ProvinsiEntity>)
+    suspend fun insertProvinsi(provinsi: ProvinsiEntity) // Method for single insert
 
-    @Query("SELECT * FROM provinsis ORDER BY name ASC")
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllProvinsis(provinsis: List<ProvinsiEntity>) // Method for bulk insert
+
+    @Query("SELECT * FROM provinsi_table")
     fun getAllProvinsis(): Flow<List<ProvinsiEntity>>
 
-    @Query("SELECT * FROM provinsis WHERE id = :provinsiId")
+    @Query("SELECT * FROM provinsi_table WHERE id = :provinsiId")
     suspend fun getProvinsiById(provinsiId: Int): ProvinsiEntity?
 
-    @Query("DELETE FROM provinsis")
-    suspend fun deleteAll()
+    @Query("DELETE FROM provinsi_table")
+    suspend fun deleteAllProvinsis()
 }
