@@ -1,10 +1,50 @@
 <resources>
     <string name="app_name">SIPENTING</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="nav_header_title">SIPENTING</string>
-    <string name="nav_header_subtitle">aplikasi.sipenting@bkkbnjabar.com</string>
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+
+    <!-- General Actions -->
+    <string name="action_settings">Pengaturan</string>
     <string name="action_logout">Logout</string>
+
+    <!-- Navigation Drawer / Header (Legacy, good to keep for reference) -->
+    <string name="nav_header_title">Nama Pengguna</string>
+    <string name="nav_header_subtitle">user.email@example.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+    <!-- Menu Titles -->
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Galeri</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_pregnant_mother">Ibu Hamil</string>
+    <string name="menu_child">Anak</string>
+    <string name="menu_breastfeeding_mother">Ibu Menyusui</string>
+    <string name="menu_profile">Profil</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Selamat Datang di SIPENTING</string>
+    <string name="login_username_hint">Username</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_button_text">Login</string>
+
+    <!-- Pregnant Mother Registration -->
+    <string name="form_title_pregnant_mother_data">Pendaftaran Ibu Hamil (Data Ibu)</string>
+    <string name="form_title_pregnant_mother_visit">Pendaftaran Ibu Hamil (Data Kunjungan)</string>
+    <string name="hint_mother_name">Nama Ibu Hamil</string>
+    <string name="hint_nik">Nomor Induk Kependudukan (NIK)</string>
+    <string name="hint_date_of_birth">Tanggal Lahir (DD/MM/YYYY)</string>
+    <string name="hint_phone_number">Nomor Telepon</string>
+    <string name="hint_province">Provinsi</string>
+    <string name="hint_regency">Kabupaten/Kota</string>
+    <string name="hint_district">Kecamatan</string>
+    <string name="hint_village">Kelurahan/Desa</string>
+    <string name="hint_rw">RW</string>
+    <string name="hint_rt">RT</string>
+    <string name="hint_full_address">Alamat Lengkap (Jl, No Rumah)</string>
+    <string name="hint_registration_date">Tanggal Pendaftaran</string>
+    <string name="button_next">Lanjut</string>
+    <string name="button_save">Simpan</string>
+    <string name="button_previous">Kembali</string>
+
+    <!-- General UI -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

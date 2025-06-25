@@ -1,9 +1,13 @@
 package com.bkkbnjabar.sipenting.domain.usecase.auth
 
-import com.bkkbnjabar.sipenting.domain.repository.AuthRepository
-import com.bkkbnjabar.sipenting.utils.Resource
-import javax.inject.Inject
-
+/**
+ * Interface for the ValidateToken use case.
+ * Defines the contract for checking if a user session is currently valid.
+ */
 interface ValidateTokenUseCase {
-    suspend fun execute(): Resource<Boolean>
+    /**
+     * Executes the token validation check.
+     * @return True if the user is considered logged in, false otherwise.
+     */
+    fun execute(): Boolean
 }

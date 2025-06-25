@@ -5,8 +5,16 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class KecamatanDto(
-    @Json(name = "id") val id: Int?,
-    @Json(name = "name") val name: String?,
-    @Json(name = "kabupaten_id") val kabupatenId: Int?,
-    @Json(name = "kabupaten") val kabupaten: KabupatenDto? // Objek bersarang
+    @Json(name = "id")
+    val id: Int,
+    @Json(name = "kabupaten_id")
+    val kabupatenId: Int?, // Dibuat nullable
+    @Json(name = "name")
+    val name: String
+)
+
+@JsonClass(generateAdapter = true)
+data class KecamatanListResponse(
+    @Json(name = "data")
+    val data: List<KecamatanDto>?
 )

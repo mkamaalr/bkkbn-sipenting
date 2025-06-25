@@ -1,10 +1,15 @@
 package com.bkkbnjabar.sipenting.data.model.pregnantmother
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import com.google.gson.annotations.SerializedName
 
-@JsonClass(generateAdapter = true)
+/**
+ * DTO untuk respons setelah berhasil mengunggah data.
+ */
 data class PregnantMotherUploadResponse(
-    @Json(name = "id") val id: String?, // ID dari server setelah berhasil upload
-    @Json(name = "message") val message: String? // Pesan konfirmasi dari server
+    @SerializedName("success")
+    val success: Boolean,
+    @SerializedName("message")
+    val message: String,
+    @SerializedName("server_id")
+    val serverId: String? // ID data yang baru dibuat di server
 )

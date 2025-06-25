@@ -1,6 +1,5 @@
 package com.bkkbnjabar.sipenting.domain.model
 
-// Model domain ini akan menampung detail lokasi yang akan digunakan untuk pre-fill UI
 data class LocationDetails(
     val provinsiId: String?,
     val provinsiName: String?,
@@ -10,5 +9,4 @@ data class LocationDetails(
     val kecamatanName: String?,
     val kelurahanId: String?,
     val kelurahanName: String?
-) {
-}
+)

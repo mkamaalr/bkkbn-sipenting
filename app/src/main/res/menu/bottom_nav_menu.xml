@@ -1,23 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/homeFragment"
-        android:icon="@drawable/ic_home_black_24dp"
-        android:title="Home" />
 
     <item
-        android:id="@+id/pregnantMotherListFragment"
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/menu_home" />
+
+    <item
+        android:id="@+id/nav_pregnant_mother_list"
         android:icon="@drawable/ic_pregnant_mother"
-        android:title="Ibu Hamil" />
+        android:title="@string/menu_pregnant_mother" />
 
     <item
-        android:id="@+id/breastfeedingMotherListFragment"
-        android:icon="@drawable/ic_breastfeeding_mother"
-        android:title="Ibu Menyusui" />
-
-    <item
-        android:id="@+id/childListFragment"
+        android:id="@+id/nav_child_list"
         android:icon="@drawable/ic_child"
-        android:title="Balita" />
+        android:title="@string/menu_child" />
+
+    <item
+        android:id="@+id/nav_breastfeeding_mother_list"
+        android:icon="@drawable/ic_breastfeeding_mother"
+        android:title="@string/menu_breastfeeding_mother" />
+
+    <!-- Anda bisa menambahkan item menu lainnya di sini, misal untuk profil -->
+    <!--
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_profile"
+        android:title="@string/menu_profile" />
+    -->
 
 </menu>

@@ -2,25 +2,20 @@ package com.bkkbnjabar.sipenting.domain.usecase.common
 
 import com.bkkbnjabar.sipenting.data.repository.LookupRepository
 import com.bkkbnjabar.sipenting.domain.model.Provinsi
-import com.bkkbnjabar.sipenting.utils.Resource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
- * Use case untuk mendapatkan daftar Provinsi dari database lokal (Room).
- * Data ini diasumsikan sudah di-preload di SplashScreen.
+ * Use case to get the list of all provinces.
  */
-class GetProvinsisUseCase @Inject constructor(
-    private val lookupRepository: LookupRepository
-) {
-    /**
-     * Mengeksekusi use case untuk mendapatkan semua data Provinsi.
-     * Mengembalikan Flow of Resource yang menunjukkan status loading, sukses, atau error.
-     */
-    operator fun invoke(): Flow<Resource<List<Provinsi>>> {
-        return lookupRepository.getAllProvinsisFromRoom().map { listProvinsi ->
-            Resource.Success(listProvinsi)
-        }
+interface GetProvinsisUseCase {
+    operator fun invoke(): Flow<List<Provinsi>>
+}
+
+class GetProvinsisUseCaseImpl @Inject constructor(
+    private val repository: LookupRepository
+) : GetProvinsisUseCase {
+    override operator fun invoke(): Flow<List<Provinsi>> {
+        return repository.getAllProvinsisFromRoom()
     }
 }

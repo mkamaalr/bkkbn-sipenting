@@ -6,23 +6,27 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Interceptor kustom untuk menambahkan token otentikasi (Bearer Token) ke setiap permintaan API.
- * Mengambil token dari SharedPrefsManager.
+ * An OkHttp Interceptor that adds the Authorization header with a Bearer token
+ * to every outgoing API request.
  */
 @Singleton
-class AuthInterceptor @Inject constructor( // <<< PASTIKAN ADA @Inject constructor DI SINI
+class AuthInterceptor @Inject constructor(
     private val sharedPrefsManager: SharedPrefsManager
 ) : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val originalRequest = chain.request()
-        val accessToken = sharedPrefsManager.getAccessToken() // Menggunakan getAccessToken()
 
-        val requestBuilder = originalRequest.newBuilder()
-        if (!accessToken.isNullOrEmpty()) { // Cek null/empty saja, tidak ada "No-Authentication"
-            requestBuilder.header("Authorization", "Bearer $accessToken")
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val token = sharedPrefsManager.getUserSession()?.accessToken
+        val originalRequest = chain.request()
+
+        // If a token exists, add it to the request header.
+        val requestBuilder = if (token != null) {
+            originalRequest.newBuilder()
+                .header("Authorization", "Bearer $token")
+        } else {
+            originalRequest.newBuilder()
         }
 
-        val modifiedRequest = requestBuilder.build()
-        return chain.proceed(modifiedRequest)
+        val request = requestBuilder.build()
+        return chain.proceed(request)
     }
 }

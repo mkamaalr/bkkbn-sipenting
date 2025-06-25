@@ -4,99 +4,101 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.bkkbnjabar.sipenting.data.local.entity.KabupatenEntity
-import com.bkkbnjabar.sipenting.data.local.entity.KecamatanEntity
-import com.bkkbnjabar.sipenting.data.local.entity.KelurahanEntity
-import com.bkkbnjabar.sipenting.data.local.entity.ProvinsiEntity
-import com.bkkbnjabar.sipenting.data.local.entity.RtEntity
-import com.bkkbnjabar.sipenting.data.local.entity.RwEntity
+import com.bkkbnjabar.sipenting.data.local.entity.*
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Data Access Object (DAO) for all lookup-related entities.
+ * This interface provides methods to interact with the location tables
+ * (provinsi, kabupaten, kecamatan, etc.) in the local Room database.
+ */
 @Dao
 interface LookupDao {
 
-    // --- Provinsi Operations ---
+    // --- INSERT METHODS (for preloading data from API) ---
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllProvinsi(provinsis: List<ProvinsiEntity>)
+    suspend fun insertAllProvinsis(provinsis: List<ProvinsiEntity>)
 
-    @Query("SELECT * FROM provinsi_table ORDER BY name ASC")
-    fun getAllProvinsi(): Flow<List<ProvinsiEntity>>
-
-    @Query("SELECT * FROM provinsi_table WHERE id = :provinsiId LIMIT 1")
-    suspend fun getProvinsiById(provinsiId: Int): ProvinsiEntity?
-
-    @Query("DELETE FROM provinsi_table")
-    suspend fun clearProvinsi()
-
-    // --- Kabupaten Operations ---
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllKabupaten(kabupatens: List<KabupatenEntity>)
+    suspend fun insertAllKabupatens(kabupatens: List<KabupatenEntity>)
 
-    @Query("SELECT * FROM kabupaten_table ORDER BY name ASC")
-    fun getAllKabupaten(): Flow<List<KabupatenEntity>>
-
-    @Query("SELECT * FROM kabupaten_table WHERE id = :kabupatenId LIMIT 1")
-    suspend fun getKabupatenById(kabupatenId: Int): KabupatenEntity?
-
-    @Query("DELETE FROM kabupaten_table")
-    suspend fun clearKabupaten()
-
-    // --- Kecamatan Operations ---
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllKecamatan(kecamatans: List<KecamatanEntity>)
+    suspend fun insertAllKecamatans(kecamatans: List<KecamatanEntity>)
 
-    @Query("SELECT * FROM kecamatan_table ORDER BY name ASC")
-    fun getAllKecamatan(): Flow<List<KecamatanEntity>>
-
-    @Query("SELECT * FROM kecamatan_table WHERE kabupatenId = :kabupatenId ORDER BY name ASC")
-    fun getKecamatansByKabupatenId(kabupatenId: Int): Flow<List<KecamatanEntity>>
-
-    @Query("SELECT * FROM kecamatan_table WHERE id = :kecamatanId LIMIT 1")
-    suspend fun getKecamatanById(kecamatanId: Int): KecamatanEntity?
-
-    @Query("DELETE FROM kecamatan_table")
-    suspend fun clearKecamatan()
-
-    // --- Kelurahan Operations ---
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllKelurahan(kelurahans: List<KelurahanEntity>)
+    suspend fun insertAllKelurahans(kelurahans: List<KelurahanEntity>)
 
-    @Query("SELECT * FROM kelurahan_table ORDER BY name ASC")
-    fun getAllKelurahan(): Flow<List<KelurahanEntity>>
-
-    @Query("SELECT * FROM kelurahan_table WHERE kecamatanId = :kecamatanId ORDER BY name ASC")
-    fun getKelurahansByKecamatanId(kecamatanId: Int): Flow<List<KelurahanEntity>>
-
-    @Query("SELECT * FROM kelurahan_table WHERE id = :kelurahanId LIMIT 1")
-    suspend fun getKelurahanById(kelurahanId: Int): KelurahanEntity? // <<< TAMBAHKAN INI
-
-    @Query("DELETE FROM kelurahan_table")
-    suspend fun clearKelurahan()
-
-    // --- RW Operations ---
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllRw(rws: List<RwEntity>)
+    suspend fun insertAllRws(rws: List<RwEntity>)
 
-    @Query("SELECT * FROM rw_table ORDER BY name ASC")
-    fun getAllRw(): Flow<List<RwEntity>>
-
-    @Query("SELECT * FROM rw_table WHERE kelurahanId = :kelurahanId ORDER BY name ASC")
-    fun getRwsByKelurahanId(kelurahanId: Int): Flow<List<RwEntity>>
-
-    @Query("DELETE FROM rw_table")
-    suspend fun clearRw()
-
-    // --- RT Operations ---
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllRt(rts: List<RtEntity>)
+    suspend fun insertAllRts(rts: List<RtEntity>)
 
-    @Query("SELECT * FROM rt_table ORDER BY name ASC")
-    fun getAllRt(): Flow<List<RtEntity>>
 
-    @Query("SELECT * FROM rt_table WHERE rwId = :rwId ORDER BY name ASC")
-    fun getRtsByRwId(rwId: Int): Flow<List<RtEntity>>
+    // --- GET ALL METHODS (Reactive, using Flow) ---
 
-    @Query("DELETE FROM rt_table")
-    suspend fun clearRt()
+    @Query("SELECT * FROM provinsi ORDER BY name ASC")
+    fun getAllProvinsis(): Flow<List<ProvinsiEntity>>
 
+    @Query("SELECT * FROM kabupaten ORDER BY name ASC")
+    fun getAllKabupatens(): Flow<List<KabupatenEntity>>
+
+
+    // --- GET FILTERED LIST METHODS (Reactive, using Flow) ---
+
+    @Query("SELECT * FROM kecamatan WHERE kabupatenId = :kabupatenId ORDER BY name ASC")
+    fun getKecamatansByKabupaten(kabupatenId: Int): Flow<List<KecamatanEntity>>
+
+    @Query("SELECT * FROM kelurahan WHERE kecamatanId = :kecamatanId ORDER BY name ASC")
+    fun getKelurahansByKecamatan(kecamatanId: Int): Flow<List<KelurahanEntity>>
+
+    @Query("SELECT * FROM rw WHERE kelurahanId = :kelurahanId ORDER BY name ASC")
+    fun getRwsByKelurahan(kelurahanId: Int): Flow<List<RwEntity>>
+
+    @Query("SELECT * FROM rt WHERE rwId = :rwId ORDER BY name ASC")
+    fun getRtsByRw(rwId: Int): Flow<List<RtEntity>>
+
+
+    // --- GET SINGLE ITEM BY ID METHODS (One-shot, suspend) ---
+
+    @Query("SELECT * FROM provinsi WHERE id = :id LIMIT 1")
+    suspend fun getProvinsiById(id: Int?): ProvinsiEntity?
+
+    @Query("SELECT * FROM kabupaten WHERE id = :id LIMIT 1")
+    suspend fun getKabupatenById(id: Int?): KabupatenEntity?
+
+    @Query("SELECT * FROM kecamatan WHERE id = :id LIMIT 1")
+    suspend fun getKecamatanById(id: Int?): KecamatanEntity?
+
+    @Query("SELECT * FROM kelurahan WHERE id = :id LIMIT 1")
+    suspend fun getKelurahanById(id: Int?): KelurahanEntity?
+
+
+    // ================== FUNGSI BARU UNTUK MEMERIKSA DATA ==================
+    /**
+     * Menghitung jumlah provinsi di database.
+     * Digunakan untuk memeriksa apakah data lookup sudah pernah diunduh.
+     * @return Jumlah baris di tabel provinsi.
+     */
+    @Query("SELECT COUNT(id) FROM provinsi")
+    suspend fun getProvinsiCount(): Int
+    // ====================================================================
+    // ================== FUNGSI BARU UNTUK LOOKUP ITEMS ==================
+
+    /**
+     * Menyimpan daftar LookupItemEntity ke database.
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLookupItems(items: List<LookupItemEntity>)
+
+    /**
+     * Mengambil daftar LookupItemEntity dari database berdasarkan tipenya.
+     * @param type Jenis lookup yang ingin diambil (misal: "disease_histories").
+     * @return Flow yang berisi daftar item yang sesuai.
+     */
+    @Query("SELECT * FROM lookup_item WHERE type = :type ORDER BY name ASC")
+    fun getLookupItemsByType(type: String): Flow<List<LookupItemEntity>>
+
+    // ====================================================================
 }

@@ -1,15 +1,12 @@
 package com.bkkbnjabar.sipenting.data.model.pregnantmother
 
-import android.os.Parcelable
-import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
-import kotlinx.parcelize.Parcelize
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
-@Parcelize
+/**
+ * Data class yang menampung state dari formulir kunjungan ibu hamil.
+ * Digunakan oleh ViewModel untuk menyimpan data kunjungan yang sedang diisi oleh pengguna.
+ */
 data class PregnantMotherVisitData(
-    val localVisitId: Int? = null, // ID lokal untuk kunjungan (Room Primary Key)
-    val pregnantMotherLocalId: Int? = null, // Foreign Key ke Ibu Hamil
+    val localVisitId: Int? = null,
+    val pregnantMotherLocalId: Int? = null,
     val visitDate: String? = null,
     val childNumber: Int? = null,
     val dateOfBirthLastChild: String? = null,
@@ -25,21 +22,25 @@ data class PregnantMotherVisitData(
     val isEstimatedFetalWeightChecked: Boolean? = null,
     val isExposedToCigarettes: Boolean? = null,
     val isCounselingReceived: Boolean? = null,
-    val counselingTypeId: Int? = null, // Ini mungkin lookup ID
+    val counselingTypeId: Int? = null,
     val isIronTablesReceived: Boolean? = null,
     val isIronTablesTaken: Boolean? = null,
-    val facilitatingReferralServiceStatus: String? = null, // Ini mungkin lookup String
-    val facilitatingSocialAssistanceStatus: String? = null, // Ini mungkin lookup String
+    val facilitatingReferralServiceStatus: String? = null,
+    val facilitatingSocialAssistanceStatus: String? = null,
     val nextVisitDate: String? = null,
     val tpkNotes: String? = null,
     val isAlive: Boolean? = null,
     val isGivenBirth: Boolean? = null,
-    val givenBirthStatusId: Int? = null, // Ini mungkin lookup ID
-    val pregnantMotherStatusId: Int? = null, // Ini mungkin lookup ID
-    val diseaseHistory: List<String>? = null, // List of selected strings (checkboxes)
+    val givenBirthStatusId: Int? = null,
+    val pregnantMotherStatusId: Int? = null,
+    val diseaseHistory: List<String>? = null,
     val mainSourceOfDrinkingWater: List<String>? = null,
     val defecationFacility: List<String>? = null,
     val socialAssistanceFacilitationOptions: List<String>? = null,
-    val syncStatus: SyncStatus = SyncStatus.PENDING_UPLOAD, // Sync status untuk kunjungan
-    val createdAt: String? = null
-) : Parcelable
+    val syncStatus: SyncStatus = SyncStatus.PENDING,
+    val createdAt: String? = null,
+    // Menambahkan field yang sebelumnya hilang untuk dropdown
+    val deliveryPlaceId: Int? = null,
+    val birthAssistantId: Int? = null,
+    val contraceptionOptionId: Int? = null
+)

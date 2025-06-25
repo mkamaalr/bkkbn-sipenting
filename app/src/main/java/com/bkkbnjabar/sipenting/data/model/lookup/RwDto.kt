@@ -5,10 +5,16 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class RwDto(
-    @Json(name = "id") val id: Int?,
-    @Json(name = "name") val name: String?,
-    @Json(name = "kelurahan_id") val kelurahanId: Int?,
-    // Tidak perlu nested KelurahanDto jika Anda tidak membutuhkannya di sini.
-    // Jika API RwResource Laravel menyertakan Kelurahan, tambahkan:
-     @Json(name = "kelurahan") val kelurahan: KelurahanDto?
+    @Json(name = "id")
+    val id: Int,
+    @Json(name = "kelurahan_id")
+    val kelurahanId: Int?, // Dibuat nullable
+    @Json(name = "name")
+    val name: String
+)
+
+@JsonClass(generateAdapter = true)
+data class RwListResponse(
+    @Json(name = "data")
+    val data: List<RwDto>?
 )

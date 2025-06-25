@@ -1,14 +1,13 @@
 package com.bkkbnjabar.sipenting.data.model.pregnantmother
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
-@Parcelize
+/**
+ * Data class that holds the state of the pregnant mother registration form.
+ * It is used by the ViewModel to store data temporarily as the user fills out the form
+ * across multiple fragments. All fields are nullable to represent an empty initial state.
+ */
 data class PregnantMotherRegistrationData(
-    val localId: Int? = null, // Ini akan menjadi Primary Key dari Room (Entity)
-    val registrationDate: String? = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE), // Default ke tanggal hari ini
+    val localId: Int? = null,
+    val registrationDate: String? = null,
     val name: String? = null,
     val nik: String? = null,
     val dateOfBirth: String? = null,
@@ -25,20 +24,7 @@ data class PregnantMotherRegistrationData(
     val rwId: Int? = null,
     val rtName: String? = null,
     val rtId: Int? = null,
-    val husbandName: String? = null,
     val fullAddress: String? = null,
-    val syncStatus: SyncStatus = SyncStatus.PENDING_UPLOAD,
-    val createdAt: String? = null // BARU: Menambahkan field createdAt
-) : Parcelable
-
-enum class SyncStatus {
-    PENDING_UPLOAD,
-    UPLOADED,
-    FAILED_UPLOAD,
-    PENDING_UPDATE,
-    UPDATED,
-    FAILED_UPDATE,
-    PENDING_DELETE,
-    DELETED,
-    FAILED_DELETE
-}
+    val syncStatus: SyncStatus = SyncStatus.PENDING,
+    val createdAt: String? = null
+)

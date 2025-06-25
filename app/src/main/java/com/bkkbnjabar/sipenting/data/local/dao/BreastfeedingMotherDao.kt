@@ -11,21 +11,18 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BreastfeedingMotherDao {
+
+    /**
+     * Inserts a new breastfeeding mother record.
+     * @param mother The entity to insert.
+     */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(breastfeedingMother: BreastfeedingMotherEntity): Long
+    suspend fun insertBreastfeedingMother(mother: BreastfeedingMotherEntity)
 
-    @Update
-    suspend fun update(breastfeedingMother: BreastfeedingMotherEntity)
-
-    @Query("SELECT * FROM breastfeeding_mothers ORDER BY createdAt DESC")
+    /**
+     * Gets all breastfeeding mother records from the database.
+     * @return A Flow emitting a list of all breastfeeding mothers.
+     */
+    @Query("SELECT * FROM breastfeeding_mother ORDER BY name ASC")
     fun getAllBreastfeedingMothers(): Flow<List<BreastfeedingMotherEntity>>
-
-    @Query("SELECT * FROM breastfeeding_mothers WHERE syncStatus = :status")
-    suspend fun getBreastfeedingMothersBySyncStatus(status: SyncStatus): List<BreastfeedingMotherEntity>
-
-    @Query("SELECT * FROM breastfeeding_mothers WHERE localId = :localId")
-    suspend fun getBreastfeedingMotherById(localId: Int): BreastfeedingMotherEntity?
-
-    @Query("DELETE FROM breastfeeding_mothers WHERE localId = :localId")
-    suspend fun deleteBreastfeedingMother(localId: Int)
 }

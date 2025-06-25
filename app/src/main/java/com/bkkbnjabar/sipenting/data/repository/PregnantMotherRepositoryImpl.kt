@@ -4,59 +4,36 @@ import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherVisitsDao
 import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherEntity
 import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherVisitsEntity
-import com.bkkbnjabar.sipenting.data.local.mapper.toPregnantMotherRegistrationData
-import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherRegistrationData
 import com.bkkbnjabar.sipenting.utils.Resource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PregnantMotherRepositoryImpl @Inject constructor(
     private val pregnantMotherDao: PregnantMotherDao,
-    private val pregnantMotherVisitsDao: PregnantMotherVisitsDao
+    private val visitsDao: PregnantMotherVisitsDao
 ) : PregnantMotherRepository {
 
-    override suspend fun createPregnantMother(mother: PregnantMotherEntity): Resource<Long> { // FIXED: Mengembalikan Long ID
+    override suspend fun insertPregnantMother(motherEntity: PregnantMotherEntity): Resource<Long> {
         return try {
-            val id = pregnantMotherDao.insertPregnantMother(mother)
-            Resource.Success(id)
+            val newRowId = pregnantMotherDao.insertPregnantMother(motherEntity)
+            Resource.Success(newRowId)
         } catch (e: Exception) {
-            Resource.Error("Failed to create pregnant mother: ${e.localizedMessage}")
+            Resource.Error("Gagal menyimpan data ibu hamil ke database: ${e.message}")
         }
     }
 
-    override fun getPregnantMothers(): Flow<Resource<List<PregnantMotherRegistrationData>>> = flow {
-        emit(Resource.Loading())
-
-        try {
-            pregnantMotherDao.getAllPregnantMothers()
-                .map { entities ->
-                    entities.map { it.toPregnantMotherRegistrationData() }
-                }
-                .collect { mappedDataList ->
-                    emit(Resource.Success(mappedDataList))
-                }
-        } catch (e: Exception) {
-            emit(Resource.Error("Error loading pregnant mothers: ${e.localizedMessage}"))
-        }
-    }.catch { e ->
-        emit(Resource.Error("Unexpected error in pregnant mothers flow: ${e.localizedMessage}"))
-    }
-
-    override suspend fun addPregnantMotherVisit(visit: PregnantMotherVisitsEntity): Resource<Unit> {
+    override suspend fun insertPregnantMotherVisit(visitEntity: PregnantMotherVisitsEntity): Resource<Unit> {
         return try {
-            pregnantMotherVisitsDao.insertPregnantMotherVisit(visit)
+            visitsDao.insertVisit(visitEntity)
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error("Failed to add pregnant mother visit: ${e.localizedMessage}")
+            Resource.Error("Gagal menyimpan data kunjungan ke database: ${e.message}")
         }
     }
 
-    override fun getPregnantMotherVisits(motherId: Int): Flow<List<PregnantMotherVisitsEntity>> {
-        return pregnantMotherVisitsDao.getVisitsForPregnantMother(motherId)
+    override fun getAllPregnantMothers(): Flow<List<PregnantMotherEntity>> {
+        return pregnantMotherDao.getAllPregnantMothers()
     }
 }

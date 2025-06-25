@@ -1,53 +1,36 @@
 package com.bkkbnjabar.sipenting.data.local.mapper
 
-import com.bkkbnjabar.sipenting.data.local.entity.KabupatenEntity
-import com.bkkbnjabar.sipenting.data.local.entity.KecamatanEntity
-import com.bkkbnjabar.sipenting.data.local.entity.KelurahanEntity
-import com.bkkbnjabar.sipenting.data.local.entity.ProvinsiEntity
-import com.bkkbnjabar.sipenting.data.local.entity.RwEntity
-import com.bkkbnjabar.sipenting.data.local.entity.RtEntity
-import com.bkkbnjabar.sipenting.domain.model.Kabupaten
-import com.bkkbnjabar.sipenting.domain.model.Kecamatan
-import com.bkkbnjabar.sipenting.domain.model.Kelurahan
-import com.bkkbnjabar.sipenting.domain.model.Provinsi
-import com.bkkbnjabar.sipenting.domain.model.Rw
-import com.bkkbnjabar.sipenting.domain.model.Rt
+import com.bkkbnjabar.sipenting.data.local.entity.*
+import com.bkkbnjabar.sipenting.domain.model.*
+import kotlin.jvm.JvmName
 
-// Mappers from Domain Models to Room Entities
-fun Provinsi.toProvinsiEntity(): ProvinsiEntity =
-    ProvinsiEntity(id = this.id, name = this.name)
+// --- Entity to Domain Mappers (for single objects) ---
 
-fun Kabupaten.toKabupatenEntity(): KabupatenEntity =
-    KabupatenEntity(id = this.id, name = this.name, provinsiId = this.provinsiId) // Perhatikan nama kolom Room: provinsi_id
-
-fun Kecamatan.toKecamatanEntity(): KecamatanEntity =
-    KecamatanEntity(id = this.id, name = this.name, kabupatenId = this.kabupatenId) // Perhatikan nama kolom Room: kabupaten_id
-
-fun Kelurahan.toKelurahanEntity(): KelurahanEntity =
-    KelurahanEntity(id = this.id, name = this.name, kecamatanId = this.kecamatanId) // Perhatikan nama kolom Room: kecamatan_id
-
-fun Rw.toRwEntity(): RwEntity =
-    RwEntity(id = this.id, name = this.name, kelurahanId = this.kelurahanId) // Perhatikan nama kolom Room: kelurahan_id
-
-fun Rt.toRtEntity(): RtEntity =
-    RtEntity(id = this.id, name = this.name, rwId = this.rwId) // Perhatikan nama kolom Room: rw_id
+fun ProvinsiEntity.toDomain(): Provinsi = Provinsi(id = this.id, name = this.name)
+fun KabupatenEntity.toDomain(): Kabupaten = Kabupaten(id = this.id, provinsiId = this.provinsiId, name = this.name)
+fun KecamatanEntity.toDomain(): Kecamatan = Kecamatan(id = this.id, kabupatenId = this.kabupatenId, name = this.name)
+fun KelurahanEntity.toDomain(): Kelurahan = Kelurahan(id = this.id, kecamatanId = this.kecamatanId, name = this.name)
+fun RwEntity.toDomain(): Rw = Rw(id = this.id, kelurahanId = this.kelurahanId, name = this.name)
+fun RtEntity.toDomain(): Rt = Rt(id = this.id, rwId = this.rwId, name = this.name)
 
 
-// Mappers from Room Entities to Domain Models
-fun ProvinsiEntity.toProvinsi(): Provinsi =
-    Provinsi(id = this.id, name = this.name)
+// --- Entity List to Domain List Mappers (for lists of objects) ---
 
-fun KabupatenEntity.toKabupaten(): Kabupaten =
-    Kabupaten(id = this.id, name = this.name, provinsiId = this.provinsiId) // Perhatikan nama kolom Room: provinsi_id
+// Menggunakan @JvmName untuk memberikan nama unik pada level JVM
+@JvmName("provinsiEntityToDomain")
+fun List<ProvinsiEntity>.toDomain(): List<Provinsi> = this.map { it.toDomain() }
 
-fun KecamatanEntity.toKecamatan(): Kecamatan =
-    Kecamatan(id = this.id, name = this.name, kabupatenId = this.kabupatenId) // Perhatikan nama kolom Room: kabupaten_id
+@JvmName("kabupatenEntityToDomain")
+fun List<KabupatenEntity>.toDomain(): List<Kabupaten> = this.map { it.toDomain() }
 
-fun KelurahanEntity.toKelurahan(): Kelurahan =
-    Kelurahan(id = this.id, name = this.name, kecamatanId = this.kecamatanId) // Perhatikan nama kolom Room: kecamatan_id
+@JvmName("kecamatanEntityToDomain")
+fun List<KecamatanEntity>.toDomain(): List<Kecamatan> = this.map { it.toDomain() }
 
-fun RwEntity.toRw(): Rw =
-    Rw(id = this.id, name = this.name, kelurahanId = this.kelurahanId) // Perhatikan nama kolom Room: kelurahan_id
+@JvmName("kelurahanEntityToDomain")
+fun List<KelurahanEntity>.toDomain(): List<Kelurahan> = this.map { it.toDomain() }
 
-fun RtEntity.toRt(): Rt =
-    Rt(id = this.id, name = this.name, rwId = this.rwId) // Perhatikan nama kolom Room: rw_id
+@JvmName("rwEntityToDomain")
+fun List<RwEntity>.toDomain(): List<Rw> = this.map { it.toDomain() }
+
+@JvmName("rtEntityToDomain")
+fun List<RtEntity>.toDomain(): List<Rt> = this.map { it.toDomain() }

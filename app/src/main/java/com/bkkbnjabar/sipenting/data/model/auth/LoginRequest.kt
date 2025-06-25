@@ -1,11 +1,18 @@
 package com.bkkbnjabar.sipenting.data.model.auth
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import com.google.gson.annotations.SerializedName
 
-@JsonClass(generateAdapter = true)
+/**
+ * Data Transfer Object (DTO) for the login request body.
+ * This class structures the data that will be sent to the server for authentication.
+ *
+ * @param email The user's email. It can be null.
+ * @param password The user's password. It can be null.
+ */
 data class LoginRequest(
-    @Json(name = "username") val username: String? = null, // Mengizinkan nama pengguna atau email
-    @Json(name = "email") val email: String? = null,
-    @Json(name = "password") val password: String // Ini harus selalu ada
+    @SerializedName("username")
+    val email: String?,
+
+    @SerializedName("password")
+    val password: String?
 )

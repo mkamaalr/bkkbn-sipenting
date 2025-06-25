@@ -4,8 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <!-- Anda bisa menambahkan variabel data binding di sini jika diperlukan,
-             tetapi untuk contoh ini, kita akan mengelola UI dari Fragment. -->
     </data>
 
     <ScrollView
@@ -113,10 +111,11 @@
                     android:inputType="phone" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Provinsi -->
+            <!-- ==== BAGIAN LOKASI (READ-ONLY) ==== -->
+            <!-- Provinsi (Read-Only) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_provinsi"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -125,18 +124,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/til_phone_number">
 
-                <AutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_provinsi"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none"
-                    tools:ignore="LabelFor" />
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Kabupaten -->
+            <!-- Kabupaten (Read-Only) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_kabupaten"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -145,18 +145,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/til_provinsi">
 
-                <AutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_kabupaten"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none"
-                    tools:ignore="LabelFor" />
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Kecamatan -->
+            <!-- Kecamatan (Read-Only) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_kecamatan"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -165,18 +166,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/til_kabupaten">
 
-                <AutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_kecamatan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none"
-                    tools:ignore="LabelFor" />
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Kelurahan -->
+            <!-- Kelurahan (Read-Only) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_kelurahan"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -185,15 +187,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/til_kecamatan">
 
-                <AutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_kelurahan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none"
-                    tools:ignore="LabelFor" />
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- RW -->
+            <!-- ==== BAGIAN LOKASI (BISA DIEDIT) ==== -->
+            <!-- RW (Bisa dipilih) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_rw"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -213,7 +217,7 @@
                     tools:ignore="LabelFor" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- RT -->
+            <!-- RT (Bisa dipilih) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_rt"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -286,7 +290,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/til_registration_date" />
+                app:layout_constraintTop_toBottomOf="@id/til_registration_date"
+                app:layout_constraintVertical_bias="0.0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

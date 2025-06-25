@@ -6,53 +6,57 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
 
+/**
+ * Represents the "pregnant_mother_visits" table.
+ * Each row is a visit record linked to a mother in the pregnant_mother table.
+ */
 @Entity(
     tableName = "pregnant_mother_visits",
-    // Menambahkan Foreign Key ke PregnantMotherEntity
-    foreignKeys = [ForeignKey(
-        entity = PregnantMotherEntity::class,
-        parentColumns = ["localId"], // Kolom di PregnantMotherEntity
-        childColumns = ["pregnantMotherLocalId"], // Kolom di PregnantMotherVisitsEntity
-        onDelete = ForeignKey.CASCADE // Jika PregnantMother dihapus, kunjungan ikut dihapus
-    )],
-    // Menambahkan index untuk performa query berdasarkan pregnantMotherLocalId
+    foreignKeys = [
+        ForeignKey(
+            entity = PregnantMotherEntity::class,
+            parentColumns = ["localId"],
+            childColumns = ["pregnantMotherLocalId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
     indices = [Index(value = ["pregnantMotherLocalId"])]
 )
 data class PregnantMotherVisitsEntity(
     @PrimaryKey(autoGenerate = true)
-    val localVisitId: Int? = null, // ID unik untuk setiap kunjungan
-    val pregnantMotherLocalId: Int, // Foreign key ke PregnantMotherEntity
-    val visitDate: String?, // Tanggal kunjungan
-    val childNumber: Int?, // Anak ke-berapa
-    val dateOfBirthLastChild: String?, // Tanggal lahir anak terakhir (jika ada)
-    val pregnancyWeekAge: Int?, // Usia kehamilan (minggu)
-    val weightTrimester1: Double?, // Berat badan pada trimester 1
-    val currentHeight: Double?, // Tinggi badan saat ini
-    val currentWeight: Double?, // Berat badan saat ini
-    val isHbChecked: Boolean?, // Apakah Hb sudah diperiksa
-    val hemoglobinLevel: Double?, // Tingkat hemoglobin
-    val upperArmCircumference: Double?, // Lingkar lengan atas
-    val isTwin: Boolean?, // Apakah kembar
-    val numberOfTwins: Int?, // Jumlah kembar
-    val isEstimatedFetalWeightChecked: Boolean?, // Apakah taksiran berat janin sudah diperiksa
-    val isExposedToCigarettes: Boolean?, // Apakah terpapar rokok
-    val isCounselingReceived: Boolean?, // Apakah sudah menerima konseling
-    val counselingTypeId: Int?, // ID jenis konseling (akan diperlakukan sebagai single ID untuk saat ini)
-    val isIronTablesReceived: Boolean?, // Apakah sudah menerima tablet zat besi
-    val isIronTablesTaken: Boolean?, // Apakah tablet zat besi sudah diminum
-    val facilitatingReferralServiceStatus: String?, // Status fasilitas layanan rujukan (string untuk saat ini)
-    val facilitatingSocialAssistanceStatus: String?, // Status fasilitas bantuan sosial (string untuk saat ini)
-    val nextVisitDate: String?, // Tanggal kunjungan berikutnya
-    val tpkNotes: String?, // Catatan TPK
-    val isAlive: Boolean?, // Apakah ibu masih hidup
-    val isGivenBirth: Boolean?, // Apakah sudah melahirkan
-    val givenBirthStatusId: Int?, // ID status melahirkan
-    val pregnantMotherStatusId: Int?, // ID status ibu hamil
-    // Bidang untuk data multiple, disimpan sebagai JSON string di database
-    val diseaseHistory: String?,
-    val mainSourceOfDrinkingWater: String?,
-    val defecationFacility: String?,
-    val socialAssistanceFacilitationOptions: String?,
-    val createdAt: String?, // Waktu pembuatan record kunjungan
-    val syncStatus: SyncStatus // FIXED: Tipe Enum langsung di sini
+    val localVisitId: Int = 0,
+    val id: String? = null, // ID from server after sync
+    val pregnantMotherLocalId: Int,
+    val visitDate: String,
+    val childNumber: Int?,
+    val dateOfBirthLastChild: String?,
+    val pregnancyWeekAge: Int?,
+    val weightTrimester1: Double?,
+    val currentHeight: Double?,
+    val currentWeight: Double?,
+    val isHbChecked: Boolean,
+    val hemoglobinLevel: Double?,
+    val upperArmCircumference: Double?,
+    val isTwin: Boolean,
+    val numberOfTwins: Int?,
+    val isEstimatedFetalWeightChecked: Boolean,
+    val isExposedToCigarettes: Boolean,
+    val isCounselingReceived: Boolean,
+    val counselingTypeId: Int?,
+    val isIronTablesReceived: Boolean,
+    val isIronTablesTaken: Boolean,
+    val facilitatingReferralServiceStatus: String?,
+    val facilitatingSocialAssistanceStatus: String?,
+    val nextVisitDate: String?,
+    val tpkNotes: String?,
+    val isAlive: Boolean,
+    val isGivenBirth: Boolean,
+    val givenBirthStatusId: Int?,
+    val pregnantMotherStatusId: Int?,
+    val diseaseHistory: List<String>?,
+    val mainSourceOfDrinkingWater: List<String>?,
+    val defecationFacility: List<String>?,
+    val socialAssistanceFacilitationOptions: List<String>?,
+    val syncStatus: SyncStatus = SyncStatus.PENDING,
+    val createdAt: Long = System.currentTimeMillis()
 )

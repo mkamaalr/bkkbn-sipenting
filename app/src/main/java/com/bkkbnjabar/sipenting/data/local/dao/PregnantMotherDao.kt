@@ -11,23 +11,27 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PregnantMotherDao {
+    /**
+     * Inserts a new pregnant mother record. If there's a conflict, it replaces the old one.
+     * @param pregnantMother The entity to insert.
+     * @return The row ID of the newly inserted mother.
+     */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPregnantMother(pregnantMother: PregnantMotherEntity): Long
 
-    @Update
-    suspend fun updatePregnantMother(pregnantMother: PregnantMotherEntity)
-
-    @Delete
-    suspend fun deletePregnantMother(pregnantMother: PregnantMotherEntity)
-
-    @Query("SELECT * FROM pregnant_mother_table WHERE localId = :localId")
-    suspend fun getPregnantMotherById(localId: Int): PregnantMotherEntity?
-
-    @Query("SELECT * FROM pregnant_mother_table")
+    /**
+     * Gets all pregnant mother records from the database, ordered by creation date.
+     * @return A Flow emitting a list of all pregnant mothers.
+     */
+    @Query("SELECT * FROM pregnant_mother ORDER BY createdAt DESC")
     fun getAllPregnantMothers(): Flow<List<PregnantMotherEntity>>
 
-    @Query("DELETE FROM pregnant_mother_table WHERE localId = :localId")
-    suspend fun deletePregnantMotherById(localId: Int)
-
+    /**
+     * Gets a single pregnant mother by her local ID.
+     * @param localId The local primary key of the mother.
+     * @return A Flow emitting the specific PregnantMotherEntity or null if not found.
+     */
+    @Query("SELECT * FROM pregnant_mother WHERE localId = :localId")
+    fun getPregnantMotherById(localId: Int): Flow<PregnantMotherEntity?>
 
 }

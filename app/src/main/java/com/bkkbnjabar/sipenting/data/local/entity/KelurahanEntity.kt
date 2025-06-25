@@ -5,17 +5,25 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "kelurahan_table",
+/**
+ * Represents the "kelurahan" table in the local Room database.
+ * It has a foreign key relationship with the KecamatanEntity.
+ */
+@Entity(
+    tableName = "kelurahan",
     foreignKeys = [
-        ForeignKey(entity = KecamatanEntity::class,
+        ForeignKey(
+            entity = KecamatanEntity::class,
             parentColumns = ["id"],
             childColumns = ["kecamatanId"],
-            onDelete = ForeignKey.CASCADE)
+            onDelete = ForeignKey.CASCADE
+        )
     ],
     indices = [Index(value = ["kecamatanId"])]
 )
 data class KelurahanEntity(
-    @PrimaryKey val id: Int,
-    val name: String,
-    val kecamatanId: Int
+    @PrimaryKey
+    val id: Int,
+    val kecamatanId: Int?,
+    val name: String
 )

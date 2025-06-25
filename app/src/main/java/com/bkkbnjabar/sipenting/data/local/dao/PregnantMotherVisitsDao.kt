@@ -11,24 +11,18 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PregnantMotherVisitsDao {
+    /**
+     * Inserts a new visit record.
+     * @param visit The visit entity to insert.
+     */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPregnantMotherVisit(visit: PregnantMotherVisitsEntity): Long
+    suspend fun insertVisit(visit: PregnantMotherVisitsEntity)
 
-    @Update
-    suspend fun updatePregnantMotherVisit(visit: PregnantMotherVisitsEntity)
-
-    @Delete
-    suspend fun deletePregnantMotherVisit(visit: PregnantMotherVisitsEntity)
-
-    @Query("SELECT * FROM pregnant_mother_visits WHERE localVisitId = :localVisitId")
-    suspend fun getPregnantMotherVisitById(localVisitId: Int): PregnantMotherVisitsEntity?
-
-    @Query("SELECT * FROM pregnant_mother_visits WHERE pregnantMotherLocalId = :pregnantMotherLocalId ORDER BY visitDate DESC")
-    fun getVisitsForPregnantMother(pregnantMotherLocalId: Int): Flow<List<PregnantMotherVisitsEntity>>
-
-    @Query("DELETE FROM pregnant_mother_visits WHERE localVisitId = :localVisitId")
-    suspend fun deletePregnantMotherVisitById(localVisitId: Int)
-
-    @Query("DELETE FROM pregnant_mother_visits WHERE pregnantMotherLocalId = :pregnantMotherLocalId")
-    suspend fun deleteAllVisitsForPregnantMother(pregnantMotherLocalId: Int)
+    /**
+     * Gets all visit records for a specific pregnant mother, ordered by visit date.
+     * @param motherId The local ID of the mother.
+     * @return A Flow emitting a list of visits for the specified mother.
+     */
+    @Query("SELECT * FROM pregnant_mother_visits WHERE pregnantMotherLocalId = :motherId ORDER BY createdAt DESC")
+    fun getVisitsForMother(motherId: Int): Flow<List<PregnantMotherVisitsEntity>>
 }

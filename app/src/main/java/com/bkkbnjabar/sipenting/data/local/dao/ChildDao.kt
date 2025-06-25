@@ -11,21 +11,18 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChildDao {
+
+    /**
+     * Inserts a new child record.
+     * @param child The child entity to insert.
+     */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(child: ChildEntity): Long
+    suspend fun insertChild(child: ChildEntity)
 
-    @Update
-    suspend fun update(child: ChildEntity)
-
-    @Query("SELECT * FROM children ORDER BY createdAt DESC")
+    /**
+     * Gets all child records from the database.
+     * @return A Flow emitting a list of all children.
+     */
+    @Query("SELECT * FROM child ORDER BY name ASC")
     fun getAllChildren(): Flow<List<ChildEntity>>
-
-    @Query("SELECT * FROM children WHERE syncStatus = :status")
-    suspend fun getChildrenBySyncStatus(status: SyncStatus): List<ChildEntity>
-
-    @Query("SELECT * FROM children WHERE localId = :localId")
-    suspend fun getChildById(localId: Int): ChildEntity?
-
-    @Query("DELETE FROM children WHERE localId = :localId")
-    suspend fun deleteChild(localId: Int)
 }

@@ -4,22 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.bkkbnjabar.sipenting.data.local.converter.ListStringConverter
-import com.bkkbnjabar.sipenting.data.local.dao.LookupDao
-import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherDao
-import com.bkkbnjabar.sipenting.data.local.dao.BreastfeedingMotherDao // Asumsi ini ada
-import com.bkkbnjabar.sipenting.data.local.dao.ChildDao // Asumsi ini ada
-import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherVisitsDao
-
-import com.bkkbnjabar.sipenting.data.local.entity.ProvinsiEntity
-import com.bkkbnjabar.sipenting.data.local.entity.KabupatenEntity
-import com.bkkbnjabar.sipenting.data.local.entity.KecamatanEntity
-import com.bkkbnjabar.sipenting.data.local.entity.KelurahanEntity
-import com.bkkbnjabar.sipenting.data.local.entity.RwEntity
-import com.bkkbnjabar.sipenting.data.local.entity.RtEntity
-import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherEntity
-import com.bkkbnjabar.sipenting.data.local.entity.BreastfeedingMotherEntity // Asumsi ini ada
-import com.bkkbnjabar.sipenting.data.local.entity.ChildEntity // Asumsi ini ada
-import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherVisitsEntity
+import com.bkkbnjabar.sipenting.data.local.dao.*
+import com.bkkbnjabar.sipenting.data.local.entity.*
 
 
 @Database(
@@ -33,6 +19,7 @@ import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherVisitsEntity
         PregnantMotherEntity::class,
         BreastfeedingMotherEntity::class,
         ChildEntity::class,
+        LookupItemEntity::class,
         PregnantMotherVisitsEntity::class // FIXED: Tambahkan Entity ini
     ],
     version = 1, // FIXED: MENINGKATKAN VERSI DATABASE! Naikkan dari 1 ke 10

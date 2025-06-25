@@ -4,54 +4,49 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bkkbnjabar.sipenting.domain.model.AuthResponse
 import com.bkkbnjabar.sipenting.data.model.auth.LoginRequest
-import com.bkkbnjabar.sipenting.domain.model.UserSession
-import com.bkkbnjabar.sipenting.domain.repository.AuthRepository
+import com.bkkbnjabar.sipenting.domain.model.AuthResponse
 import com.bkkbnjabar.sipenting.domain.usecase.auth.LoginUseCase
 import com.bkkbnjabar.sipenting.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for the LoginFragment.
+ * It handles the business logic for the login process.
+ */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase
 ) : ViewModel() {
 
-    // LiveData untuk melacak status proses login
-    private val _loginResult = MutableLiveData<Resource<UserSession>>()
-    val loginResult: LiveData<Resource<UserSession>> = _loginResult
-
-    init {
-        // Inisialisasi status awal sebagai Idle
-        _loginResult.value = Resource.Idle
-    }
+    private val _loginResult = MutableLiveData<Resource<AuthResponse>>(Resource.Idle)
+    val loginResult: LiveData<Resource<AuthResponse>> = _loginResult
 
     /**
-     * Memulai proses login dengan kredensial yang diberikan.
-     * Mengatur status _loginResult ke Loading, kemudian memanggil LoginUseCase.
-     * Setelah use case mengembalikan hasil, _loginResult diperbarui.
-     *
-     * @param request Objek LoginRequest yang berisi email/username dan password.
+     * Initiates the login process.
+     * @param username The username entered by the user.
+     * @param password The password entered by the user.
      */
-    fun login(request: LoginRequest) {
-        _loginResult.value = Resource.Loading() // Set status ke Loading
-
+    fun login(username: String?, password: String?) {
         viewModelScope.launch {
-            val result = loginUseCase.execute(request) // Panggil use case
-            _loginResult.postValue(result) // Perbarui LiveData dengan hasil
-        }
-    }
+            // Basic validation before creating the request
+            if (username.isNullOrBlank() || password.isNullOrBlank()){
+                _loginResult.postValue(Resource.Error("Username dan password tidak boleh kosong."))
+                return@launch
+            }
 
-    /**
-     * Mereset status _loginResult ke Idle.
-     * Berguna setelah menampilkan pesan sukses/error atau setelah navigasi,
-     * agar LiveData tidak memicu ulang observer saat konfigurasi berubah.
-     */
-    fun resetLoginResult() {
-        _loginResult.value = Resource.Idle
+            val loginRequest = LoginRequest(username, password)
+
+            try {
+                loginUseCase.execute(loginRequest).collectLatest { result ->
+                    _loginResult.postValue(result)
+                }
+            } catch (e: Exception) {
+                _loginResult.postValue(Resource.Error(e.message ?: "Terjadi kesalahan tidak diketahui"))
+            }
+        }
     }
 }

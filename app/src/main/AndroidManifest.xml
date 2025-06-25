@@ -2,46 +2,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Izin (Permissions) -->
-
-    <!-- Wajib: Untuk komunikasi jaringan dengan API Anda -->
+    <!-- Izin untuk mengakses internet agar bisa berkomunikasi dengan API -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Opsional, Direkomendasikan: Untuk memeriksa status koneksi jaringan -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- Opsional: Jika aplikasi Anda perlu mengakses status Wi-Fi -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-    <!-- Izin terkait Lokasi (Tambahkan jika aplikasi Anda memerlukan lokasi) -->
-    <!-- Jika hanya perlu lokasi kasar (misalnya untuk kelurahan/kecamatan) -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!-- Jika perlu lokasi yang lebih akurat -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <!-- Izin terkait Media/Penyimpanan (Tambahkan jika aplikasi menyimpan/membaca file pengguna) -->
-    <!-- Untuk Android 10 (API 29) dan di bawahnya. Hati-hati dengan Scoped Storage di Android 11+. -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
-    <!-- Untuk Android 13 (API 33) dan di atasnya, menggunakan izin media spesifik -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-
-
-    <!-- Deklarasi Aplikasi -->
     <application
         android:name=".SipentingApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/ic_app_logo"
+        android:icon="@drawable/ic_launcher_basic"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/ic_app_logo"
+        android:roundIcon="@drawable/ic_launcher_basic"
         android:supportsRtl="true"
         android:theme="@style/Theme.SIPENTING"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-        <!-- Splash Activity - Titik masuk awal aplikasi -->
+        <!-- SplashActivity sebagai layar pembuka (launcher) -->
         <activity
             android:name=".ui.splash.SplashActivity"
             android:exported="true"
@@ -52,17 +29,19 @@
             </intent-filter>
         </activity>
 
-        <!-- Main Activity -->
+        <!-- AuthActivity untuk alur login/registrasi -->
+        <activity
+            android:name=".ui.auth.AuthActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SIPENTING" />
+
+        <!-- MainActivity untuk konten utama setelah login -->
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="false"
             android:label="@string/app_name"
             android:theme="@style/Theme.SIPENTING" />
-        <activity
-            android:name="com.bkkbnjabar.sipenting.ui.auth.LoginActivity"
-            android:theme="@style/Theme.SIPENTING"/>
 
-
-        <!-- Jika Anda memiliki aktivitas lain, deklarasikan di sini dengan properti exported yang sesuai -->
     </application>
+
 </manifest>

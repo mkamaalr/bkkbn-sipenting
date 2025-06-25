@@ -2,35 +2,20 @@ package com.bkkbnjabar.sipenting.domain.usecase.common
 
 import com.bkkbnjabar.sipenting.data.repository.LookupRepository
 import com.bkkbnjabar.sipenting.domain.model.Rt
-import com.bkkbnjabar.sipenting.utils.Resource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
- * Use case untuk mendapatkan daftar RT dari database lokal (Room).
- * Data ini diasumsikan sudah di-preload di SplashScreen.
+ * Use case to get a list of neighborhood units (RT) filtered by community unit ID.
  */
-class GetRTSUseCase @Inject constructor(
-    private val lookupRepository: LookupRepository
-) {
-    /**
-     * Mengeksekusi use case untuk mendapatkan semua data RT.
-     * Mengembalikan Flow of Resource yang menunjukkan status loading, sukses, atau error.
-     */
-    operator fun invoke(): Flow<Resource<List<Rt>>> {
-        return lookupRepository.getAllRTSFromRoom().map { listRt ->
-            Resource.Success(listRt)
-        }
-    }
+interface GetRTSUseCase {
+    operator fun invoke(rwId: Int): Flow<List<Rt>>
+}
 
-    /**
-     * Mengeksekusi use case untuk mendapatkan daftar RT berdasarkan ID RW dari database lokal (Room).
-     * Mengembalikan Flow of Resource yang menunjukkan status loading, sukses, atau error.
-     */
-    operator fun invoke(rwId: Int): Flow<Resource<List<Rt>>> {
-        return lookupRepository.getRTSByRwFromRoom(rwId).map { listRt ->
-            Resource.Success(listRt)
-        }
+class GetRTSUseCaseImpl @Inject constructor(
+    private val repository: LookupRepository
+) : GetRTSUseCase {
+    override operator fun invoke(rwId: Int): Flow<List<Rt>> {
+        return repository.getRTSByRwFromRoom(rwId)
     }
 }

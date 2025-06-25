@@ -1,85 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!--
+    Base application theme for night mode, customized with BKKBN color palette.
+    This theme uses the Material 3 (Material You) color scheme.
+    -->
     <style name="Theme.SIPENTING" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Core Material 3 color mapping to your palette.
-             Material 3 focuses on color roles. We map your primary/secondary
-             to the main color roles. -->
+        <!-- Material 3 Color Palette Mapping -->
+        <item name="colorPrimary">@color/md_theme_dark_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_dark_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_dark_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_dark_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_dark_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_dark_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_dark_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/md_theme_dark_tertiary</item>
+        <item name="colorOnTertiary">@color/md_theme_dark_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/md_theme_dark_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/md_theme_dark_onTertiaryContainer</item>
+        <item name="colorError">@color/md_theme_dark_error</item>
+        <item name="colorOnError">@color/md_theme_dark_onError</item>
+        <item name="colorErrorContainer">@color/md_theme_dark_errorContainer</item>
+        <item name="colorOnErrorContainer">@color/md_theme_dark_onErrorContainer</item>
+        <item name="android:colorBackground">@color/md_theme_dark_background</item>
+        <item name="colorOnBackground">@color/md_theme_dark_onBackground</item>
+        <item name="colorSurface">@color/md_theme_dark_surface</item>
+        <item name="colorOnSurface">@color/md_theme_dark_onSurface</item>
+        <item name="colorSurfaceVariant">@color/md_theme_dark_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_dark_onSurfaceVariant</item>
+        <item name="colorOutline">@color/md_theme_dark_outline</item>
 
-        <!-- Primary Color -->
-        <item name="colorPrimary">@color/sipenting_primary</item>
-        <item name="colorOnPrimary">@color/sipenting_on_primary</item>
-        <item name="colorPrimaryContainer">@color/sipenting_primary_light</item> <!-- Lighter primary for containers -->
-        <item name="colorOnPrimaryContainer">@color/black</item> <!-- Text on primary container -->
-
-        <!-- Secondary Color -->
-        <item name="colorSecondary">@color/sipenting_secondary</item>
-        <item name="colorOnSecondary">@color/sipenting_on_secondary</item>
-        <item name="colorSecondaryContainer">@color/sipenting_secondary_light</item> <!-- Lighter secondary for containers -->
-        <item name="colorOnSecondaryContainer">@color/black</item> <!-- Text on secondary container -->
-
-        <!-- Tertiary Color (Optional, if you have a third main accent color) -->
-        <!-- <item name="colorTertiary">@color/your_tertiary_color</item> -->
-        <!-- <item name="colorOnTertiary">@color/your_on_tertiary_color</item> -->
-        <!-- <item name="colorTertiaryContainer">@color/your_tertiary_container_color</item> -->
-        <!-- <item name="colorOnTertiaryContainer">@color/your_on_tertiary_container_color</item> -->
-
-        <!-- Background, Surface, and Error colors -->
-        <item name="android:colorBackground">@color/sipenting_background</item> <!-- Main app background -->
-        <item name="colorOnBackground">@color/sipenting_on_surface</item> <!-- Text/Icons on background -->
-        <item name="colorSurface">@color/sipenting_surface</item> <!-- Component surface color -->
-        <item name="colorOnSurface">@color/sipenting_on_surface</item> <!-- Text/Icons on surface -->
-        <item name="colorSurfaceVariant">@color/sipenting_primary_lightest</item> <!-- A lighter variant of surface, could be used for subtle separation -->
-        <item name="colorOnSurfaceVariant">@color/sipenting_on_surface</item> <!-- Text/Icons on surface variant -->
-        <item name="colorError">@color/sipenting_error</item>
-        <item name="colorOnError">@color/sipenting_on_error</item>
-        <item name="colorErrorContainer">@color/sipenting_error</item>
-        <item name="colorOnErrorContainer">@color/sipenting_on_error</item>
+        <item name="colorSurfaceContainerLowest">@color/md_theme_dark_surfaceContainerLowest</item>
+        <item name="colorSurfaceContainerLow">@color/md_theme_dark_surfaceContainerLow</item>
+        <item name="colorSurfaceContainer">@color/md_theme_dark_surfaceContainer</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_dark_surfaceContainerHigh</item>
+        <item name="colorSurfaceContainerHighest">@color/md_theme_dark_surfaceContainerHighest</item>
 
         <!-- Status bar and Navigation bar colors -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
-        <item name="android:navigationBarColor" tools:targetApi="o">@color/black</item>
-
-        <!-- Typography: Use Material 3 text appearances -->
-        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Material3.DisplayLarge</item>
-        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Material3.DisplayMedium</item>
-        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Material3.DisplaySmall</item>
-        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Material3.HeadlineLarge</item>
-        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Material3.HeadlineMedium</item>
-        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Material3.HeadlineSmall</item>
-        <item name="textAppearanceTitleLarge">@style/TextAppearance.Material3.TitleLarge</item>
-        <item name="textAppearanceTitleMedium">@style/TextAppearance.Material3.TitleMedium</item>
-        <item name="textAppearanceTitleSmall">@style/TextAppearance.Material3.TitleSmall</item>
-        <item name="textAppearanceBodyLarge">@style/TextAppearance.Material3.BodyLarge</item>
-        <item name="textAppearanceBodyMedium">@style/TextAppearance.Material3.BodyMedium</item>
-        <item name="textAppearanceBodySmall">@style/TextAppearance.Material3.BodySmall</item>
-        <item name="textAppearanceLabelLarge">@style/TextAppearance.Material3.LabelLarge</item>
-        <item name="textAppearanceLabelMedium">@style/TextAppearance.Material3.LabelMedium</item>
-        <item name="textAppearanceLabelSmall">@style/TextAppearance.Material3.LabelSmall</item>
-
-        <!-- Widget styles: Use Material 3 widgets -->
-        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.FilledBox</item> <!-- OutlinedBox juga bisa -->
-        <item name="materialButtonStyle">@style/Widget.Material3.Button</item>
-        <item name="toolbarStyle">@style/Widget.Material3.Toolbar</item>
-        <item name="bottomNavigationStyle">@style/Widget.Material3.BottomNavigationView</item>
-        <!-- Anda bisa menyesuaikan lebih banyak style widget Material 3 di sini -->
-
+        <item name="android:navigationBarColor" tools:targetApi="o">?attr/colorSurfaceContainer</item>
     </style>
-
-    <!-- Splash Screen Theme -->
-    <style name="Theme.SIPENTING.Splash" parent="Theme.SIPENTING">
-        <item name="android:windowBackground">@drawable/splash_background</item>
-        <item name="android:statusBarColor">@color/white</item>
-    </style>
-
-    <!-- Tema tanpa ActionBar/Toolbar, jika diperlukan oleh Activity/Fragment tertentu -->
-    <style name="Theme.SIPENTING.NoActionBar" parent="Theme.SIPENTING">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <!-- Overlay themes for backward compatibility (may not be needed with Material3) -->
-    <style name="Theme.SipentingApplication.AppBarOverlay" parent="ThemeOverlay.Material3.Dark.ActionBar" />
-    <style name="Theme.SipentingApplication.PopupOverlay" parent="ThemeOverlay.Material3.Light" />
-
 </resources>

@@ -3,36 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/auth_nav_graph"
-    app:startDestination="@id/loginFragment"> <!-- LoginFragment adalah titik awal otentikasi -->
+    app:startDestination="@id/loginFragment">
 
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.bkkbnjabar.sipenting.ui.auth.LoginFragment"
-        android:label="Login"
-        tools:layout="@layout/fragment_login">
-        <!-- Tambahkan aksi navigasi ke RegisterFragment atau ForgotPasswordFragment di sini jika ada -->
-        <!--
-        <action
-            android:id="@+id/action_loginFragment_to_registerFragment"
-            app:destination="@id/registerFragment" />
-        <action
-            android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
-            app:destination="@id/forgotPasswordFragment" />
-        -->
-    </fragment>
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" />
 
-    <!-- Contoh fragment lain dalam alur otentikasi (jika ada) -->
-    <!--
-    <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.bkkbnjabar.sipenting.ui.auth.RegisterFragment"
-        android:label="Daftar Akun"
-        tools:layout="@layout/fragment_register" />
+    <!-- Anda bisa menambahkan action atau fragment lain di sini -->
+    <!-- misalnya untuk halaman register atau lupa password -->
 
-    <fragment
-        android:id="@+id/forgotPasswordFragment"
-        android:name="com.bkkbnjabar.sipenting.ui.auth.ForgotPasswordFragment"
-        android:label="Lupa Kata Sandi"
-        tools:layout="@layout/fragment_forgot_password" />
-    -->
 </navigation>
