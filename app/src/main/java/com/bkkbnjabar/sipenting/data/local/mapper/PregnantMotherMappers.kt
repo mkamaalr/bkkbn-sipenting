@@ -10,7 +10,6 @@ import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherRegistra
 fun PregnantMotherRegistrationData.toEntity(): PregnantMotherEntity {
     return PregnantMotherEntity(
         localId = this.localId ?: 0, // Use 0 for auto-generation if localId is null
-        registrationDate = this.registrationDate ?: "",
         name = this.name ?: "",
         nik = this.nik ?: "",
         dateOfBirth = this.dateOfBirth ?: "",

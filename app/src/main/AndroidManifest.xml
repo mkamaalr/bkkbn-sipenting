@@ -4,6 +4,11 @@
 
     <!-- Izin untuk mengakses internet agar bisa berkomunikasi dengan API -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- For Capturing Image   -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".SipentingApplication"
@@ -41,6 +46,16 @@
             android:exported="false"
             android:label="@string/app_name"
             android:theme="@style/Theme.SIPENTING" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
 
     </application>
 

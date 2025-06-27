@@ -13,7 +13,9 @@ import com.bkkbnjabar.sipenting.databinding.ItemPregnantMotherBinding
 /**
  * Adapter untuk RecyclerView yang menampilkan daftar ibu hamil.
  */
-class PregnantMotherAdapter : ListAdapter<PregnantMotherEntity, PregnantMotherAdapter.MotherViewHolder>(DiffCallback()) {
+class PregnantMotherAdapter(
+    private val onItemClicked: (PregnantMotherEntity) -> Unit
+) : ListAdapter<PregnantMotherEntity, PregnantMotherAdapter.MotherViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MotherViewHolder {
         val binding = ItemPregnantMotherBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -22,6 +24,9 @@ class PregnantMotherAdapter : ListAdapter<PregnantMotherEntity, PregnantMotherAd
 
     override fun onBindViewHolder(holder: MotherViewHolder, position: Int) {
         val currentItem = getItem(position)
+        holder.itemView.setOnClickListener {
+            onItemClicked(currentItem)
+        }
         holder.bind(currentItem)
     }
 

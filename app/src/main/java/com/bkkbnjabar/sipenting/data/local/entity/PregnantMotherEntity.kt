@@ -12,7 +12,6 @@ data class PregnantMotherEntity(
     @PrimaryKey(autoGenerate = true)
     val localId: Int = 0,
     val id: String? = null, // ID from server after sync
-    val registrationDate: String,
     val name: String,
     val nik: String,
     val dateOfBirth: String,

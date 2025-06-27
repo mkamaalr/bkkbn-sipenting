@@ -26,7 +26,11 @@ class PregnantMotherListFragment : Fragment() {
     // ================== PERBAIKAN UTAMA DI SINI ==================
     // Adapter diinisialisasi langsung saat kelas dibuat, bukan dengan lateinit.
     // Ini menjamin adapter selalu ada sebelum dibutuhkan.
-    private val pregnantMotherAdapter = PregnantMotherAdapter()
+    private val pregnantMotherAdapter = PregnantMotherAdapter { mother ->
+        // Saat item diklik, navigasi ke halaman detail dengan membawa ID ibu
+        val action = PregnantMotherListFragmentDirections.actionNavPregnantMotherListToPregnantMotherDetailFragment(mother.localId)
+        findNavController().navigate(action)
+    }
     // ============================================================
 
     override fun onCreateView(

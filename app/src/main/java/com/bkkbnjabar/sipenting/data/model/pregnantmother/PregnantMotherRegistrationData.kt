@@ -7,7 +7,6 @@ package com.bkkbnjabar.sipenting.data.model.pregnantmother
  */
 data class PregnantMotherRegistrationData(
     val localId: Int? = null,
-    val registrationDate: String? = null,
     val name: String? = null,
     val nik: String? = null,
     val dateOfBirth: String? = null,

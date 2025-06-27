@@ -20,6 +20,19 @@
         <action
             android:id="@+id/action_nav_pregnant_mother_list_to_pregnantMotherRegistrationFragment1"
             app:destination="@id/pregnantMotherRegistrationFragment1" />
+        <action
+            android:id="@+id/action_nav_pregnant_mother_list_to_pregnantMotherDetailFragment"
+            app:destination="@id/pregnantMotherDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pregnantMotherDetailFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.pregnantmother.detail.PregnantMotherDetailFragment"
+        android:label="Detail Ibu Hamil"
+        tools:layout="@layout/fragment_pregnant_mother_detail" >
+        <argument
+            android:name="motherId"
+            app:argType="integer" />
     </fragment>
 
     <fragment

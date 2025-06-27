@@ -42,5 +42,12 @@ data class PregnantMotherVisitData(
     // Menambahkan field yang sebelumnya hilang untuk dropdown
     val deliveryPlaceId: Int? = null,
     val birthAssistantId: Int? = null,
-    val contraceptionOptionId: Int? = null
+    val contraceptionOptionId: Int? = null,
+    val imagePath1: String? = null,
+    val imagePath2: String? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val isReceivedMbg: Boolean? = null,
+    val isTfuMeasured: Boolean? = null,
+    val tfu: Double? = null
 )

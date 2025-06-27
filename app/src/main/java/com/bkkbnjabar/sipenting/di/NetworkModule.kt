@@ -24,6 +24,7 @@ object NetworkModule {
 
     // BASE URL hanya didefinisikan di sini
     private const val BASE_URL = "http://192.168.1.10:8000/api/" // <<< GANTI DENGAN BASE URL API ANDA!
+//    private const val BASE_URL = "https://sipenting.bkkbnjabar.id/api/" // <<< GANTI DENGAN BASE URL API ANDA!
 
     @Provides
     @Singleton

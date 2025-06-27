@@ -60,7 +60,6 @@ class PregnantMotherRegistrationFragment1 : Fragment() {
         binding.etNik.doAfterTextChanged { text -> viewModel.updatePregnantMotherData(nik = text.toString()) }
         binding.etPhoneNumber.doAfterTextChanged { text -> viewModel.updatePregnantMotherData(phoneNumber = text.toString()) }
         binding.etFullAddress.doAfterTextChanged { text -> viewModel.updatePregnantMotherData(fullAddress = text.toString()) }
-        binding.etRegistrationDate.doAfterTextChanged { text -> viewModel.updatePregnantMotherData(registrationDate = text.toString()) }
         binding.etDateOfBirth.doAfterTextChanged { text -> viewModel.updatePregnantMotherData(dateOfBirth = text.toString()) }
 
         // Listener untuk dropdown yang bisa dipilih (RW dan RT)
@@ -78,7 +77,6 @@ class PregnantMotherRegistrationFragment1 : Fragment() {
 
         // Listener untuk menampilkan date picker
         binding.etDateOfBirth.setOnClickListener { showDatePickerDialog(it as TextInputEditText) }
-        binding.etRegistrationDate.setOnClickListener { showDatePickerDialog(it as TextInputEditText) }
     }
 
     private fun observeViewModel() {
@@ -113,7 +111,6 @@ class PregnantMotherRegistrationFragment1 : Fragment() {
         if (binding.etNik.text.toString() != data.nik) binding.etNik.setText(data.nik)
         if (binding.etPhoneNumber.text.toString() != data.phoneNumber) binding.etPhoneNumber.setText(data.phoneNumber)
         if (binding.etDateOfBirth.text.toString() != data.dateOfBirth) binding.etDateOfBirth.setText(data.dateOfBirth)
-        if (binding.etRegistrationDate.text.toString() != data.registrationDate) binding.etRegistrationDate.setText(data.registrationDate)
         if (binding.etFullAddress.text.toString() != data.fullAddress) binding.etFullAddress.setText(data.fullAddress)
 
         // ====================== PERBAIKAN UTAMA ADA DI SINI ======================

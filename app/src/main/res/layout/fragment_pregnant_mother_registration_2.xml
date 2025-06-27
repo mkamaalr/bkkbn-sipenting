@@ -246,6 +246,58 @@
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/tv_tfu_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Pengukuran Tinggi Fundus Uteri (TFU)"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/layout_lila_hb"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:visibility="visible"/>
+
+                <RadioGroup
+                    android:id="@+id/rg_tfu_status"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/tv_tfu_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:visibility="visible">
+                    <RadioButton
+                        android:id="@+id/rb_tfu_diukur"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Diukur"/>
+                    <RadioButton
+                        android:id="@+id/rb_tfu_tidak_diukur"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Tidak Diukur"/>
+                </RadioGroup>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_tfu"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="TFU (cm)"
+                    app:layout_constraintTop_toBottomOf="@id/rg_tfu_status"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_tfu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <!-- Dropdown Rencana Persalinan -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_delivery_place"
@@ -254,7 +306,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="Rencana Tempat Persalinan"
-                    app:layout_constraintTop_toBottomOf="@id/layout_lila_hb"
+                    app:layout_constraintTop_toBottomOf="@id/til_tfu"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
                     <AutoCompleteTextView
@@ -316,6 +368,40 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_facilitating_referral_service"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="Status Fasilitasi Rujukan"
+                    app:layout_constraintTop_toBottomOf="@id/til_counseling_type"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_facilitating_referral_service"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_facilitating_social_assistance"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Status Fasilitasi Bansos"
+                    app:layout_constraintTop_toBottomOf="@id/til_facilitating_referral_service"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_facilitating_social_assistance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <!-- Checkboxes -->
                 <TextView
                     android:id="@+id/tv_checkbox_title"
@@ -324,7 +410,7 @@
                     android:layout_marginTop="16dp"
                     android:text="Status &amp; Pemeriksaan Lainnya:"
                     android:textAppearance="?attr/textAppearanceTitleSmall"
-                    app:layout_constraintTop_toBottomOf="@id/til_counseling_type"
+                    app:layout_constraintTop_toBottomOf="@id/til_facilitating_social_assistance"
                     app:layout_constraintStart_toStartOf="parent"/>
 
                 <com.google.android.material.checkbox.MaterialCheckBox
@@ -411,6 +497,7 @@
                     app:layout_constraintTop_toBottomOf="@id/cb_is_iron_tables_received"
                     app:layout_constraintStart_toStartOf="parent" />
 
+
                 <com.google.android.material.checkbox.MaterialCheckBox
                     android:id="@+id/cb_is_exposed_to_cigarettes"
                     android:layout_width="wrap_content"
@@ -419,15 +506,24 @@
                     app:layout_constraintTop_toBottomOf="@id/cb_is_iron_tables_taken"
                     app:layout_constraintStart_toStartOf="parent" />
 
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cb_is_received_mbg"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Apakah menerima distribusi Makan Bergizi Gratis dari pemerintah (SPPG)?"
+                    app:layout_constraintTop_toBottomOf="@id/cb_is_exposed_to_cigarettes"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
                 <!-- Multi-select untuk Riwayat Penyakit -->
                 <TextView
                     android:id="@+id/tv_disease_history_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Riwayat Penyakit"
+                    android:text="Riwayat Penyakit (Pilih)"
                     android:textAppearance="?attr/textAppearanceTitleSmall"
-                    app:layout_constraintTop_toBottomOf="@id/cb_is_exposed_to_cigarettes"
+                    app:layout_constraintTop_toBottomOf="@id/cb_is_received_mbg"
                     app:layout_constraintStart_toStartOf="parent"/>
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chip_group_disease_history"
@@ -568,6 +664,96 @@
                         android:inputType="date" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Images -->
+                <TextView
+                    android:id="@+id/tv_attachment_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Dokumentasi &amp; Lokasi"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    app:layout_constraintTop_toBottomOf="@id/til_next_visit_date"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+                <LinearLayout
+                    android:id="@+id/layout_images"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/tv_attachment_title"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_marginEnd="8dp">
+                        <ImageView
+                            android:id="@+id/iv_preview1"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:scaleType="centerCrop"
+                            android:background="?attr/colorSurfaceVariant"
+                            app:srcCompat="@drawable/ic_menu_camera"/>
+                        <Button
+                            android:id="@+id/btn_capture1"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ambil Foto 1"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_marginStart="8dp">
+                        <ImageView
+                            android:id="@+id/iv_preview2"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:scaleType="centerCrop"
+                            android:background="?attr/colorSurfaceVariant"
+                            app:srcCompat="@drawable/ic_menu_camera"/>
+                        <Button
+                            android:id="@+id/btn_capture2"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ambil Foto 2"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_get_location"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:text="Ambil Lokasi GPS Saat Ini"
+                    app:icon="@drawable/ic_menu_gallery"
+                    app:layout_constraintTop_toBottomOf="@id/layout_images"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <TextView
+                    android:id="@+id/tv_location_result"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    app:layout_constraintTop_toBottomOf="@id/btn_get_location"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="Lat: -6.9175, Long: 107.6191" />
+
                 <!-- Tombol Navigasi -->
                 <LinearLayout
                     android:id="@+id/button_container"
@@ -575,7 +761,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginTop="24dp"
-                    app:layout_constraintTop_toBottomOf="@id/til_next_visit_date"
+                    app:layout_constraintTop_toBottomOf="@id/tv_location_result"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"

@@ -1,5 +1,8 @@
 package com.bkkbnjabar.sipenting.ui.pregnantmother.registration
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +10,9 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -16,12 +21,15 @@ import com.bkkbnjabar.sipenting.R
 import com.bkkbnjabar.sipenting.databinding.FragmentPregnantMotherRegistration2Binding
 import com.bkkbnjabar.sipenting.domain.model.LookupItem
 import com.bkkbnjabar.sipenting.utils.Resource
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
+import java.io.File
+import androidx.core.content.FileProvider
 import java.util.*
 
 @AndroidEntryPoint
@@ -31,6 +39,48 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: PregnantMotherRegistrationViewModel by activityViewModels()
+
+    // Properti lokal untuk menyimpan daftar opsi setelah dimuat dari ViewModel
+    private var diseaseHistoryOptions: List<LookupItem> = emptyList()
+    private var drinkingWaterOptions: List<LookupItem> = emptyList()
+    private var defecationFacilityOptions: List<LookupItem> = emptyList()
+    private var socialAssistanceOptions: List<LookupItem> = emptyList()
+
+    private var imageUri1: Uri? = null
+    private var imageUri2: Uri? = null
+    private var latestTmpUri: Uri? = null
+    private var captureRequestIndex: Int = 0
+
+    // Launcher untuk meminta izin
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                // Jika izin diberikan, panggil kembali fungsi yang memintanya
+                when {
+                    captureRequestIndex > 0 -> handleImageCapture(captureRequestIndex)
+                    else -> handleLocationCapture()
+                }
+            } else {
+                Toast.makeText(context, "Izin dibutuhkan untuk menggunakan fitur ini", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    // Launcher untuk mengambil gambar dari kamera
+    private val takeImageLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
+        if (isSuccess) {
+            latestTmpUri?.let { uri ->
+                if (captureRequestIndex == 1) {
+                    imageUri1 = uri
+                    binding.ivPreview1.setImageURI(uri)
+                    viewModel.updatePregnantMotherVisitData(imagePath1 = uri.path)
+                } else {
+                    imageUri2 = uri
+                    binding.ivPreview2.setImageURI(uri)
+                    viewModel.updatePregnantMotherVisitData(imagePath2 = uri.path)
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,10 +92,16 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Set tombol multi-select tidak aktif di awal
+        binding.btnSelectDiseaseHistory.isEnabled = false
+        binding.btnSelectDrinkingWater.isEnabled = false
+        binding.btnSelectDefecationFacility.isEnabled = false
+        binding.btnSelectSocialAssistance.isEnabled = false
         setupListeners()
         observeViewModel()
         loadDataFromViewModel()
     }
+
 
     private fun setupListeners() {
         binding.btnPrevious.setOnClickListener {
@@ -53,12 +109,17 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             findNavController().popBackStack()
         }
         binding.btnSave.setOnClickListener {
-            if (validateForm()) {
-                saveDataToViewModel()
-                viewModel.saveAllData()
-            } else {
-                Toast.makeText(requireContext(), "Harap lengkapi semua field yang wajib diisi.", Toast.LENGTH_SHORT).show()
-            }
+            saveDataToViewModel()
+            viewModel.saveAllData()
+        }
+
+        binding.etFacilitatingReferralService.setOnItemClickListener { _, _, position, _ ->
+            val selected = binding.etFacilitatingReferralService.adapter.getItem(position) as String
+            viewModel.updatePregnantMotherVisitData(facilitatingReferralServiceStatus = selected)
+        }
+        binding.etFacilitatingSocialAssistance.setOnItemClickListener { _, _, position, _ ->
+            val selected = binding.etFacilitatingSocialAssistance.adapter.getItem(position) as String
+            viewModel.updatePregnantMotherVisitData(facilitatingSocialAssistanceStatus = selected)
         }
 
         // Listeners untuk Date Picker
@@ -82,11 +143,12 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         setupDropdownListener(binding.etBirthAssistant) { viewModel.updatePregnantMotherVisitData(birthAssistantId = it.id) }
         setupDropdownListener(binding.etContraceptionOption) { viewModel.updatePregnantMotherVisitData(contraceptionOptionId = it.id) }
 
-        // Listener untuk tombol multi-select
+        // ================== LOGIKA LISTENER DIPERBAIKI ==================
         binding.btnSelectDiseaseHistory.setOnClickListener {
+            // Gunakan properti lokal yang sudah diisi oleh observer
             showMultiSelectDialog(
                 "Pilih Riwayat Penyakit",
-                viewModel.diseaseHistories.value ?: emptyList(),
+                diseaseHistoryOptions,
                 viewModel.currentPregnantMotherVisit.value?.diseaseHistory ?: emptyList()
             ) { selectedItems ->
                 viewModel.updatePregnantMotherVisitData(diseaseHistory = selectedItems)
@@ -95,7 +157,7 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         binding.btnSelectDrinkingWater.setOnClickListener {
             showMultiSelectDialog(
                 "Pilih Sumber Air Minum",
-                viewModel.mainSourcesOfDrinkingWater.value ?: emptyList(),
+                drinkingWaterOptions,
                 viewModel.currentPregnantMotherVisit.value?.mainSourceOfDrinkingWater ?: emptyList()
             ) { selectedItems ->
                 viewModel.updatePregnantMotherVisitData(mainSourceOfDrinkingWater = selectedItems)
@@ -104,7 +166,7 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         binding.btnSelectDefecationFacility.setOnClickListener {
             showMultiSelectDialog(
                 "Pilih Fasilitas Jamban",
-                viewModel.defecationFacilities.value ?: emptyList(),
+                defecationFacilityOptions,
                 viewModel.currentPregnantMotherVisit.value?.defecationFacility ?: emptyList()
             ) { selectedItems ->
                 viewModel.updatePregnantMotherVisitData(defecationFacility = selectedItems)
@@ -113,11 +175,79 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         binding.btnSelectSocialAssistance.setOnClickListener {
             showMultiSelectDialog(
                 "Pilih Bantuan Sosial",
-                viewModel.socialAssistanceOptions.value ?: emptyList(),
+                socialAssistanceOptions,
                 viewModel.currentPregnantMotherVisit.value?.socialAssistanceFacilitationOptions ?: emptyList()
             ) { selectedItems ->
                 viewModel.updatePregnantMotherVisitData(socialAssistanceFacilitationOptions = selectedItems)
             }
+        }
+
+        binding.rgTfuStatus.setOnCheckedChangeListener { _, checkedId ->
+            val isMeasured = checkedId == R.id.rb_tfu_diukur
+            binding.tilTfu.isVisible = isMeasured
+            viewModel.updatePregnantMotherVisitData(isTfuMeasured = isMeasured)
+            if (!isMeasured) {
+                binding.etTfu.setText("") // Kosongkan nilai jika "Tidak Diukur"
+            }
+        }
+
+        binding.btnCapture1.setOnClickListener { handleImageCapture(1) }
+        binding.btnCapture2.setOnClickListener { handleImageCapture(2) }
+        binding.btnGetLocation.setOnClickListener { handleLocationCapture() }
+    }
+
+    private fun handleImageCapture(imageIndex: Int) {
+        captureRequestIndex = imageIndex
+        when {
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
+                getTmpFileUri().let { uri ->
+                    latestTmpUri = uri
+                    takeImageLauncher.launch(uri)
+                }
+            }
+            else -> {
+                // Minta izin kamera
+                requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }
+    }
+
+    private fun handleLocationCapture() {
+        captureRequestIndex = 0 // Reset index
+        when {
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED -> {
+                getCurrentLocation()
+            }
+            else -> {
+                // Minta izin lokasi
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        }
+    }
+
+    private fun getTmpFileUri(): Uri {
+        val tmpFile = File.createTempFile("sipenting_${System.currentTimeMillis()}", ".png", requireActivity().cacheDir).apply {
+            createNewFile()
+            deleteOnExit()
+        }
+        return FileProvider.getUriForFile(requireActivity(), "${requireActivity().packageName}.provider", tmpFile)
+    }
+
+    private fun getCurrentLocation() {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        try {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    val lat = location.latitude
+                    val long = location.longitude
+                    binding.tvLocationResult.text = String.format(Locale.US, "Lat: %.6f, Long: %.6f", lat, long)
+                    viewModel.updatePregnantMotherVisitData(latitude = lat, longitude = long)
+                } else {
+                    Toast.makeText(context, "Tidak bisa mendapatkan lokasi. Pastikan GPS aktif.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (e: SecurityException) {
+            Toast.makeText(context, "Izin lokasi tidak diberikan.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -147,6 +277,15 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             }
         }
 
+        viewModel.referralStatusOptions.observe(viewLifecycleOwner) { options ->
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, options)
+            binding.etFacilitatingReferralService.setAdapter(adapter)
+        }
+        viewModel.socialAssistanceStatusOptions.observe(viewLifecycleOwner) { options ->
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, options)
+            binding.etFacilitatingSocialAssistance.setAdapter(adapter)
+        }
+
         // Observers untuk mengisi adapter dropdown
         viewModel.pregnantMotherStatuses.observe(viewLifecycleOwner) { setAdapter(binding.etPregnantMotherStatus, it) }
         viewModel.givenBirthStatuses.observe(viewLifecycleOwner) { setAdapter(binding.etGivenBirthStatus, it) }
@@ -155,13 +294,43 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         viewModel.birthAssistants.observe(viewLifecycleOwner) { setAdapter(binding.etBirthAssistant, it) }
         viewModel.contraceptionOptions.observe(viewLifecycleOwner) { setAdapter(binding.etContraceptionOption, it) }
 
-        // Observer untuk mengupdate tampilan ChipGroup
+        // ================== LOGIKA OBSERVER DIPERBAIKI ==================
+        // Observer untuk data multi-select: simpan ke properti lokal dan aktifkan tombol saat data datang
+        viewModel.diseaseHistories.observe(viewLifecycleOwner) { options ->
+            diseaseHistoryOptions = options ?: emptyList()
+            binding.btnSelectDiseaseHistory.isEnabled = diseaseHistoryOptions.isNotEmpty()
+        }
+        viewModel.mainSourcesOfDrinkingWater.observe(viewLifecycleOwner) { options ->
+            drinkingWaterOptions = options ?: emptyList()
+            binding.btnSelectDrinkingWater.isEnabled = options.isNotEmpty()
+        }
+        viewModel.defecationFacilities.observe(viewLifecycleOwner) { options ->
+            defecationFacilityOptions = options ?: emptyList()
+            binding.btnSelectDefecationFacility.isEnabled = options.isNotEmpty()
+        }
+        viewModel.socialAssistanceOptions.observe(viewLifecycleOwner) { options ->
+            socialAssistanceOptions = options ?: emptyList()
+            binding.btnSelectSocialAssistance.isEnabled = options.isNotEmpty()
+        }
+
+        // Observer untuk mengupdate tampilan ChipGroup setiap kali data pilihan berubah
         viewModel.currentPregnantMotherVisit.observe(viewLifecycleOwner) { visitData ->
-            if (visitData == null) return@observe
-            updateChipGroup(binding.chipGroupDiseaseHistory, visitData.diseaseHistory)
-            updateChipGroup(binding.chipGroupDrinkingWater, visitData.mainSourceOfDrinkingWater)
-            updateChipGroup(binding.chipGroupDefecationFacility, visitData.defecationFacility)
-            updateChipGroup(binding.chipGroupSocialAssistance, visitData.socialAssistanceFacilitationOptions)
+            if (visitData != null) {
+                updateChipGroup(binding.chipGroupDiseaseHistory, visitData.diseaseHistory)
+                updateChipGroup(binding.chipGroupDrinkingWater, visitData.mainSourceOfDrinkingWater)
+                updateChipGroup(binding.chipGroupDefecationFacility, visitData.defecationFacility)
+                updateChipGroup(binding.chipGroupSocialAssistance, visitData.socialAssistanceFacilitationOptions)
+
+                // Tampilkan/sembunyikan seluruh bagian TFU berdasarkan usia kehamilan
+                val isTfuEligible = (visitData.pregnancyWeekAge ?: 0) >= 20
+                binding.tvTfuLabel.isVisible = isTfuEligible
+                binding.rgTfuStatus.isVisible = isTfuEligible
+
+                // Jika tidak eligible, pastikan input TFU juga tersembunyi
+                if (!isTfuEligible) {
+                    binding.tilTfu.isVisible = false
+                }
+            }
         }
     }
 
@@ -184,6 +353,8 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             binding.etNumberOfTwins.setText(data.numberOfTwins?.toString() ?: "")
             binding.etTpkNotes.setText(data.tpkNotes)
             binding.etNextVisitDate.setText(data.nextVisitDate)
+            binding.etFacilitatingReferralService.setText(data.facilitatingReferralServiceStatus ?: "", false)
+            binding.etFacilitatingSocialAssistance.setText(data.facilitatingSocialAssistanceStatus ?: "", false)
 
             binding.cbIsAlive.isChecked = data.isAlive ?: true
             binding.cbIsGivenBirth.isChecked = data.isGivenBirth ?: false
@@ -195,6 +366,22 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             binding.cbIsIronTablesReceived.isChecked = data.isIronTablesReceived ?: false
             binding.cbIsIronTablesTaken.isChecked = data.isIronTablesTaken ?: false
             binding.cbIsExposedToCigarettes.isChecked = data.isExposedToCigarettes ?: false
+            binding.etTfu.setText(data.tfu?.toString() ?: "")
+            binding.cbIsReceivedMbg.isChecked = data.isReceivedMbg ?: false
+        }
+
+        viewModel.currentPregnantMotherVisit.value?.let { data ->
+            data.imagePath1?.let {
+                val uri = Uri.parse(it)
+                binding.ivPreview1.setImageURI(uri)
+            }
+            data.imagePath2?.let {
+                val uri = Uri.parse(it)
+                binding.ivPreview2.setImageURI(uri)
+            }
+            if (data.latitude != null && data.longitude != null) {
+                binding.tvLocationResult.text = String.format(Locale.US, "Lat: %.6f, Long: %.6f", data.latitude, data.longitude)
+            }
         }
     }
 
@@ -220,34 +407,11 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             nextVisitDate = binding.etNextVisitDate.text.toString().trim(),
             tpkNotes = binding.etTpkNotes.text.toString().trim(),
             isAlive = binding.cbIsAlive.isChecked,
-            isGivenBirth = binding.cbIsGivenBirth.isChecked
+            isGivenBirth = binding.cbIsGivenBirth.isChecked,
+            tfu = binding.etTfu.text.toString().toDoubleOrNull(),
+            isReceivedMbg = binding.cbIsReceivedMbg.isChecked
         )
     }
-
-    // ================== FUNGSI YANG HILANG SEKARANG ADA DI SINI ==================
-    private fun validateForm(): Boolean {
-        var isValid = true
-
-        if (binding.etVisitDate.text.isNullOrBlank()) {
-            binding.tilVisitDate.error = "Tanggal kunjungan wajib diisi"
-            isValid = false
-        } else {
-            binding.tilVisitDate.error = null
-        }
-
-        if (binding.etPregnancyWeek.text.isNullOrBlank()) {
-            binding.tilPregnancyWeek.error = "Usia kehamilan wajib diisi"
-            isValid = false
-        } else {
-            binding.tilPregnancyWeek.error = null
-        }
-
-        // Anda bisa menambahkan validasi untuk field lain di sini dengan pola yang sama
-        // if (binding.etCurrentWeight.text.isNullOrBlank()) { ... }
-
-        return isValid
-    }
-    // ===========================================================================
 
     private fun showMultiSelectDialog(
         title: String,
@@ -265,7 +429,9 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             .setTitle(title)
             .setMultiChoiceItems(itemsArray, checkedItems) { _, which, isChecked ->
                 if (isChecked) {
-                    selectedList.add(itemsArray[which])
+                    if (!selectedList.contains(itemsArray[which])) {
+                        selectedList.add(itemsArray[which])
+                    }
                 } else {
                     selectedList.remove(itemsArray[which])
                 }
@@ -280,11 +446,18 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             .show()
     }
 
+    /**
+     * Fungsi ini menggambar Chip berdasarkan daftar string yang dipilih.
+     */
     private fun updateChipGroup(chipGroup: ChipGroup, selectedItems: List<String>?) {
+        // Hapus semua chip lama sebelum menggambar yang baru
         chipGroup.removeAllViews()
         selectedItems?.forEach { item ->
-            val chip = Chip(context)
-            chip.text = item
+            val chip = Chip(context).apply {
+                text = item
+                isClickable = false // Chip hanya untuk display
+                isCheckable = false
+            }
             chipGroup.addView(chip)
         }
     }

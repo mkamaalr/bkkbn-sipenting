@@ -6,10 +6,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
 
-/**
- * Represents the "pregnant_mother_visits" table.
- * Each row is a visit record linked to a mother in the pregnant_mother table.
- */
 @Entity(
     tableName = "pregnant_mother_visits",
     foreignKeys = [
@@ -25,7 +21,7 @@ import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
 data class PregnantMotherVisitsEntity(
     @PrimaryKey(autoGenerate = true)
     val localVisitId: Int = 0,
-    val id: String? = null, // ID from server after sync
+    val id: String? = null,
     val pregnantMotherLocalId: Int,
     val visitDate: String,
     val childNumber: Int?,
@@ -58,5 +54,15 @@ data class PregnantMotherVisitsEntity(
     val defecationFacility: List<String>?,
     val socialAssistanceFacilitationOptions: List<String>?,
     val syncStatus: SyncStatus = SyncStatus.PENDING,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val deliveryPlaceId: Int?,
+    val birthAssistantId: Int?,
+    val contraceptionOptionId: Int?,
+    val imagePath1: String?,
+    val imagePath2: String?,
+    val latitude: Double?,
+    val longitude: Double?,
+    val isReceivedMbg: Boolean,
+    val isTfuMeasured: Boolean?,
+    val tfu: Double?
 )

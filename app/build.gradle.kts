@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt") // For Hilt
     id("com.google.dagger.hilt.android") // For Hilt
     id("kotlin-parcelize") // Add this line
+    alias(libs.plugins.navigation.safeargs)
 }
 
 android {
@@ -61,12 +62,14 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.1")
 
     // Navigation Component (highly recommended for multi-screen apps)
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.9.0")
+    implementation("androidx.navigation:navigation-ui-ktx:2.9.0")
+
 
     // Hilt (Dependency Injection)
     implementation("com.google.dagger:hilt-android:2.51.1")
     implementation(libs.androidx.coordinatorlayout)
+    implementation(libs.play.services.location)
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     kapt("androidx.hilt:hilt-compiler:1.2.0") // Hilt dengan dukungan ViewModel
 

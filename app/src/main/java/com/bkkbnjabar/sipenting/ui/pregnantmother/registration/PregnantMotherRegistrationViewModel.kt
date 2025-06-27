@@ -42,6 +42,12 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
     private val _userLocationDetails = MutableLiveData<LocationDetails?>()
     val userLocationDetails: LiveData<LocationDetails?> = _userLocationDetails
 
+    private val _referralStatusOptions = MutableLiveData<List<String>>()
+    val referralStatusOptions: LiveData<List<String>> = _referralStatusOptions
+
+    private val _socialAssistanceStatusOptions = MutableLiveData<List<String>>()
+    val socialAssistanceStatusOptions: LiveData<List<String>> = _socialAssistanceStatusOptions
+
     // State untuk daftar pilihan dropdown Halaman 1
     private val _rws = MutableLiveData<List<Rw>>()
     val rws: LiveData<List<Rw>> = _rws
@@ -62,6 +68,7 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
 
     init {
         resetForm()
+        loadStaticOptions()
     }
 
     fun resetForm() {
@@ -70,6 +77,19 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
         _saveResult.value = Resource.Idle
         _userLocationDetails.value = null
         loadUserLocationDetails()
+    }
+
+    private fun loadStaticOptions() {
+        _referralStatusOptions.value = listOf(
+            "Ya, Sedang Proses",
+            "Ya, Sudah Mendapatkan Pelayanan Rujukan",
+            "Tidak"
+        )
+        _socialAssistanceStatusOptions.value = listOf(
+            "Ya, Sedang Proses",
+            "Ya, Sudah Mendapatkan Bantuan Sosial",
+            "Tidak"
+        )
     }
 
     private fun loadUserLocationDetails() {
@@ -101,7 +121,6 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
     }
 
     fun updatePregnantMotherData(
-        registrationDate: String? = null,
         name: String? = null,
         nik: String? = null,
         dateOfBirth: String? = null,
@@ -122,7 +141,6 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
     ) {
         val currentData = _currentPregnantMother.value ?: PregnantMotherRegistrationData()
         val updatedData = currentData.copy(
-            registrationDate = registrationDate ?: currentData.registrationDate,
             name = name ?: currentData.name,
             nik = nik ?: currentData.nik,
             dateOfBirth = dateOfBirth ?: currentData.dateOfBirth,
@@ -177,7 +195,14 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
         diseaseHistory: List<String>? = null,
         mainSourceOfDrinkingWater: List<String>? = null,
         defecationFacility: List<String>? = null,
-        socialAssistanceFacilitationOptions: List<String>? = null
+        socialAssistanceFacilitationOptions: List<String>? = null,
+        imagePath1: String? = null,
+        imagePath2: String? = null,
+        latitude: Double? = null,
+        longitude: Double? = null,
+        isReceivedMbg: Boolean? = null,
+        isTfuMeasured: Boolean? = null,
+        tfu: Double? = null
     ) {
         val currentData = _currentPregnantMotherVisit.value ?: PregnantMotherVisitData()
         val updatedData = currentData.copy(
@@ -213,7 +238,14 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
             diseaseHistory = diseaseHistory ?: currentData.diseaseHistory,
             mainSourceOfDrinkingWater = mainSourceOfDrinkingWater ?: currentData.mainSourceOfDrinkingWater,
             defecationFacility = defecationFacility ?: currentData.defecationFacility,
-            socialAssistanceFacilitationOptions = socialAssistanceFacilitationOptions ?: currentData.socialAssistanceFacilitationOptions
+            socialAssistanceFacilitationOptions = socialAssistanceFacilitationOptions ?: currentData.socialAssistanceFacilitationOptions,
+            imagePath1 = imagePath1 ?: currentData.imagePath1,
+            imagePath2 = imagePath2 ?: currentData.imagePath2,
+            latitude = latitude ?: currentData.latitude,
+            longitude = longitude ?: currentData.longitude,
+            isReceivedMbg = isReceivedMbg ?: currentData.isReceivedMbg,
+            isTfuMeasured = isTfuMeasured ?: currentData.isTfuMeasured,
+            tfu = tfu ?: currentData.tfu
         )
         _currentPregnantMotherVisit.value = updatedData
     }

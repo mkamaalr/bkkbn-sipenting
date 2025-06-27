@@ -36,4 +36,12 @@ class PregnantMotherRepositoryImpl @Inject constructor(
     override fun getAllPregnantMothers(): Flow<List<PregnantMotherEntity>> {
         return pregnantMotherDao.getAllPregnantMothers()
     }
+
+    override fun getMotherById(localId: Int): Flow<PregnantMotherEntity?> {
+        return pregnantMotherDao.getPregnantMotherById(localId)
+    }
+
+    override fun getVisitsForMother(motherId: Int): Flow<List<PregnantMotherVisitsEntity>> {
+        return visitsDao.getVisitsForMother(motherId)
+    }
 }

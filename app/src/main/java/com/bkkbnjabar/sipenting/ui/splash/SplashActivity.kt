@@ -25,8 +25,8 @@ class SplashActivity : AppCompatActivity() {
 
         // Amati status preloading dari ViewModel
         viewModel.isPreloadingComplete.observe(this) { isComplete ->
+            // Hanya navigasi JIKA proses sudah selesai (isComplete == true)
             if (isComplete) {
-                // Jika sudah selesai, baru lakukan navigasi
                 checkLoginStatusAndNavigate()
             }
         }

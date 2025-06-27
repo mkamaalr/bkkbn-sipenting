@@ -3,13 +3,9 @@ package com.bkkbnjabar.sipenting.data.local.mapper
 import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherVisitsEntity
 import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherVisitData
 
-/**
- * Converts the visit form data object into a database entity object.
- * It handles nullable fields by providing default values to ensure the entity is valid.
- */
 fun PregnantMotherVisitData.toEntity(): PregnantMotherVisitsEntity {
     return PregnantMotherVisitsEntity(
-        localVisitId = this.localVisitId ?: 0, // Use 0 for auto-generation
+        localVisitId = this.localVisitId ?: 0,
         pregnantMotherLocalId = this.pregnantMotherLocalId ?: 0,
         visitDate = this.visitDate ?: "",
         childNumber = this.childNumber,
@@ -41,6 +37,16 @@ fun PregnantMotherVisitData.toEntity(): PregnantMotherVisitsEntity {
         mainSourceOfDrinkingWater = this.mainSourceOfDrinkingWater,
         defecationFacility = this.defecationFacility,
         socialAssistanceFacilitationOptions = this.socialAssistanceFacilitationOptions,
-        syncStatus = this.syncStatus
+        syncStatus = this.syncStatus,
+        deliveryPlaceId = this.deliveryPlaceId,
+        birthAssistantId = this.birthAssistantId,
+        contraceptionOptionId = this.contraceptionOptionId,
+        imagePath1 = this.imagePath1,
+        imagePath2 = this.imagePath2,
+        latitude = this.latitude,
+        longitude = this.longitude,
+        isReceivedMbg = this.isReceivedMbg ?: false,
+        isTfuMeasured = this.isTfuMeasured ?: false,
+        tfu = this.tfu
     )
 }

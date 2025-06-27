@@ -258,28 +258,6 @@
                     android:gravity="top" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Tanggal Pendaftaran -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/til_registration_date"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="Tanggal Pendaftaran (DD/MM/YYYY)"
-                app:endIconDrawable="@drawable/ic_calendar"
-                app:endIconMode="custom"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/til_full_address">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_registration_date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:inputType="date" />
-            </com.google.android.material.textfield.TextInputLayout>
-
             <!-- Next Button -->
             <Button
                 android:id="@+id/btn_next"
@@ -290,7 +268,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/til_registration_date"
+                app:layout_constraintTop_toBottomOf="@id/til_full_address"
                 app:layout_constraintVertical_bias="0.0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
