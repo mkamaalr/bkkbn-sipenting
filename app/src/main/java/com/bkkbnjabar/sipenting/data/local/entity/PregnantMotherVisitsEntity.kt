@@ -32,10 +32,12 @@ data class PregnantMotherVisitsEntity(
     val currentWeight: Double?,
     val isHbChecked: Boolean,
     val hemoglobinLevel: Double?,
+    val hemoglobinLevelReason: String?, // ADDED
     val upperArmCircumference: Double?,
     val isTwin: Boolean,
     val numberOfTwins: Int?,
     val isEstimatedFetalWeightChecked: Boolean,
+    val tbj: Double?, // ADDED: Taksiran Berat Janin in grams
     val isExposedToCigarettes: Boolean,
     val isCounselingReceived: Boolean,
     val counselingTypeId: Int?,

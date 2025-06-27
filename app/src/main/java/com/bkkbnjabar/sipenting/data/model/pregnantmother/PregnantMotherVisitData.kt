@@ -16,10 +16,12 @@ data class PregnantMotherVisitData(
     val currentWeight: Double? = null,
     val isHbChecked: Boolean? = null,
     val hemoglobinLevel: Double? = null,
+    val hemoglobinLevelReason: String? = null, // ADDED
     val upperArmCircumference: Double? = null,
     val isTwin: Boolean? = null,
     val numberOfTwins: Int? = null,
     val isEstimatedFetalWeightChecked: Boolean? = null,
+    val tbj: Double? = null, // ADDED
     val isExposedToCigarettes: Boolean? = null,
     val isCounselingReceived: Boolean? = null,
     val counselingTypeId: Int? = null,

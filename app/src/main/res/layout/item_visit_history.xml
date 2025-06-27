@@ -13,19 +13,31 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/tv_visit_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/iv_arrow_icon"
+            tools:text="Kunjungan ke-3" />
+
+        <TextView
             android:id="@+id/tv_visit_date_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="Kunjungan Tanggal:"
             android:textAppearance="?attr/textAppearanceLabelSmall"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/tv_visit_title" />
 
         <TextView
             android:id="@+id/tv_visit_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_visit_date_label"
             tools:text="26 Juni 2025" />
@@ -38,9 +50,11 @@
             android:textAppearance="?attr/textAppearanceBodyMedium"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_visit_date"
+            app:layout_constraintEnd_toEndOf="parent"
             tools:text="Usia Kehamilan: 12 Minggu, BB: 55.5 kg" />
 
         <ImageView
+            android:id="@+id/iv_arrow_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_drop_down"

@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherEntity
+import com.bkkbnjabar.sipenting.data.local.mapper.toRegistrationData
 import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherRegistrationData
 import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherVisitData
 import com.bkkbnjabar.sipenting.data.repository.LookupRepository
@@ -172,10 +174,12 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
         currentWeight: Double? = null,
         isHbChecked: Boolean? = null,
         hemoglobinLevel: Double? = null,
+        hemoglobinLevelReason: String? = null, // ADDED
         upperArmCircumference: Double? = null,
         isTwin: Boolean? = null,
         numberOfTwins: Int? = null,
         isEstimatedFetalWeightChecked: Boolean? = null,
+        tbj: Double? = null, // ADDED
         isExposedToCigarettes: Boolean? = null,
         isCounselingReceived: Boolean? = null,
         counselingTypeId: Int? = null,
@@ -215,10 +219,12 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
             currentWeight = currentWeight ?: currentData.currentWeight,
             isHbChecked = isHbChecked ?: currentData.isHbChecked,
             hemoglobinLevel = hemoglobinLevel ?: currentData.hemoglobinLevel,
+            hemoglobinLevelReason = hemoglobinLevelReason ?: currentData.hemoglobinLevelReason, // ADDED
             upperArmCircumference = upperArmCircumference ?: currentData.upperArmCircumference,
             isTwin = isTwin ?: currentData.isTwin,
             numberOfTwins = numberOfTwins ?: currentData.numberOfTwins,
             isEstimatedFetalWeightChecked = isEstimatedFetalWeightChecked ?: currentData.isEstimatedFetalWeightChecked,
+            tbj = tbj ?: currentData.tbj, // ADDED
             isExposedToCigarettes = isExposedToCigarettes ?: currentData.isExposedToCigarettes,
             isCounselingReceived = isCounselingReceived ?: currentData.isCounselingReceived,
             counselingTypeId = counselingTypeId ?: currentData.counselingTypeId,
@@ -262,6 +268,15 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
         }
     }
 
+    fun startNewVisitForExistingMother(mother: PregnantMotherEntity) {
+        // Populate the mother's data so the form has context
+        _currentPregnantMother.value = mother.toRegistrationData()
+
+        // Clear only the visit data, but crucially link it to the mother
+        _currentPregnantMotherVisit.value = PregnantMotherVisitData(pregnantMotherLocalId = mother.localId)
+        _saveResult.value = Resource.Idle
+    }
+
     fun saveAllData() = viewModelScope.launch {
         _saveResult.value = Resource.Loading
         val motherData = _currentPregnantMother.value
@@ -272,21 +287,29 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
             return@launch
         }
 
-        when (val motherResult = createPregnantMotherUseCase.execute(motherData)) {
-            is Resource.Success -> {
-                val motherId = motherResult.data
-                if (motherId != null) {
-                    val finalVisitData = visitData.copy(pregnantMotherLocalId = motherId.toInt())
-                    val visitResult = createPregnantMotherVisitUseCase.execute(finalVisitData)
-                    _saveResult.value = visitResult
-                } else {
-                    _saveResult.value = Resource.Error("Gagal mendapatkan ID Ibu setelah disimpan.")
+        // Check if the mother already exists in the database.
+        if (motherData.localId != null && motherData.localId > 0) {
+            // Mother exists, just save the visit data.
+            val visitResult = createPregnantMotherVisitUseCase.execute(visitData)
+            _saveResult.value = visitResult
+        } else {
+            // Mother is new. Save the mother first, then use the new ID to save the visit.
+            when (val motherResult = createPregnantMotherUseCase.execute(motherData)) {
+                is Resource.Success -> {
+                    val newMotherId = motherResult.data
+                    if (newMotherId != null) {
+                        val finalVisitData = visitData.copy(pregnantMotherLocalId = newMotherId.toInt())
+                        val visitResult = createPregnantMotherVisitUseCase.execute(finalVisitData)
+                        _saveResult.value = visitResult
+                    } else {
+                        _saveResult.value = Resource.Error("Gagal mendapatkan ID Ibu setelah disimpan.")
+                    }
                 }
+                is Resource.Error -> {
+                    _saveResult.value = Resource.Error(motherResult.message)
+                }
+                else -> { /* No-op for Loading/Idle */ }
             }
-            is Resource.Error -> {
-                _saveResult.value = Resource.Error(motherResult.message ?: "Gagal menyimpan data ibu.")
-            }
-            else -> {}
         }
     }
 }

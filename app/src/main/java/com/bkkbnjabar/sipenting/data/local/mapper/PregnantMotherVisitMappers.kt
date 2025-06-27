@@ -16,10 +16,12 @@ fun PregnantMotherVisitData.toEntity(): PregnantMotherVisitsEntity {
         currentWeight = this.currentWeight,
         isHbChecked = this.isHbChecked ?: false,
         hemoglobinLevel = this.hemoglobinLevel,
+        hemoglobinLevelReason = this.hemoglobinLevelReason, // ADDED
         upperArmCircumference = this.upperArmCircumference,
         isTwin = this.isTwin ?: false,
         numberOfTwins = this.numberOfTwins,
         isEstimatedFetalWeightChecked = this.isEstimatedFetalWeightChecked ?: false,
+        tbj = this.tbj, // ADDED
         isExposedToCigarettes = this.isExposedToCigarettes ?: false,
         isCounselingReceived = this.isCounselingReceived ?: false,
         counselingTypeId = this.counselingTypeId,

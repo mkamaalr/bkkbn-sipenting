@@ -22,11 +22,15 @@ class VisitHistoryAdapter(
         holder.itemView.setOnClickListener {
             onItemClick(currentItem)
         }
-        holder.bind(currentItem)
+        // Since the list is ordered new to old, we reverse the index for display.
+        val visitNumber = itemCount - position
+        holder.bind(currentItem, visitNumber)
     }
 
     class VisitViewHolder(private val binding: ItemVisitHistoryBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(visit: PregnantMotherVisitsEntity) {
+        // Updated bind function to accept the visit number
+        fun bind(visit: PregnantMotherVisitsEntity, visitNumber: Int) {
+            binding.tvVisitTitle.text = "Kunjungan ke-${visitNumber}"
             binding.tvVisitDate.text = visit.visitDate
             val summary = "Usia Hamil: ${visit.pregnancyWeekAge ?: '-'} mg, BB: ${visit.currentWeight ?: '-'} kg"
             binding.tvVisitSummary.text = summary

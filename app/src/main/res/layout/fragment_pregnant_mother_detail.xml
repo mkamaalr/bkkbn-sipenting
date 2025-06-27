@@ -18,7 +18,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Data Utama Ibu -->
             <TextView
                 android:id="@+id/tv_mother_name_detail"
                 android:layout_width="wrap_content"
@@ -34,6 +33,22 @@
                 tools:text="NIK: 3273xxxxxxxxxxxx" />
 
             <TextView
+                android:id="@+id/tv_mother_dob_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                tools:text="Tanggal Lahir: 01/01/1990" />
+
+            <TextView
+                android:id="@+id/tv_mother_phone_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                tools:text="No. HP: 081234567890" />
+
+            <TextView
                 android:id="@+id/tv_mother_address_detail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -41,35 +56,99 @@
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 tools:text="Jl. Merdeka No. 1, Kel. Cihapit, Kec. Bandung Wetan" />
 
-            <!-- Kartu Interpretasi -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardBackgroundColor="?attr/colorPrimaryContainer">
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Interpretasi Kesehatan"
+                        android:text="Interpretasi Kesehatan (Kunjungan Terakhir)"
                         android:textAppearance="?attr/textAppearanceTitleMedium"
-                        android:textColor="?attr/colorOnPrimaryContainer"/>
-                    <TextView
-                        android:id="@+id/tv_interpretation_result"
-                        android:layout_width="wrap_content"
+                        android:textColor="?attr/colorOnSurface"/>
+
+                    <TableLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textAppearance="?attr/textAppearanceBodyLarge"
-                        android:textColor="?attr/colorOnPrimaryContainer"
-                        tools:text="Status Gizi: Risiko KEK"/>
+                        android:layout_marginTop="12dp"
+                        android:stretchColumns="1">
+
+                        <TableRow>
+                            <TextView android:text="Usia Kehamilan" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_week_age" style="@style/InterpretationValue" tools:text="30 Minggu"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="Usia Ibu" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_age" style="@style/InterpretationValue" tools:text="Ideal"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="Jumlah Anak Kandung" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_child_count" style="@style/InterpretationValue" tools:text="Ideal"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="TFU" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_tfu" style="@style/InterpretationValue" tools:text="Ideal"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="TBJ (gram)" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_tbj_value" style="@style/InterpretationValue" tools:text="1319 gram"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="Status Taksiran Berat Janin" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_tbj" style="@style/InterpretationValue" tools:text="Ideal"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="Indeks Masa Tubuh (IMT)" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_imt" style="@style/InterpretationValue" tools:text="Normal"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="Kadar Hemoglobin (g/dl)" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_hb" style="@style/InterpretationValue" tools:text="Normal"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="Lingkar Lengan Atas (Cm)" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_lila" style="@style/InterpretationValue" tools:text="Normal"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="Riwayat Penyakit" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_disease" style="@style/InterpretationValue" tools:text="Tidak Beresiko"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="Air Minum" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_water" style="@style/InterpretationValue" tools:text="Layak"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="Fasilitas BAB" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_bab" style="@style/InterpretationValue" tools:text="Layak"/>
+                        </TableRow>
+
+                        <TableRow>
+                            <TextView android:text="Terpapar Rokok" style="@style/InterpretationLabel"/>
+                            <TextView android:id="@+id/tv_interpretation_smoke" style="@style/InterpretationValue" tools:text="Tidak Beresiko"/>
+                        </TableRow>
+
+                    </TableLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Riwayat Kunjungan -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

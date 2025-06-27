@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="status_green_text">#388E3C</color>
+    <color name="status_red_text">#D32F2F</color>
+    <color name="status_yellow_text">#F57C00</color>
+    <color name="status_black_text">#000000</color>
+
     <!-- BKKBN Color Palette -->
     <!-- Primary (Blue) -->
     <color name="bkkbn_primary_blue">#1d71b8</color>

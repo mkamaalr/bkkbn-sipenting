@@ -30,7 +30,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- Tanggal Kunjungan -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_visit_date"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -51,7 +50,6 @@
                         android:inputType="date" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Status Ibu -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_pregnant_mother_status"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -69,7 +67,6 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Status Kelahiran -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_given_birth_status"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -87,7 +84,6 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Data Kehamilan -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_child_number"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -105,7 +101,6 @@
                         android:inputType="number" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Tanggal Lahir Anak Terakhir -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_date_of_birth_last_child"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -126,7 +121,6 @@
                         android:inputType="date" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Usia Kehamilan & BB Trimester 1 -->
                 <LinearLayout
                     android:id="@+id/layout_pregnancy_data"
                     android:layout_width="0dp"
@@ -166,7 +160,6 @@
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
-                <!-- Berat & Tinggi Badan Saat Ini -->
                 <LinearLayout
                     android:id="@+id/layout_current_measures"
                     android:layout_width="0dp"
@@ -206,78 +199,104 @@
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
-                <!-- LILA & HB -->
-                <LinearLayout
-                    android:id="@+id/layout_lila_hb"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_lila"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_marginTop="8dp"
                     app:layout_constraintTop_toBottomOf="@id/layout_current_measures"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_lila"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:hint="LILA (cm)">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_lila"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
-                        android:hint="LILA (cm)">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_lila"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="numberDecimal" />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_hb"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:hint="Kadar HB (g/dL)">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_hb"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="numberDecimal" />
-                    </com.google.android.material.textfield.TextInputLayout>
-                </LinearLayout>
+                        android:inputType="numberDecimal" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
-                    android:id="@+id/tv_tfu_label"
+                    android:id="@+id/tv_hb_check_label"
+                    style="@style/FormLabel"
+                    android:text="Pemeriksaan HB Dilakukan?"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/til_lila" />
+                <RadioGroup
+                    android:id="@+id/rg_is_hb_checked"
+                    style="@style/FormRadioGroup"
+                    app:layout_constraintTop_toBottomOf="@id/tv_hb_check_label"
+                    app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_hb_checked_yes" style="@style/FormRadioButton" android:text="Ya"/>
+                    <RadioButton android:id="@+id/rb_hb_checked_no" style="@style/FormRadioButton" android:text="Tidak"/>
+                </RadioGroup>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_hb"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Kadar HB (g/dL)"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_hb_checked"
+                    tools:visibility="visible">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_hb"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_hb_reason"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Alasan Tidak Diperiksa"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_hb_checked">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_hb_reason"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/barrier_hb_section"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="rg_is_hb_checked,til_hb,til_hb_reason" />
+                <TextView
+                    android:id="@+id/tv_tfu_label"
+                    style="@style/FormLabel"
                     android:text="Pengukuran Tinggi Fundus Uteri (TFU)"
-                    android:textAppearance="?attr/textAppearanceTitleSmall"
                     android:visibility="gone"
-                    app:layout_constraintTop_toBottomOf="@id/layout_lila_hb"
+                    app:layout_constraintTop_toBottomOf="@id/barrier_hb_section"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:visibility="visible"/>
 
                 <RadioGroup
                     android:id="@+id/rg_tfu_status"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    style="@style/FormRadioGroup"
                     android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@id/tv_tfu_label"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
                     tools:visibility="visible">
                     <RadioButton
                         android:id="@+id/rb_tfu_diukur"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        style="@style/FormRadioButton"
                         android:text="Diukur"/>
                     <RadioButton
                         android:id="@+id/rb_tfu_tidak_diukur"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        style="@style/FormRadioButton"
                         android:text="Tidak Diukur"/>
                 </RadioGroup>
 
@@ -288,17 +307,17 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="TFU (cm)"
+                    android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@id/rg_tfu_status"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:visibility="visible">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_tfu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal" />
                 </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Dropdown Rencana Persalinan -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_delivery_place"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -350,7 +369,6 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Dropdown Jenis Konseling -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_counseling_type"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -402,7 +420,6 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Checkboxes -->
                 <TextView
                     android:id="@+id/tv_checkbox_title"
                     android:layout_width="wrap_content"
@@ -413,109 +430,75 @@
                     app:layout_constraintTop_toBottomOf="@id/til_facilitating_social_assistance"
                     app:layout_constraintStart_toStartOf="parent"/>
 
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_is_alive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Ibu Masih Hidup"
-                    app:layout_constraintTop_toBottomOf="@id/tv_checkbox_title"
-                    app:layout_constraintStart_toStartOf="parent" />
+                <TextView android:id="@+id/tv_is_alive_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/tv_checkbox_title" app:layout_constraintStart_toStartOf="parent" android:text="Ibu Masih Hidup?"/>
+                <RadioGroup android:id="@+id/rg_is_alive" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_alive_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_alive_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_alive_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
 
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_is_given_birth"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sudah Melahirkan"
-                    app:layout_constraintTop_toBottomOf="@id/cb_is_alive"
-                    app:layout_constraintStart_toStartOf="parent" />
+                <TextView android:id="@+id/tv_is_given_birth_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_alive" app:layout_constraintStart_toStartOf="parent" android:text="Sudah Melahirkan?"/>
+                <RadioGroup android:id="@+id/rg_is_given_birth" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_given_birth_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_given_birth_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_given_birth_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
 
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_is_hb_checked"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Pemeriksaan HB Dilakukan"
-                    app:layout_constraintTop_toBottomOf="@id/cb_is_given_birth"
-                    app:layout_constraintStart_toStartOf="parent" />
-
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_is_twin"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hamil Kembar"
-                    app:layout_constraintTop_toBottomOf="@id/cb_is_hb_checked"
-                    app:layout_constraintStart_toStartOf="parent" />
-
+                <TextView android:id="@+id/tv_is_twin_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_given_birth" app:layout_constraintStart_toStartOf="parent" android:text="Hamil Kembar?"/>
+                <RadioGroup android:id="@+id/rg_is_twin" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_twin_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_twin_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_twin_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_number_of_twins"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:visibility="gone"
-                    android:hint="Jumlah Kembar"
-                    app:layout_constraintTop_toBottomOf="@id/cb_is_twin"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    tools:visibility="visible">
+                    android:id="@+id/til_number_of_twins" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:visibility="gone"
+                    android:hint="Jumlah Kembar" app:layout_constraintTop_toBottomOf="@id/rg_is_twin" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" tools:visibility="visible">
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_number_of_twins"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number" />
+                        android:id="@+id/et_number_of_twins" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_is_estimated_fetal_weight_checked"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Taksiran Berat Janin Diperiksa"
-                    app:layout_constraintTop_toBottomOf="@id/til_number_of_twins"
-                    app:layout_constraintStart_toStartOf="parent" />
+                <TextView android:id="@+id/tv_is_tbj_checked_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/til_number_of_twins" app:layout_constraintStart_toStartOf="parent" android:text="Taksiran Berat Janin Diperiksa?"/>
+                <RadioGroup android:id="@+id/rg_is_tbj_checked" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_tbj_checked_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_tbj_checked_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_tbj_checked_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_tbj" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:visibility="gone"
+                    android:hint="Taksiran Berat Janin (gram)" app:layout_constraintTop_toBottomOf="@id/rg_is_tbj_checked" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" tools:visibility="visible">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_tbj" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_is_counseling_received"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Menerima Konseling"
-                    app:layout_constraintTop_toBottomOf="@id/cb_is_estimated_fetal_weight_checked"
-                    app:layout_constraintStart_toStartOf="parent" />
+                <TextView android:id="@+id/tv_is_counseling_received_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/til_tbj" app:layout_constraintStart_toStartOf="parent" android:text="Menerima Konseling?"/>
+                <RadioGroup android:id="@+id/rg_is_counseling_received" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_counseling_received_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_counseling_received_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_counseling_received_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
 
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_is_iron_tables_received"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Menerima Tablet Tambah Darah"
-                    app:layout_constraintTop_toBottomOf="@id/cb_is_counseling_received"
-                    app:layout_constraintStart_toStartOf="parent" />
+                <TextView android:id="@+id/tv_is_iron_received_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_counseling_received" app:layout_constraintStart_toStartOf="parent" android:text="Menerima Tablet Tambah Darah?"/>
+                <RadioGroup android:id="@+id/rg_is_iron_received" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_iron_received_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_iron_received_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_iron_received_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
 
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_is_iron_tables_taken"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tablet Tambah Darah Diminum"
-                    app:layout_constraintTop_toBottomOf="@id/cb_is_iron_tables_received"
-                    app:layout_constraintStart_toStartOf="parent" />
+                <TextView android:id="@+id/tv_is_iron_taken_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_iron_received" app:layout_constraintStart_toStartOf="parent" android:text="Tablet Tambah Darah Diminum?"/>
+                <RadioGroup android:id="@+id/rg_is_iron_taken" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_iron_taken_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_iron_taken_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_iron_taken_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
+                <TextView android:id="@+id/tv_is_exposed_to_smoke_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_iron_taken" app:layout_constraintStart_toStartOf="parent" android:text="Terpapar Asap Rokok?"/>
+                <RadioGroup android:id="@+id/rg_is_exposed_to_smoke" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_exposed_to_smoke_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_exposed_to_smoke_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_exposed_to_smoke_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
+                <TextView android:id="@+id/tv_is_mbg_received_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_exposed_to_smoke" app:layout_constraintStart_toStartOf="parent" android:text="Menerima Makanan Bergizi Gratis (SPPG)?"/>
+                <RadioGroup android:id="@+id/rg_is_mbg_received" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_mbg_received_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_mbg_received_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_mbg_received_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
 
 
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_is_exposed_to_cigarettes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Terpapar Asap Rokok"
-                    app:layout_constraintTop_toBottomOf="@id/cb_is_iron_tables_taken"
-                    app:layout_constraintStart_toStartOf="parent" />
-
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_is_received_mbg"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Apakah menerima distribusi Makan Bergizi Gratis dari pemerintah (SPPG)?"
-                    app:layout_constraintTop_toBottomOf="@id/cb_is_exposed_to_cigarettes"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <!-- Multi-select untuk Riwayat Penyakit -->
                 <TextView
                     android:id="@+id/tv_disease_history_label"
                     android:layout_width="wrap_content"
@@ -523,7 +506,7 @@
                     android:layout_marginTop="16dp"
                     android:text="Riwayat Penyakit (Pilih)"
                     android:textAppearance="?attr/textAppearanceTitleSmall"
-                    app:layout_constraintTop_toBottomOf="@id/cb_is_received_mbg"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_mbg_received"
                     app:layout_constraintStart_toStartOf="parent"/>
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chip_group_disease_history"
@@ -542,7 +525,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
-                <!-- Multi-select untuk Sumber Air Minum -->
                 <TextView
                     android:id="@+id/tv_drinking_water_label"
                     android:layout_width="wrap_content"
@@ -569,7 +551,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
-                <!-- Multi-select untuk Fasilitas Jamban -->
                 <TextView
                     android:id="@+id/tv_defecation_facility_label"
                     android:layout_width="wrap_content"
@@ -596,7 +577,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
-                <!-- Multi-select untuk Bantuan Sosial -->
                 <TextView
                     android:id="@+id/tv_social_assistance_label"
                     android:layout_width="wrap_content"
@@ -623,7 +603,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
-                <!-- Catatan TPK -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_tpk_notes"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -643,7 +622,6 @@
                         android:minLines="4" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Tanggal Kunjungan Berikutnya -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_next_visit_date"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -664,7 +642,6 @@
                         android:inputType="date" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Images -->
                 <TextView
                     android:id="@+id/tv_attachment_title"
                     android:layout_width="wrap_content"
@@ -754,7 +731,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     tools:text="Lat: -6.9175, Long: 107.6191" />
 
-                <!-- Tombol Navigasi -->
                 <LinearLayout
                     android:id="@+id/button_container"
                     android:layout_width="0dp"

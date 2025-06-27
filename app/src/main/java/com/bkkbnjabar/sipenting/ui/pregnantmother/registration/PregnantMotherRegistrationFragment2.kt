@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -113,6 +114,13 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             viewModel.saveAllData()
         }
 
+        // *** THIS IS THE FIX ***
+        // Add a listener to update the ViewModel in real-time as the user types.
+        binding.etPregnancyWeek.doAfterTextChanged { text ->
+            val week = text.toString().toIntOrNull()
+            viewModel.updatePregnantMotherVisitData(pregnancyWeekAge = week)
+        }
+
         binding.etFacilitatingReferralService.setOnItemClickListener { _, _, position, _ ->
             val selected = binding.etFacilitatingReferralService.adapter.getItem(position) as String
             viewModel.updatePregnantMotherVisitData(facilitatingReferralServiceStatus = selected)
@@ -127,11 +135,33 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         binding.etDateOfBirthLastChild.setOnClickListener { showDatePickerDialog(it as TextInputEditText, "Pilih Tgl Lahir Anak Terakhir") }
         binding.etNextVisitDate.setOnClickListener { showDatePickerDialog(it as TextInputEditText, "Pilih Tgl Kunjungan Berikutnya") }
 
-        // Listener untuk checkbox Hamil Kembar
-        binding.cbIsTwin.setOnCheckedChangeListener { _, isChecked ->
+        // Listener untuk RadioGroup Hamil Kembar
+        binding.rgIsTwin.setOnCheckedChangeListener { _, checkedId ->
+            val isChecked = checkedId == R.id.rb_is_twin_yes
             binding.tilNumberOfTwins.isVisible = isChecked
             if (!isChecked) {
                 binding.etNumberOfTwins.setText("")
+            }
+        }
+
+        // Listener untuk RadioGroup Pemeriksaan HB
+        binding.rgIsHbChecked.setOnCheckedChangeListener { _, checkedId ->
+            val isChecked = checkedId == R.id.rb_hb_checked_yes
+            binding.tilHb.isVisible = isChecked
+            binding.tilHbReason.isVisible = !isChecked
+            if (isChecked) {
+                binding.etHbReason.setText("")
+            } else {
+                binding.etHb.setText("")
+            }
+        }
+
+        // Listener untuk RadioGroup Taksiran Berat Janin
+        binding.rgIsTbjChecked.setOnCheckedChangeListener { _, checkedId ->
+            val isChecked = checkedId == R.id.rb_is_tbj_checked_yes
+            binding.tilTbj.isVisible = isChecked
+            if(!isChecked) {
+                binding.etTbj.setText("")
             }
         }
 
@@ -143,9 +173,7 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         setupDropdownListener(binding.etBirthAssistant) { viewModel.updatePregnantMotherVisitData(birthAssistantId = it.id) }
         setupDropdownListener(binding.etContraceptionOption) { viewModel.updatePregnantMotherVisitData(contraceptionOptionId = it.id) }
 
-        // ================== LOGIKA LISTENER DIPERBAIKI ==================
         binding.btnSelectDiseaseHistory.setOnClickListener {
-            // Gunakan properti lokal yang sudah diisi oleh observer
             showMultiSelectDialog(
                 "Pilih Riwayat Penyakit",
                 diseaseHistoryOptions,
@@ -187,7 +215,7 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             binding.tilTfu.isVisible = isMeasured
             viewModel.updatePregnantMotherVisitData(isTfuMeasured = isMeasured)
             if (!isMeasured) {
-                binding.etTfu.setText("") // Kosongkan nilai jika "Tidak Diukur"
+                binding.etTfu.setText("")
             }
         }
 
@@ -206,20 +234,18 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
                 }
             }
             else -> {
-                // Minta izin kamera
                 requestPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
         }
     }
 
     private fun handleLocationCapture() {
-        captureRequestIndex = 0 // Reset index
+        captureRequestIndex = 0
         when {
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED -> {
                 getCurrentLocation()
             }
             else -> {
-                // Minta izin lokasi
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }
@@ -286,7 +312,6 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             binding.etFacilitatingSocialAssistance.setAdapter(adapter)
         }
 
-        // Observers untuk mengisi adapter dropdown
         viewModel.pregnantMotherStatuses.observe(viewLifecycleOwner) { setAdapter(binding.etPregnantMotherStatus, it) }
         viewModel.givenBirthStatuses.observe(viewLifecycleOwner) { setAdapter(binding.etGivenBirthStatus, it) }
         viewModel.counselingTypes.observe(viewLifecycleOwner) { setAdapter(binding.etCounselingType, it) }
@@ -294,8 +319,6 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         viewModel.birthAssistants.observe(viewLifecycleOwner) { setAdapter(binding.etBirthAssistant, it) }
         viewModel.contraceptionOptions.observe(viewLifecycleOwner) { setAdapter(binding.etContraceptionOption, it) }
 
-        // ================== LOGIKA OBSERVER DIPERBAIKI ==================
-        // Observer untuk data multi-select: simpan ke properti lokal dan aktifkan tombol saat data datang
         viewModel.diseaseHistories.observe(viewLifecycleOwner) { options ->
             diseaseHistoryOptions = options ?: emptyList()
             binding.btnSelectDiseaseHistory.isEnabled = diseaseHistoryOptions.isNotEmpty()
@@ -313,7 +336,6 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             binding.btnSelectSocialAssistance.isEnabled = options.isNotEmpty()
         }
 
-        // Observer untuk mengupdate tampilan ChipGroup setiap kali data pilihan berubah
         viewModel.currentPregnantMotherVisit.observe(viewLifecycleOwner) { visitData ->
             if (visitData != null) {
                 updateChipGroup(binding.chipGroupDiseaseHistory, visitData.diseaseHistory)
@@ -321,12 +343,10 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
                 updateChipGroup(binding.chipGroupDefecationFacility, visitData.defecationFacility)
                 updateChipGroup(binding.chipGroupSocialAssistance, visitData.socialAssistanceFacilitationOptions)
 
-                // Tampilkan/sembunyikan seluruh bagian TFU berdasarkan usia kehamilan
                 val isTfuEligible = (visitData.pregnancyWeekAge ?: 0) >= 20
                 binding.tvTfuLabel.isVisible = isTfuEligible
                 binding.rgTfuStatus.isVisible = isTfuEligible
 
-                // Jika tidak eligible, pastikan input TFU juga tersembunyi
                 if (!isTfuEligible) {
                     binding.tilTfu.isVisible = false
                 }
@@ -350,24 +370,27 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             binding.etCurrentHeight.setText(data.currentHeight?.toString() ?: "")
             binding.etLila.setText(data.upperArmCircumference?.toString() ?: "")
             binding.etHb.setText(data.hemoglobinLevel?.toString() ?: "")
+            binding.etHbReason.setText(data.hemoglobinLevelReason ?: "")
             binding.etNumberOfTwins.setText(data.numberOfTwins?.toString() ?: "")
+            binding.etTbj.setText(data.tbj?.toString() ?: "")
             binding.etTpkNotes.setText(data.tpkNotes)
             binding.etNextVisitDate.setText(data.nextVisitDate)
             binding.etFacilitatingReferralService.setText(data.facilitatingReferralServiceStatus ?: "", false)
             binding.etFacilitatingSocialAssistance.setText(data.facilitatingSocialAssistanceStatus ?: "", false)
 
-            binding.cbIsAlive.isChecked = data.isAlive ?: true
-            binding.cbIsGivenBirth.isChecked = data.isGivenBirth ?: false
-            binding.cbIsHbChecked.isChecked = data.isHbChecked ?: false
-            binding.cbIsTwin.isChecked = data.isTwin ?: false
+            (if (data.isAlive == true) binding.rbIsAliveYes else binding.rbIsAliveNo).isChecked = true
+            (if (data.isGivenBirth == true) binding.rbIsGivenBirthYes else binding.rbIsGivenBirthNo).isChecked = true
+            (if (data.isHbChecked == true) binding.rbHbCheckedYes else binding.rbHbCheckedNo).isChecked = true
+            (if (data.isTwin == true) binding.rbIsTwinYes else binding.rbIsTwinNo).isChecked = true
+            (if (data.isEstimatedFetalWeightChecked == true) binding.rbIsTbjCheckedYes else binding.rbIsTbjCheckedNo).isChecked = true
+            (if (data.isCounselingReceived == true) binding.rbIsCounselingReceivedYes else binding.rbIsCounselingReceivedNo).isChecked = true
+            (if (data.isIronTablesReceived == true) binding.rbIsIronReceivedYes else binding.rbIsIronReceivedNo).isChecked = true
+            (if (data.isIronTablesTaken == true) binding.rbIsIronTakenYes else binding.rbIsIronTakenNo).isChecked = true
+            (if (data.isExposedToCigarettes == true) binding.rbIsExposedToSmokeYes else binding.rbIsExposedToSmokeNo).isChecked = true
+            (if (data.isReceivedMbg == true) binding.rbIsMbgReceivedYes else binding.rbIsMbgReceivedNo).isChecked = true
+
             binding.tilNumberOfTwins.isVisible = data.isTwin ?: false
-            binding.cbIsEstimatedFetalWeightChecked.isChecked = data.isEstimatedFetalWeightChecked ?: false
-            binding.cbIsCounselingReceived.isChecked = data.isCounselingReceived ?: false
-            binding.cbIsIronTablesReceived.isChecked = data.isIronTablesReceived ?: false
-            binding.cbIsIronTablesTaken.isChecked = data.isIronTablesTaken ?: false
-            binding.cbIsExposedToCigarettes.isChecked = data.isExposedToCigarettes ?: false
             binding.etTfu.setText(data.tfu?.toString() ?: "")
-            binding.cbIsReceivedMbg.isChecked = data.isReceivedMbg ?: false
         }
 
         viewModel.currentPregnantMotherVisit.value?.let { data ->
@@ -394,22 +417,24 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             weightTrimester1 = binding.etWeightTrimester1.text.toString().toDoubleOrNull(),
             currentHeight = binding.etCurrentHeight.text.toString().toDoubleOrNull(),
             currentWeight = binding.etCurrentWeight.text.toString().toDoubleOrNull(),
-            isHbChecked = binding.cbIsHbChecked.isChecked,
+            isHbChecked = binding.rgIsHbChecked.checkedRadioButtonId == R.id.rb_hb_checked_yes,
             hemoglobinLevel = binding.etHb.text.toString().toDoubleOrNull(),
+            hemoglobinLevelReason = binding.etHbReason.text.toString().trim(),
             upperArmCircumference = binding.etLila.text.toString().toDoubleOrNull(),
-            isTwin = binding.cbIsTwin.isChecked,
+            isTwin = binding.rgIsTwin.checkedRadioButtonId == R.id.rb_is_twin_yes,
             numberOfTwins = binding.etNumberOfTwins.text.toString().toIntOrNull(),
-            isEstimatedFetalWeightChecked = binding.cbIsEstimatedFetalWeightChecked.isChecked,
-            isExposedToCigarettes = binding.cbIsExposedToCigarettes.isChecked,
-            isCounselingReceived = binding.cbIsCounselingReceived.isChecked,
-            isIronTablesReceived = binding.cbIsIronTablesReceived.isChecked,
-            isIronTablesTaken = binding.cbIsIronTablesTaken.isChecked,
+            isEstimatedFetalWeightChecked = binding.rgIsTbjChecked.checkedRadioButtonId == R.id.rb_is_tbj_checked_yes,
+            tbj = binding.etTbj.text.toString().toDoubleOrNull(),
+            isExposedToCigarettes = binding.rgIsExposedToSmoke.checkedRadioButtonId == R.id.rb_is_exposed_to_smoke_yes,
+            isCounselingReceived = binding.rgIsCounselingReceived.checkedRadioButtonId == R.id.rb_is_counseling_received_yes,
+            isIronTablesReceived = binding.rgIsIronReceived.checkedRadioButtonId == R.id.rb_is_iron_received_yes,
+            isIronTablesTaken = binding.rgIsIronTaken.checkedRadioButtonId == R.id.rb_is_iron_taken_yes,
             nextVisitDate = binding.etNextVisitDate.text.toString().trim(),
             tpkNotes = binding.etTpkNotes.text.toString().trim(),
-            isAlive = binding.cbIsAlive.isChecked,
-            isGivenBirth = binding.cbIsGivenBirth.isChecked,
+            isAlive = binding.rgIsAlive.checkedRadioButtonId == R.id.rb_is_alive_yes,
+            isGivenBirth = binding.rgIsGivenBirth.checkedRadioButtonId == R.id.rb_is_given_birth_yes,
             tfu = binding.etTfu.text.toString().toDoubleOrNull(),
-            isReceivedMbg = binding.cbIsReceivedMbg.isChecked
+            isReceivedMbg = binding.rgIsMbgReceived.checkedRadioButtonId == R.id.rb_is_mbg_received_yes
         )
     }
 
@@ -446,16 +471,12 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             .show()
     }
 
-    /**
-     * Fungsi ini menggambar Chip berdasarkan daftar string yang dipilih.
-     */
     private fun updateChipGroup(chipGroup: ChipGroup, selectedItems: List<String>?) {
-        // Hapus semua chip lama sebelum menggambar yang baru
         chipGroup.removeAllViews()
         selectedItems?.forEach { item ->
             val chip = Chip(context).apply {
                 text = item
-                isClickable = false // Chip hanya untuk display
+                isClickable = false
                 isCheckable = false
             }
             chipGroup.addView(chip)
