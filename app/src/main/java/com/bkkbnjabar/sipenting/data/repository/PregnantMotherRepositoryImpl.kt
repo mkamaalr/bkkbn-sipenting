@@ -4,6 +4,7 @@ import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherVisitsDao
 import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherEntity
 import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherVisitsEntity
+import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherWithLatestStatus
 import com.bkkbnjabar.sipenting.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -56,5 +57,9 @@ class PregnantMotherRepositoryImpl @Inject constructor(
 
     override fun getVisitById(visitId: Int): Flow<PregnantMotherVisitsEntity?> {
         return visitsDao.getVisitById(visitId)
+    }
+
+    override fun getAllMothersWithLatestStatus(): Flow<List<PregnantMotherWithLatestStatus>> {
+        return pregnantMotherDao.getAllMothersWithLatestStatus()
     }
 }

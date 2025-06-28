@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherEntity
+import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherWithLatestStatus
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -33,5 +34,23 @@ interface PregnantMotherDao {
      */
     @Query("SELECT * FROM pregnant_mother WHERE localId = :localId")
     fun getPregnantMotherById(localId: Int): Flow<PregnantMotherEntity?>
+
+    /**
+     * Gets all pregnant mother records, joining the status, next visit date, and pregnancy age
+     * from their most recent visit.
+     * @return A Flow emitting a list of the combined data objects.
+     */
+    @Query("""
+        SELECT 
+            pm.*,
+            (SELECT pmv.pregnantMotherStatusId FROM pregnant_mother_visits pmv WHERE pmv.pregnantMotherLocalId = pm.localId ORDER BY pmv.createdAt DESC LIMIT 1) as pregnantMotherStatusId,
+            (SELECT pmv.nextVisitDate FROM pregnant_mother_visits pmv WHERE pmv.pregnantMotherLocalId = pm.localId ORDER BY pmv.createdAt DESC LIMIT 1) as nextVisitDate,
+            (SELECT pmv.pregnancyWeekAge FROM pregnant_mother_visits pmv WHERE pmv.pregnantMotherLocalId = pm.localId ORDER BY pmv.createdAt DESC LIMIT 1) as pregnancyWeekAge
+        FROM 
+            pregnant_mother pm 
+        ORDER BY 
+            pm.createdAt DESC
+    """)
+    fun getAllMothersWithLatestStatus(): Flow<List<PregnantMotherWithLatestStatus>>
 
 }

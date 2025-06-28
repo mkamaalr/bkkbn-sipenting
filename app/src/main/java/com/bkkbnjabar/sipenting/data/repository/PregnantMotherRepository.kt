@@ -2,6 +2,7 @@ package com.bkkbnjabar.sipenting.data.repository
 
 import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherEntity
 import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherVisitsEntity
+import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherWithLatestStatus
 import com.bkkbnjabar.sipenting.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
@@ -13,4 +14,6 @@ interface PregnantMotherRepository {
     fun getVisitsForMother(motherId: Int): Flow<List<PregnantMotherVisitsEntity>>
     suspend fun updatePregnantMotherVisit(visitEntity: PregnantMotherVisitsEntity): Resource<Unit>
     fun getVisitById(visitId: Int): Flow<PregnantMotherVisitsEntity?>
+    fun getAllMothersWithLatestStatus(): Flow<List<PregnantMotherWithLatestStatus>>
+
 }

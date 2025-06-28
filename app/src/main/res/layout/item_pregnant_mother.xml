@@ -32,6 +32,27 @@
             app:layout_constraintTop_toBottomOf="@id/tv_mother_name"
             tools:text="NIK: 3273xxxxxxxxxxxx" />
 
+        <TextView
+            android:id="@+id/tv_mother_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_mother_nik"
+            tools:text="Status: Resiko Tinggi" />
+
+        <TextView
+            android:id="@+id/tv_mother_visit_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_mother_status"
+            tools:text="Usia Kehamilan: 30 mg, Kunjungan Berikutnya: 28-06-2025" />
+
         <ImageView
             android:id="@+id/iv_sync_status"
             android:layout_width="24dp"
