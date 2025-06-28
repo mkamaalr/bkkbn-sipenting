@@ -9,6 +9,8 @@ import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMoth
 import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMotherUseCaseImpl
 import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMotherVisitUseCase
 import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMotherVisitUseCaseImpl
+import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.UpdatePregnantMotherVisitUseCase
+import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.UpdatePregnantMotherVisitUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -42,4 +44,10 @@ abstract class UseCaseModule {
     abstract fun bindCreatePregnantMotherVisitUseCase(
         createPregnantMotherVisitUseCaseImpl: CreatePregnantMotherVisitUseCaseImpl
     ): CreatePregnantMotherVisitUseCase
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindUpdatePregnantMotherVisitUseCase(
+        updatePregnantMotherVisitUseCaseImpl: UpdatePregnantMotherVisitUseCaseImpl
+    ): UpdatePregnantMotherVisitUseCase
 }

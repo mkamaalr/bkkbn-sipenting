@@ -53,8 +53,11 @@ data class PregnantMotherVisitsEntity(
     val pregnantMotherStatusId: Int?,
     val diseaseHistory: List<String>?,
     val mainSourceOfDrinkingWater: List<String>?,
+    val mainSourceOfDrinkingWaterOther: String?,
     val defecationFacility: List<String>?,
+    val defecationFacilityOther: String?,
     val socialAssistanceFacilitationOptions: List<String>?,
+    val socialAssistanceFacilitationOptionsOther: String?, // ADDED
     val syncStatus: SyncStatus = SyncStatus.PENDING,
     val createdAt: Long = System.currentTimeMillis(),
     val deliveryPlaceId: Int?,

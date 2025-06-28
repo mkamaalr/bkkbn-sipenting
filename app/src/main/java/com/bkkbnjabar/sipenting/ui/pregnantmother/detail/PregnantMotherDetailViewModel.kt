@@ -9,9 +9,11 @@ import com.bkkbnjabar.sipenting.domain.model.InterpretationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.pow
 
@@ -72,6 +74,9 @@ class PregnantMotherDetailViewModel @Inject constructor(
     private val _tbjValueText = MutableLiveData<String>()
     val tbjValueText: LiveData<String> = _tbjValueText
 
+    private val _nextVisitDateText = MutableLiveData<String>()
+    val nextVisitDateText: LiveData<String> = _nextVisitDateText
+
 
     fun calculateAllInterpretations() {
         val mother = motherDetails.value
@@ -99,6 +104,7 @@ class PregnantMotherDetailViewModel @Inject constructor(
             _interpretationSmoke.value = noData
             _pregnancyWeekAgeText.value = noDataString
             _tbjValueText.value = noDataString
+            _nextVisitDateText.value = "" // Hide if no visits
             return
         }
 
@@ -117,6 +123,21 @@ class PregnantMotherDetailViewModel @Inject constructor(
         _interpretationWater.value = interpretWater(latestVisit.mainSourceOfDrinkingWater)
         _interpretationBab.value = interpretBab(latestVisit.defecationFacility)
         _interpretationSmoke.value = interpretSmoke(latestVisit.isExposedToCigarettes)
+        _nextVisitDateText.value = formatNextVisitDate(latestVisit.nextVisitDate)
+    }
+
+    private fun formatNextVisitDate(dateString: String?): String {
+        if (dateString.isNullOrBlank()) {
+            return "Kunjungan Berikutnya: Belum ditentukan"
+        }
+        return try {
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.forLanguageTag("id-ID"))
+            val date = inputFormat.parse(dateString)
+            "Kunjungan Berikutnya: ${outputFormat.format(date)}"
+        } catch (e: Exception) {
+            "Kunjungan Berikutnya: ${dateString}" // Fallback to original string on error
+        }
     }
 
     private fun interpretAge(dobString: String): InterpretationResult {

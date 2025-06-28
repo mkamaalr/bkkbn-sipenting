@@ -6,6 +6,7 @@ package com.bkkbnjabar.sipenting.data.model.pregnantmother
  */
 data class PregnantMotherVisitData(
     val localVisitId: Int? = null,
+    val id: String? = null, // ADDED: To hold the server-side ID of the visit
     val pregnantMotherLocalId: Int? = null,
     val visitDate: String? = null,
     val childNumber: Int? = null,
@@ -16,12 +17,12 @@ data class PregnantMotherVisitData(
     val currentWeight: Double? = null,
     val isHbChecked: Boolean? = null,
     val hemoglobinLevel: Double? = null,
-    val hemoglobinLevelReason: String? = null, // ADDED
+    val hemoglobinLevelReason: String? = null,
     val upperArmCircumference: Double? = null,
     val isTwin: Boolean? = null,
     val numberOfTwins: Int? = null,
     val isEstimatedFetalWeightChecked: Boolean? = null,
-    val tbj: Double? = null, // ADDED
+    val tbj: Double? = null,
     val isExposedToCigarettes: Boolean? = null,
     val isCounselingReceived: Boolean? = null,
     val counselingTypeId: Int? = null,
@@ -37,11 +38,13 @@ data class PregnantMotherVisitData(
     val pregnantMotherStatusId: Int? = null,
     val diseaseHistory: List<String>? = null,
     val mainSourceOfDrinkingWater: List<String>? = null,
+    val mainSourceOfDrinkingWaterOther: String? = null,
     val defecationFacility: List<String>? = null,
+    val defecationFacilityOther: String? = null,
     val socialAssistanceFacilitationOptions: List<String>? = null,
+    val socialAssistanceFacilitationOptionsOther: String? = null,
     val syncStatus: SyncStatus = SyncStatus.PENDING,
     val createdAt: String? = null,
-    // Menambahkan field yang sebelumnya hilang untuk dropdown
     val deliveryPlaceId: Int? = null,
     val birthAssistantId: Int? = null,
     val contraceptionOptionId: Int? = null,

@@ -11,4 +11,6 @@ interface PregnantMotherRepository {
     fun getAllPregnantMothers(): Flow<List<PregnantMotherEntity>>
     fun getMotherById(localId: Int): Flow<PregnantMotherEntity?>
     fun getVisitsForMother(motherId: Int): Flow<List<PregnantMotherVisitsEntity>>
+    suspend fun updatePregnantMotherVisit(visitEntity: PregnantMotherVisitsEntity): Resource<Unit>
+    fun getVisitById(visitId: Int): Flow<PregnantMotherVisitsEntity?>
 }

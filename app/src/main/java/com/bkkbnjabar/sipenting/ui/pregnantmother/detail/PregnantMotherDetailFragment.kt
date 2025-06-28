@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.view.isVisible
 import com.bkkbnjabar.sipenting.R
 import com.bkkbnjabar.sipenting.databinding.FragmentPregnantMotherDetailBinding
 import com.bkkbnjabar.sipenting.domain.model.InterpretationResult
@@ -29,7 +30,6 @@ class PregnantMotherDetailFragment : Fragment() {
     private val registrationViewModel: PregnantMotherRegistrationViewModel by activityViewModels()
 
 
-    private val viewModel: PregnantMotherDetailViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +43,9 @@ class PregnantMotherDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val visitAdapter = VisitHistoryAdapter { visit ->
-            // TODO: Navigasi ke halaman edit kunjungan dengan membawa visit.localVisitId
+            val action = PregnantMotherDetailFragmentDirections
+                .actionPregnantMotherDetailFragmentToPregnantMotherVisitEditFragment(visit.localVisitId)
+            findNavController().navigate(action)
         }
 
         binding.recyclerViewVisits.apply {
@@ -67,7 +69,7 @@ class PregnantMotherDetailFragment : Fragment() {
     }
 
     private fun observeViewModel(adapter: VisitHistoryAdapter) {
-        viewModel.motherDetails.observe(viewLifecycleOwner) { mother ->
+        detailViewModel.motherDetails.observe(viewLifecycleOwner) { mother ->
             mother?.let {
                 binding.tvMotherNameDetail.text = it.name
                 binding.tvMotherNikDetail.text = "NIK: ${it.nik}"
@@ -76,31 +78,36 @@ class PregnantMotherDetailFragment : Fragment() {
                 binding.tvMotherPhoneDetail.text = "No. HP: ${it.phoneNumber ?: '-'}"
                 val address = "${it.fullAddress}, RT ${it.rtName}, RW ${it.rwName}, ${it.kelurahanName}"
                 binding.tvMotherAddressDetail.text = address
-                viewModel.calculateAllInterpretations()
+                detailViewModel.calculateAllInterpretations()
             }
         }
 
-        viewModel.visitHistory.observe(viewLifecycleOwner) { visits ->
+        detailViewModel.visitHistory.observe(viewLifecycleOwner) { visits ->
             adapter.submitList(visits)
-            viewModel.calculateAllInterpretations()
+            detailViewModel.calculateAllInterpretations()
+        }
+
+        detailViewModel.nextVisitDateText.observe(viewLifecycleOwner) { text ->
+            binding.tvNextVisitDate.text = text
+            binding.tvNextVisitDate.isVisible = !text.isNullOrEmpty()
         }
 
         // Observe raw values
-        viewModel.pregnancyWeekAgeText.observe(viewLifecycleOwner) { binding.tvInterpretationWeekAge.text = it }
-        viewModel.tbjValueText.observe(viewLifecycleOwner) { binding.tvInterpretationTbjValue.text = it }
+        detailViewModel.pregnancyWeekAgeText.observe(viewLifecycleOwner) { binding.tvInterpretationWeekAge.text = it }
+        detailViewModel.tbjValueText.observe(viewLifecycleOwner) { binding.tvInterpretationTbjValue.text = it }
 
         // Observe all interpretation LiveData
-        viewModel.interpretationAge.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationAge, it) }
-        viewModel.interpretationChildCount.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationChildCount, it) }
-        viewModel.interpretationTfu.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationTfu, it) }
-        viewModel.interpretationImt.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationImt, it) }
-        viewModel.interpretationDisease.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationDisease, it) }
-        viewModel.interpretationHb.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationHb, it) }
-        viewModel.interpretationLila.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationLila, it) }
-        viewModel.interpretationTbj.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationTbj, it) }
-        viewModel.interpretationWater.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationWater, it) }
-        viewModel.interpretationBab.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationBab, it) }
-        viewModel.interpretationSmoke.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationSmoke, it) }
+        detailViewModel.interpretationAge.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationAge, it) }
+        detailViewModel.interpretationChildCount.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationChildCount, it) }
+        detailViewModel.interpretationTfu.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationTfu, it) }
+        detailViewModel.interpretationImt.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationImt, it) }
+        detailViewModel.interpretationDisease.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationDisease, it) }
+        detailViewModel.interpretationHb.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationHb, it) }
+        detailViewModel.interpretationLila.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationLila, it) }
+        detailViewModel.interpretationTbj.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationTbj, it) }
+        detailViewModel.interpretationWater.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationWater, it) }
+        detailViewModel.interpretationBab.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationBab, it) }
+        detailViewModel.interpretationSmoke.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationSmoke, it) }
     }
 
     private fun updateInterpretationUI(textView: TextView, result: InterpretationResult?) {

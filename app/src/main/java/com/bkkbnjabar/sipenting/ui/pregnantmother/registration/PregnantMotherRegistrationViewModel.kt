@@ -11,22 +11,30 @@ import com.bkkbnjabar.sipenting.data.local.mapper.toRegistrationData
 import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherRegistrationData
 import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherVisitData
 import com.bkkbnjabar.sipenting.data.repository.LookupRepository
+import com.bkkbnjabar.sipenting.data.repository.PregnantMotherRepository
 import com.bkkbnjabar.sipenting.domain.model.*
+import com.bkkbnjabar.sipenting.R // Make sure this is imported
 import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMotherUseCase
 import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMotherVisitUseCase
+import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.UpdatePregnantMotherVisitUseCase
 import com.bkkbnjabar.sipenting.utils.Resource
 import com.bkkbnjabar.sipenting.utils.SharedPrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.bkkbnjabar.sipenting.data.local.mapper.toData // You'll need to create this mapper
 
 @HiltViewModel
 class PregnantMotherRegistrationViewModel @Inject constructor(
     private val sharedPrefsManager: SharedPrefsManager,
     private val lookupRepository: LookupRepository,
     private val createPregnantMotherUseCase: CreatePregnantMotherUseCase,
-    private val createPregnantMotherVisitUseCase: CreatePregnantMotherVisitUseCase
+    private val createPregnantMotherVisitUseCase: CreatePregnantMotherVisitUseCase,
+    private val updatePregnantMotherVisitUseCase: UpdatePregnantMotherVisitUseCase, // ADDED
+    private val repository: PregnantMotherRepository, // ADDED
+
 ) : ViewModel() {
 
     // State utama untuk data formulir
@@ -71,6 +79,26 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
     init {
         resetForm()
         loadStaticOptions()
+    }
+
+    fun loadVisitForEditing(visitId: Int) = viewModelScope.launch {
+        // Use .first() to get the first result from the Flow and stop listening.
+        val visitEntity = repository.getVisitById(visitId).first()
+
+        if (visitEntity != null) {
+            // Also use .first() to get the associated mother data.
+            val motherEntity = repository.getMotherById(visitEntity.pregnantMotherLocalId).first()
+
+            if (motherEntity != null) {
+                // Now that we have all data, update the LiveData once.
+                _currentPregnantMother.value = motherEntity.toRegistrationData()
+                _currentPregnantMotherVisit.value = visitEntity.toData()
+            } else {
+                _saveResult.value = Resource.Error("Data ibu tidak ditemukan untuk kunjungan ini.")
+            }
+        } else {
+            _saveResult.value = Resource.Error("Data kunjungan tidak ditemukan.")
+        }
     }
 
     fun resetForm() {
@@ -198,8 +226,11 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
         contraceptionOptionId: Int? = null,
         diseaseHistory: List<String>? = null,
         mainSourceOfDrinkingWater: List<String>? = null,
+        mainSourceOfDrinkingWaterOther: String? = null,
         defecationFacility: List<String>? = null,
+        defecationFacilityOther: String? = null,
         socialAssistanceFacilitationOptions: List<String>? = null,
+        socialAssistanceFacilitationOptionsOther: String? = null,
         imagePath1: String? = null,
         imagePath2: String? = null,
         latitude: Double? = null,
@@ -243,8 +274,11 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
             contraceptionOptionId = contraceptionOptionId ?: currentData.contraceptionOptionId,
             diseaseHistory = diseaseHistory ?: currentData.diseaseHistory,
             mainSourceOfDrinkingWater = mainSourceOfDrinkingWater ?: currentData.mainSourceOfDrinkingWater,
+            mainSourceOfDrinkingWaterOther = mainSourceOfDrinkingWaterOther ?: currentData.mainSourceOfDrinkingWaterOther,
             defecationFacility = defecationFacility ?: currentData.defecationFacility,
+            defecationFacilityOther = defecationFacilityOther ?: currentData.defecationFacilityOther,
             socialAssistanceFacilitationOptions = socialAssistanceFacilitationOptions ?: currentData.socialAssistanceFacilitationOptions,
+            socialAssistanceFacilitationOptionsOther = socialAssistanceFacilitationOptionsOther ?: currentData.socialAssistanceFacilitationOptionsOther,
             imagePath1 = imagePath1 ?: currentData.imagePath1,
             imagePath2 = imagePath2 ?: currentData.imagePath2,
             latitude = latitude ?: currentData.latitude,
@@ -287,13 +321,16 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
             return@launch
         }
 
-        // Check if the mother already exists in the database.
-        if (motherData.localId != null && motherData.localId > 0) {
-            // Mother exists, just save the visit data.
+        // Check if the visit already has a local ID. If so, it's an update.
+        if (visitData.localVisitId != null && visitData.localVisitId > 0) {
+            val result = updatePregnantMotherVisitUseCase.execute(visitData)
+            _saveResult.value = result
+        } else if (motherData.localId != null && motherData.localId > 0) {
+            // This is a new visit for an existing mother
             val visitResult = createPregnantMotherVisitUseCase.execute(visitData)
             _saveResult.value = visitResult
         } else {
-            // Mother is new. Save the mother first, then use the new ID to save the visit.
+            // This is a new mother and their first visit
             when (val motherResult = createPregnantMotherUseCase.execute(motherData)) {
                 is Resource.Success -> {
                     val newMotherId = motherResult.data
@@ -305,11 +342,18 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
                         _saveResult.value = Resource.Error("Gagal mendapatkan ID Ibu setelah disimpan.")
                     }
                 }
-                is Resource.Error -> {
-                    _saveResult.value = Resource.Error(motherResult.message)
-                }
-                else -> { /* No-op for Loading/Idle */ }
+                is Resource.Error -> _saveResult.value = Resource.Error(motherResult.message)
+                else -> {}
             }
+        }
+    }
+
+    fun updateChipGroupData(chipGroupId: Int, newSelection: List<String>) {
+        when (chipGroupId) {
+            R.id.chip_group_disease_history -> updatePregnantMotherVisitData(diseaseHistory = newSelection)
+            R.id.chip_group_drinking_water -> updatePregnantMotherVisitData(mainSourceOfDrinkingWater = newSelection)
+            R.id.chip_group_defecation_facility -> updatePregnantMotherVisitData(defecationFacility = newSelection)
+            R.id.chip_group_social_assistance -> updatePregnantMotherVisitData(socialAssistanceFacilitationOptions = newSelection)
         }
     }
 }

@@ -44,4 +44,17 @@ class PregnantMotherRepositoryImpl @Inject constructor(
     override fun getVisitsForMother(motherId: Int): Flow<List<PregnantMotherVisitsEntity>> {
         return visitsDao.getVisitsForMother(motherId)
     }
+
+    override suspend fun updatePregnantMotherVisit(visitEntity: PregnantMotherVisitsEntity): Resource<Unit> {
+        return try {
+            visitsDao.updateVisit(visitEntity)
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error("Gagal memperbarui data kunjungan di database: ${e.message}")
+        }
+    }
+
+    override fun getVisitById(visitId: Int): Flow<PregnantMotherVisitsEntity?> {
+        return visitsDao.getVisitById(visitId)
+    }
 }

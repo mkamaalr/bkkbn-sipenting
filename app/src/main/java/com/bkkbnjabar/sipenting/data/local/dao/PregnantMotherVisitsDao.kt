@@ -25,4 +25,10 @@ interface PregnantMotherVisitsDao {
      */
     @Query("SELECT * FROM pregnant_mother_visits WHERE pregnantMotherLocalId = :motherId ORDER BY createdAt DESC")
     fun getVisitsForMother(motherId: Int): Flow<List<PregnantMotherVisitsEntity>>
+
+    @Update
+    suspend fun updateVisit(visit: PregnantMotherVisitsEntity)
+
+    @Query("SELECT * FROM pregnant_mother_visits WHERE localVisitId = :visitId")
+    fun getVisitById(visitId: Int): Flow<PregnantMotherVisitsEntity?>
 }

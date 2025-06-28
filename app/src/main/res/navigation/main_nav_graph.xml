@@ -35,6 +35,23 @@
         <action
             android:id="@+id/action_pregnantMotherDetailFragment_to_pregnantMotherRegistrationFragment2"
             app:destination="@id/pregnantMotherRegistrationFragment2" />
+        <action
+            android:id="@+id/action_pregnantMotherDetailFragment_to_pregnantMotherVisitEditFragment"
+            app:destination="@id/pregnantMotherVisitEditFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pregnantMotherVisitEditFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.pregnantmother.edit.PregnantMotherVisitEditFragment"
+        android:label="Edit Kunjungan Ibu Hamil"
+        tools:layout="@layout/fragment_pregnant_mother_visit_edit">
+        <argument
+            android:name="visitId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_pregnantMotherVisitEditFragment_to_pregnantMotherDetailFragment"
+            app:popUpTo="@id/pregnantMotherDetailFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment

@@ -24,7 +24,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:paddingBottom="16dp"
-                    android:text="@string/form_title_pregnant_mother_visit"
+                    android:text="Edit Data Kunjungan"
                     android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -765,14 +765,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:layout_weight="1"
-                        android:text="@string/button_previous" />
+                        android:text="Batal" />
                     <Button
                         android:id="@+id/btn_save"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="@string/button_save" />
+                        android:text="Simpan Perubahan" />
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

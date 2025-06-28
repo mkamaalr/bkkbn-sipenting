@@ -1,4 +1,4 @@
-package com.bkkbnjabar.sipenting.ui.pregnantmother.registration
+package com.bkkbnjabar.sipenting.ui.pregnantmother.edit
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -18,10 +18,12 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.bkkbnjabar.sipenting.R
 import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherVisitData
-import com.bkkbnjabar.sipenting.databinding.FragmentPregnantMotherRegistration2Binding
+import com.bkkbnjabar.sipenting.databinding.FragmentPregnantMotherVisitEditBinding
 import com.bkkbnjabar.sipenting.domain.model.LookupItem
+import com.bkkbnjabar.sipenting.ui.pregnantmother.registration.PregnantMotherRegistrationViewModel
 import com.bkkbnjabar.sipenting.utils.Resource
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.chip.Chip
@@ -35,12 +37,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
-class PregnantMotherRegistrationFragment2 : Fragment() {
+class PregnantMotherVisitEditFragment : Fragment() {
 
-    private var _binding: FragmentPregnantMotherRegistration2Binding? = null
+    private var _binding: FragmentPregnantMotherVisitEditBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: PregnantMotherRegistrationViewModel by activityViewModels()
+    private val args: PregnantMotherVisitEditFragmentArgs by navArgs()
+
+    private var isFormPopulated = false
 
     private var pregnantMotherStatusOptions: List<LookupItem> = emptyList()
     private var givenBirthStatusOptions: List<LookupItem> = emptyList()
@@ -85,14 +90,15 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentPregnantMotherRegistration2Binding.inflate(inflater, container, false)
+        _binding = FragmentPregnantMotherVisitEditBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupListeners()
         observeViewModel()
+        setupListeners()
+        viewModel.loadVisitForEditing(args.visitId)
     }
 
     private fun setupListeners() {
@@ -151,9 +157,8 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
 
             when (result) {
                 is Resource.Success -> {
-                    Toast.makeText(context, "Data berhasil disimpan!", Toast.LENGTH_LONG).show()
-                    viewModel.resetForm()
-                    findNavController().navigate(R.id.action_pregnantMotherRegistrationFragment2_to_nav_pregnant_mother_list)
+                    Toast.makeText(context, "Data berhasil diperbarui!", Toast.LENGTH_LONG).show()
+                    findNavController().popBackStack()
                 }
                 is Resource.Error -> Toast.makeText(context, "Gagal menyimpan: ${result.message}", Toast.LENGTH_LONG).show()
                 else -> {}
@@ -209,54 +214,71 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             socialAssistanceOptions = it ?: emptyList()
             setupDynamicChips(binding.chipGroupSocialAssistance, socialAssistanceOptions, listOf("Lainnya"), "Lainnya", binding.tilSocialAssistanceOther)
         }
-    }
 
-    private fun setupDynamicChips(chipGroup: ChipGroup, options: List<LookupItem>, exclusiveOptions: List<String>, otherOptionName: String, otherInputLayout: TextInputLayout?) {
-        chipGroup.removeAllViews()
-        options.forEach { item ->
-            val chip = Chip(context).apply {
-                text = item.name
-                isCheckable = true
-                id = View.generateViewId()
-                setOnClickListener {
-                    handleChipClick(this, chipGroup, exclusiveOptions, otherOptionName, otherInputLayout)
-                }
+        viewModel.currentPregnantMotherVisit.observe(viewLifecycleOwner) { visitData ->
+            if (visitData != null && visitData.localVisitId == args.visitId && !isFormPopulated) {
+                updateFormFromData(visitData)
+                isFormPopulated = true
             }
-            chipGroup.addView(chip)
         }
     }
 
-    private fun handleChipClick(clickedChip: Chip, chipGroup: ChipGroup, exclusiveOptions: List<String>, otherOptionName: String, otherInputLayout: TextInputLayout?) {
-        val clickedText = clickedChip.text.toString()
-        val isExclusive = exclusiveOptions.contains(clickedText)
+    private fun updateFormFromData(data: PregnantMotherVisitData?) {
+        if (data == null) return
 
-        if (isExclusive) {
-            if (clickedChip.isChecked) {
-                chipGroup.children.filter { it.id != clickedChip.id }.forEach { (it as Chip).isChecked = false }
-            }
+        binding.etVisitDate.setText(data.visitDate)
+        binding.etChildNumber.setText(data.childNumber?.toString() ?: "")
+        binding.etDateOfBirthLastChild.setText(data.dateOfBirthLastChild)
+        binding.etPregnancyWeek.setText(data.pregnancyWeekAge?.toString() ?: "")
+        binding.etWeightTrimester1.setText(data.weightTrimester1?.toString() ?: "")
+        binding.etCurrentWeight.setText(data.currentWeight?.toString() ?: "")
+        binding.etCurrentHeight.setText(data.currentHeight?.toString() ?: "")
+        binding.etLila.setText(data.upperArmCircumference?.toString() ?: "")
+        binding.etHb.setText(data.hemoglobinLevel?.toString() ?: "")
+        binding.etHbReason.setText(data.hemoglobinLevelReason)
+        binding.etNumberOfTwins.setText(data.numberOfTwins?.toString() ?: "")
+        binding.etTbj.setText(data.tbj?.toString() ?: "")
+        binding.etTpkNotes.setText(data.tpkNotes)
+        binding.etNextVisitDate.setText(data.nextVisitDate)
+
+        binding.rgIsAlive.check(if (data.isAlive == true) R.id.rb_is_alive_yes else R.id.rb_is_alive_no)
+        binding.rgIsGivenBirth.check(if (data.isGivenBirth == true) R.id.rb_is_given_birth_yes else R.id.rb_is_given_birth_no)
+        binding.rgIsHbChecked.check(if (data.isHbChecked == true) R.id.rb_hb_checked_yes else R.id.rb_hb_checked_no)
+        binding.rgIsTwin.check(if (data.isTwin == true) R.id.rb_is_twin_yes else R.id.rb_is_twin_no)
+        binding.rgIsTbjChecked.check(if (data.isEstimatedFetalWeightChecked == true) R.id.rb_is_tbj_checked_yes else R.id.rb_is_tbj_checked_no)
+        binding.rgIsCounselingReceived.check(if (data.isCounselingReceived == true) R.id.rb_is_counseling_received_yes else R.id.rb_is_counseling_received_no)
+        binding.rgIsIronReceived.check(if (data.isIronTablesReceived == true) R.id.rb_is_iron_received_yes else R.id.rb_is_iron_received_no)
+        binding.rgIsIronTaken.check(if (data.isIronTablesTaken == true) R.id.rb_is_iron_taken_yes else R.id.rb_is_iron_taken_no)
+        binding.rgIsExposedToSmoke.check(if (data.isExposedToCigarettes == true) R.id.rb_is_exposed_to_smoke_yes else R.id.rb_is_exposed_to_smoke_no)
+        binding.rgIsMbgReceived.check(if (data.isReceivedMbg == true) R.id.rb_is_mbg_received_yes else R.id.rb_is_mbg_received_no)
+        binding.rgTfuStatus.check(if (data.isTfuMeasured == true) R.id.rb_tfu_diukur else R.id.rb_tfu_tidak_diukur)
+        binding.etTfu.setText(data.tfu?.toString() ?: "")
+
+        binding.etPregnantMotherStatus.setText(pregnantMotherStatusOptions.find { it.id == data.pregnantMotherStatusId }?.name ?: "", false)
+        binding.etGivenBirthStatus.setText(givenBirthStatusOptions.find { it.id == data.givenBirthStatusId }?.name ?: "", false)
+        binding.etCounselingType.setText(counselingTypeOptions.find { it.id == data.counselingTypeId }?.name ?: "", false)
+        binding.etDeliveryPlace.setText(deliveryPlaceOptions.find { it.id == data.deliveryPlaceId }?.name ?: "", false)
+        binding.etBirthAssistant.setText(birthAssistantOptions.find { it.id == data.birthAssistantId }?.name ?: "", false)
+        binding.etContraceptionOption.setText(contraceptionOptions.find { it.id == data.contraceptionOptionId }?.name ?: "", false)
+        binding.etFacilitatingReferralService.setText(data.facilitatingReferralServiceStatus ?: "", false)
+        binding.etFacilitatingSocialAssistance.setText(data.facilitatingSocialAssistanceStatus ?: "", false)
+
+        updateChipGroupState(binding.chipGroupDiseaseHistory, data.diseaseHistory ?: emptyList(), listOf("Tidak Ada"))
+        updateChipGroupState(binding.chipGroupDrinkingWater, data.mainSourceOfDrinkingWater ?: emptyList(), listOf("Lainnya"))
+        updateChipGroupState(binding.chipGroupDefecationFacility, data.defecationFacility ?: emptyList(), listOf("Tidak ada", "Ya, lainnya"))
+        updateChipGroupState(binding.chipGroupSocialAssistance, data.socialAssistanceFacilitationOptions ?: emptyList(), listOf("Lainnya"))
+
+        binding.etDrinkingWaterOther.setText(data.mainSourceOfDrinkingWaterOther)
+        binding.etDefecationFacilityOther.setText(data.defecationFacilityOther)
+        binding.etSocialAssistanceOther.setText(data.socialAssistanceFacilitationOptionsOther)
+
+        data.imagePath1?.let { binding.ivPreview1.tag = it; binding.ivPreview1.setImageURI(Uri.parse(it)) }
+        data.imagePath2?.let { binding.ivPreview2.tag = it; binding.ivPreview2.setImageURI(Uri.parse(it)) }
+        if (data.latitude != null && data.longitude != null) {
+            binding.tvLocationResult.text = String.format(Locale.US, "Lat: %.6f, Long: %.6f", data.latitude, data.longitude)
         } else {
-            if (clickedChip.isChecked) {
-                exclusiveOptions.forEach { exclusiveText ->
-                    (chipGroup.children.firstOrNull { (it as Chip).text.toString() == exclusiveText } as? Chip)?.isChecked = false
-                }
-            }
+            binding.tvLocationResult.text = ""
         }
-
-        val isAnyExclusiveSelected = chipGroup.children.any { view ->
-            val chip = view as Chip
-            exclusiveOptions.contains(chip.text.toString()) && chip.isChecked
-        }
-
-        chipGroup.children.forEach { view ->
-            val chip = view as Chip
-            val isThisChipExclusive = exclusiveOptions.contains(chip.text.toString())
-            chip.isEnabled = !isAnyExclusiveSelected || isThisChipExclusive
-        }
-
-        otherInputLayout?.isVisible = (chipGroup.children.firstOrNull { view ->
-            val chip = view as Chip
-            chip.text.toString() == otherOptionName && chip.isChecked
-        } != null)
     }
 
     private fun saveUIToViewModel() {
@@ -322,6 +344,99 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         )
     }
 
+    private fun setupDynamicChips(chipGroup: ChipGroup, options: List<LookupItem>, exclusiveOptions: List<String>, otherOptionName: String, otherInputLayout: TextInputLayout?) {
+        chipGroup.removeAllViews()
+        options.forEach { item ->
+            val chip = Chip(context).apply {
+                text = item.name
+                isCheckable = true
+                id = View.generateViewId()
+                setOnClickListener {
+                    handleChipClick(this, chipGroup, exclusiveOptions, otherOptionName, otherInputLayout)
+                }
+            }
+            chipGroup.addView(chip)
+        }
+    }
+
+    private fun handleChipClick(clickedChip: Chip, chipGroup: ChipGroup, exclusiveOptions: List<String>, otherOptionName: String, otherInputLayout: TextInputLayout?) {
+        val clickedText = clickedChip.text.toString()
+        val isExclusive = exclusiveOptions.contains(clickedText)
+
+        if (isExclusive) {
+            if (clickedChip.isChecked) {
+                chipGroup.children.filter { it.id != clickedChip.id }.forEach { (it as Chip).isChecked = false }
+            }
+        } else {
+            if (clickedChip.isChecked) {
+                exclusiveOptions.forEach { exclusiveText ->
+                    (chipGroup.children.firstOrNull { (it as Chip).text.toString() == exclusiveText } as? Chip)?.isChecked = false
+                }
+            }
+        }
+
+        val isAnyExclusiveSelected = chipGroup.children.any { view ->
+            val chip = view as Chip
+            exclusiveOptions.contains(chip.text.toString()) && chip.isChecked
+        }
+
+        chipGroup.children.forEach { view ->
+            val chip = view as Chip
+            val isThisChipExclusive = exclusiveOptions.contains(chip.text.toString())
+            chip.isEnabled = !isAnyExclusiveSelected || isThisChipExclusive
+        }
+
+        otherInputLayout?.isVisible = (chipGroup.children.firstOrNull { view ->
+            val chip = view as Chip
+            chip.text.toString() == otherOptionName && chip.isChecked
+        } != null)
+    }
+
+    private fun updateChipGroupState(
+        chipGroup: ChipGroup,
+        selectedItems: List<String>,
+        exclusiveOptions: List<String>
+    ) {
+        // This is the variable you asked about. It checks if any of the selected items
+        // is one of the "exclusive" ones (like "Tidak Ada" or "Lainnya").
+        val isAnExclusiveItemSelected = selectedItems.any { exclusiveOptions.contains(it) }
+
+        // Loop through every chip in the group
+        chipGroup.children.forEach { view ->
+            val chip = view as? Chip ?: return@forEach // Safe cast to Chip
+
+            // 1. Set the checked state
+            val isThisChipSelected = selectedItems.contains(chip.text.toString())
+            if (chip.isChecked != isThisChipSelected) {
+                chip.isChecked = isThisChipSelected
+            }
+
+            // 2. Set the enabled state
+            val isThisChipExclusive = exclusiveOptions.contains(chip.text.toString())
+            // A chip is enabled only if no exclusive option is selected,
+            // OR if it is the exclusive option that is currently selected.
+            chip.isEnabled = !isAnExclusiveItemSelected || isThisChipExclusive
+        }
+
+        // 3. Handle visibility of the "Other" text input, if it exists for this group
+        val otherInputLayout = when (chipGroup.id) {
+            R.id.chip_group_drinking_water -> binding.tilDrinkingWaterOther
+            R.id.chip_group_defecation_facility -> binding.tilDefecationFacilityOther
+            R.id.chip_group_social_assistance -> binding.tilSocialAssistanceOther
+            else -> null
+        }
+        val otherOptionName = when (chipGroup.id) {
+            R.id.chip_group_drinking_water -> "Lainnya"
+            R.id.chip_group_defecation_facility -> "Ya, lainnya"
+            R.id.chip_group_social_assistance -> "Lainnya"
+            else -> ""
+        }
+
+        if (otherOptionName.isNotBlank()) {
+            otherInputLayout?.isVisible = selectedItems.contains(otherOptionName)
+        }
+    }
+
     private fun handleImageCapture(imageIndex: Int) {
         captureRequestIndex = imageIndex
         when {
@@ -375,6 +490,7 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.resetForm()
         _binding = null
     }
 }

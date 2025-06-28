@@ -150,9 +150,22 @@
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
+                android:id="@+id/tv_next_visit_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textStyle="bold"
+                app:drawableStartCompat="@drawable/ic_calendar"
+                app:drawableTint="?attr/colorPrimary"
+                tools:text="Kunjungan Berikutnya: 27 Nov 2025" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="Riwayat Kunjungan TPK"
                 android:textAppearance="?attr/textAppearanceTitleMedium" />
 
