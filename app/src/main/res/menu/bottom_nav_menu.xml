@@ -8,18 +8,18 @@
 
     <item
         android:id="@+id/nav_pregnant_mother_list"
-        android:icon="@drawable/ic_pregnant_mother"
+        android:icon="@drawable/ic_bumil"
         android:title="@string/menu_pregnant_mother" />
 
     <item
-        android:id="@+id/nav_child_list"
-        android:icon="@drawable/ic_child"
-        android:title="@string/menu_child" />
+        android:id="@+id/nav_breastfeeding_mother_list"
+        android:icon="@drawable/ic_busui"
+        android:title="@string/menu_breastfeeding_mother" />
 
     <item
-        android:id="@+id/nav_breastfeeding_mother_list"
-        android:icon="@drawable/ic_breastfeeding_mother"
-        android:title="@string/menu_breastfeeding_mother" />
+        android:id="@+id/nav_child_list"
+        android:icon="@drawable/ic_balita"
+        android:title="@string/menu_child" />
 
     <!-- Anda bisa menambahkan item menu lainnya di sini, misal untuk profil -->
     <!--

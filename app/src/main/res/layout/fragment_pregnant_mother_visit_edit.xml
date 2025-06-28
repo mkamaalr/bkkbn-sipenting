@@ -25,6 +25,7 @@
                     android:gravity="center"
                     android:paddingBottom="16dp"
                     android:text="Edit Data Kunjungan"
+                    android:visibility="gone"
                     android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -67,6 +68,21 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <TextView
+                    android:id="@+id/tv_is_given_birth_label"
+                    style="@style/FormLabel"
+                    android:text="Sudah Melahirkan?"
+                    app:layout_constraintTop_toBottomOf="@id/til_pregnant_mother_status"
+                    app:layout_constraintStart_toStartOf="parent" />
+                <RadioGroup
+                    android:id="@+id/rg_is_given_birth"
+                    style="@style/FormRadioGroup"
+                    app:layout_constraintTop_toBottomOf="@id/tv_is_given_birth_label"
+                    app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_given_birth_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_given_birth_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_given_birth_status"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -74,7 +90,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="Status Kelahiran"
-                    app:layout_constraintTop_toBottomOf="@id/til_pregnant_mother_status"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_given_birth"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
                     <AutoCompleteTextView
@@ -438,13 +456,7 @@
                     <RadioButton android:id="@+id/rb_is_alive_no" android:text="Tidak" style="@style/FormRadioButton"/>
                 </RadioGroup>
 
-                <TextView android:id="@+id/tv_is_given_birth_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_alive" app:layout_constraintStart_toStartOf="parent" android:text="Sudah Melahirkan?"/>
-                <RadioGroup android:id="@+id/rg_is_given_birth" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_given_birth_label" app:layout_constraintStart_toStartOf="parent">
-                    <RadioButton android:id="@+id/rb_is_given_birth_yes" android:text="Ya" style="@style/FormRadioButton"/>
-                    <RadioButton android:id="@+id/rb_is_given_birth_no" android:text="Tidak" style="@style/FormRadioButton"/>
-                </RadioGroup>
-
-                <TextView android:id="@+id/tv_is_twin_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_given_birth" app:layout_constraintStart_toStartOf="parent" android:text="Hamil Kembar?"/>
+                <TextView android:id="@+id/tv_is_twin_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_alive" app:layout_constraintStart_toStartOf="parent" android:text="Hamil Kembar?"/>
                 <RadioGroup android:id="@+id/rg_is_twin" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_twin_label" app:layout_constraintStart_toStartOf="parent">
                     <RadioButton android:id="@+id/rb_is_twin_yes" android:text="Ya" style="@style/FormRadioButton"/>
                     <RadioButton android:id="@+id/rb_is_twin_no" android:text="Tidak" style="@style/FormRadioButton"/>

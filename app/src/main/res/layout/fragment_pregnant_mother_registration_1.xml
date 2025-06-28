@@ -26,6 +26,7 @@
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:gravity="center"
+                android:visibility="gone"
                 android:paddingBottom="16dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -107,7 +107,6 @@ class PregnantMotherVisitEditFragment : Fragment() {
             saveUIToViewModel()
             viewModel.saveAllData()
         }
-
         binding.rgIsHbChecked.setOnCheckedChangeListener { _, checkedId ->
             val isChecked = (checkedId == R.id.rb_hb_checked_yes)
             binding.tilHb.isVisible = isChecked
@@ -126,6 +125,13 @@ class PregnantMotherVisitEditFragment : Fragment() {
         binding.rgTfuStatus.setOnCheckedChangeListener { _, checkedId ->
             binding.tilTfu.isVisible = (checkedId == R.id.rb_tfu_diukur)
             if (checkedId != R.id.rb_tfu_diukur) binding.etTfu.text?.clear()
+        }
+        binding.rgIsGivenBirth.setOnCheckedChangeListener { _, checkedId ->
+            val isGivenBirth = (checkedId == R.id.rb_is_given_birth_yes)
+            binding.tilGivenBirthStatus.isVisible = isGivenBirth
+            if (!isGivenBirth) {
+                binding.etGivenBirthStatus.setText("", false)
+            }
         }
         binding.etPregnancyWeek.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
@@ -240,6 +246,8 @@ class PregnantMotherVisitEditFragment : Fragment() {
         binding.etTbj.setText(data.tbj?.toString() ?: "")
         binding.etTpkNotes.setText(data.tpkNotes)
         binding.etNextVisitDate.setText(data.nextVisitDate)
+        binding.etTfu.setText(data.tfu?.toString() ?: "")
+        binding.tilGivenBirthStatus.isVisible = (data.isGivenBirth == true)
 
         binding.rgIsAlive.check(if (data.isAlive == true) R.id.rb_is_alive_yes else R.id.rb_is_alive_no)
         binding.rgIsGivenBirth.check(if (data.isGivenBirth == true) R.id.rb_is_given_birth_yes else R.id.rb_is_given_birth_no)
@@ -252,9 +260,9 @@ class PregnantMotherVisitEditFragment : Fragment() {
         binding.rgIsExposedToSmoke.check(if (data.isExposedToCigarettes == true) R.id.rb_is_exposed_to_smoke_yes else R.id.rb_is_exposed_to_smoke_no)
         binding.rgIsMbgReceived.check(if (data.isReceivedMbg == true) R.id.rb_is_mbg_received_yes else R.id.rb_is_mbg_received_no)
         binding.rgTfuStatus.check(if (data.isTfuMeasured == true) R.id.rb_tfu_diukur else R.id.rb_tfu_tidak_diukur)
-        binding.etTfu.setText(data.tfu?.toString() ?: "")
 
         binding.etPregnantMotherStatus.setText(pregnantMotherStatusOptions.find { it.id == data.pregnantMotherStatusId }?.name ?: "", false)
+        binding.tilGivenBirthStatus.isVisible = (data.isGivenBirth == true)
         binding.etGivenBirthStatus.setText(givenBirthStatusOptions.find { it.id == data.givenBirthStatusId }?.name ?: "", false)
         binding.etCounselingType.setText(counselingTypeOptions.find { it.id == data.counselingTypeId }?.name ?: "", false)
         binding.etDeliveryPlace.setText(deliveryPlaceOptions.find { it.id == data.deliveryPlaceId }?.name ?: "", false)
@@ -283,6 +291,7 @@ class PregnantMotherVisitEditFragment : Fragment() {
 
     private fun saveUIToViewModel() {
         fun getSelectedChipTexts(chipGroup: ChipGroup): List<String> = chipGroup.children.filter { (it as Chip).isChecked }.map { (it as Chip).text.toString() }.toList()
+
         var latitude: Double? = null
         var longitude: Double? = null
         val locationText = binding.tvLocationResult.text.toString()
@@ -291,10 +300,9 @@ class PregnantMotherVisitEditFragment : Fragment() {
                 val parts = locationText.split(", Long:")
                 latitude = parts[0].removePrefix("Lat:").trim().toDouble()
                 longitude = parts[1].trim().toDouble()
-            } catch (e: Exception) {
-                // Could not parse, latitude and longitude will remain null
-            }
+            } catch (_: Exception) { /* Do nothing, leave as null */ }
         }
+
         viewModel.updatePregnantMotherVisitData(
             visitDate = binding.etVisitDate.text.toString().trim(),
             childNumber = binding.etChildNumber.text.toString().toIntOrNull(),
