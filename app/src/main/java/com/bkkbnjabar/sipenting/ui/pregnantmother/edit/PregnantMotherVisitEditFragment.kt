@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -146,13 +148,22 @@ class PregnantMotherVisitEditFragment : Fragment() {
             }
         }
 
+        binding.rgIsCounselingReceived.setOnCheckedChangeListener { _, checkedId ->
+            val isChecked = (checkedId == R.id.rb_is_counseling_received_yes)
+            binding.tilCounselingType.isVisible = isChecked
+            if (!isChecked) {
+                // Clear the selection if user chooses "Tidak"
+                binding.etCounselingType.setText("", false)
+            }
+        }
+
         binding.btnCapture1.setOnClickListener { handleImageCapture(1) }
         binding.btnCapture2.setOnClickListener { handleImageCapture(2) }
         binding.btnGetLocation.setOnClickListener { handleLocationCapture() }
 
-        binding.etVisitDate.setOnClickListener { showDatePickerDialog(it as TextInputEditText) }
-        binding.etDateOfBirthLastChild.setOnClickListener { showDatePickerDialog(it as TextInputEditText) }
-        binding.etNextVisitDate.setOnClickListener { showDatePickerDialog(it as TextInputEditText) }
+        setupDateField(binding.tilVisitDate, binding.etVisitDate)
+        setupDateField(binding.tilDateOfBirthLastChild, binding.etDateOfBirthLastChild)
+        setupDateField(binding.tilNextVisitDate, binding.etNextVisitDate)
     }
 
     private fun observeViewModel() {
@@ -255,12 +266,13 @@ class PregnantMotherVisitEditFragment : Fragment() {
         binding.rgIsTwin.check(if (data.isTwin == true) R.id.rb_is_twin_yes else R.id.rb_is_twin_no)
         binding.rgIsTbjChecked.check(if (data.isEstimatedFetalWeightChecked == true) R.id.rb_is_tbj_checked_yes else R.id.rb_is_tbj_checked_no)
         binding.rgIsCounselingReceived.check(if (data.isCounselingReceived == true) R.id.rb_is_counseling_received_yes else R.id.rb_is_counseling_received_no)
+        binding.tilCounselingType.isVisible = data.isCounselingReceived == true
+
         binding.rgIsIronReceived.check(if (data.isIronTablesReceived == true) R.id.rb_is_iron_received_yes else R.id.rb_is_iron_received_no)
         binding.rgIsIronTaken.check(if (data.isIronTablesTaken == true) R.id.rb_is_iron_taken_yes else R.id.rb_is_iron_taken_no)
         binding.rgIsExposedToSmoke.check(if (data.isExposedToCigarettes == true) R.id.rb_is_exposed_to_smoke_yes else R.id.rb_is_exposed_to_smoke_no)
         binding.rgIsMbgReceived.check(if (data.isReceivedMbg == true) R.id.rb_is_mbg_received_yes else R.id.rb_is_mbg_received_no)
         binding.rgTfuStatus.check(if (data.isTfuMeasured == true) R.id.rb_tfu_diukur else R.id.rb_tfu_tidak_diukur)
-
         binding.etPregnantMotherStatus.setText(pregnantMotherStatusOptions.find { it.id == data.pregnantMotherStatusId }?.name ?: "", false)
         binding.tilGivenBirthStatus.isVisible = (data.isGivenBirth == true)
         binding.etGivenBirthStatus.setText(givenBirthStatusOptions.find { it.id == data.givenBirthStatusId }?.name ?: "", false)
@@ -487,13 +499,67 @@ class PregnantMotherVisitEditFragment : Fragment() {
     }
 
     private fun showDatePickerDialog(editText: TextInputEditText) {
-        val datePicker = MaterialDatePicker.Builder.datePicker().setTitleText(editText.hint.toString()).build()
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(editText.hint)
+            .build()
+
+        // This check prevents a crash if the user clicks the icon very rapidly
+        if (datePicker.isAdded) {
+            return
+        }
+
         datePicker.addOnPositiveButtonClickListener { selection ->
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             sdf.timeZone = TimeZone.getTimeZone("UTC")
-            editText.setText(sdf.format(Date(selection)))
+            val dateString = sdf.format(Date(selection))
+            editText.setText(dateString)
         }
-        datePicker.show(parentFragmentManager, "DATE_PICKER_TAG_${editText.id}")
+
+        datePicker.show(parentFragmentManager, editText.id.toString())
+    }
+
+    private fun setupDateField(textInputLayout: TextInputLayout, editText: TextInputEditText) {
+        // This makes the entire layout box clickable to show the picker
+        textInputLayout.setOnClickListener {
+            showDatePickerDialog(editText)
+        }
+
+        // This makes the EditText itself also clickable
+        editText.setOnClickListener {
+            showDatePickerDialog(editText)
+        }
+
+        // This listener handles the action of the icon at the end of the field
+        textInputLayout.setEndIconOnClickListener {
+            // If the field has text, the icon is a 'clear' button. Clear the text.
+            if (editText.text.toString().isNotEmpty()) {
+                editText.text = null
+            }
+            // Otherwise, the icon is a calendar. Show the picker.
+            else {
+                showDatePickerDialog(editText)
+            }
+        }
+
+        // This watcher intelligently swaps the icon based on whether there is text
+        editText.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (s.isNullOrBlank()) {
+                    textInputLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar)
+                } else {
+                    textInputLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear_text)
+                }
+            }
+        })
+
+        // Set the initial icon state
+        if (editText.text.isNullOrBlank()) {
+            textInputLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar)
+        } else {
+            textInputLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear_text)
+        }
     }
 
     override fun onDestroyView() {

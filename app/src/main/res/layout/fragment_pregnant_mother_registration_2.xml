@@ -40,6 +40,8 @@
                     android:hint="Tanggal Kunjungan"
                     app:endIconDrawable="@drawable/ic_calendar"
                     app:endIconMode="custom"
+                    android:clickable="true"
+                    android:focusable="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_title_fragment2">
@@ -47,8 +49,10 @@
                         android:id="@+id/et_visit_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:cursorVisible="false"
                         android:focusable="false"
-                        android:inputType="date" />
+                        android:focusableInTouchMode="false" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -128,6 +132,8 @@
                     android:hint="Tgl Lahir Anak Terakhir"
                     app:endIconDrawable="@drawable/ic_calendar"
                     app:endIconMode="custom"
+                    android:clickable="true"
+                    android:focusable="true"
                     app:layout_constraintTop_toBottomOf="@id/til_child_number"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
@@ -135,8 +141,10 @@
                         android:id="@+id/et_date_of_birth_last_child"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:cursorVisible="false"
                         android:focusable="false"
-                        android:inputType="date" />
+                        android:focusableInTouchMode="false" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <LinearLayout
@@ -389,22 +397,7 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_counseling_type"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:hint="Jenis Konseling"
-                    app:layout_constraintTop_toBottomOf="@id/til_contraception_option"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
-                    <AutoCompleteTextView
-                        android:id="@+id/et_counseling_type"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="none"/>
-                </com.google.android.material.textfield.TextInputLayout>
+
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_facilitating_referral_service"
@@ -413,7 +406,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:hint="Status Fasilitasi Rujukan"
-                    app:layout_constraintTop_toBottomOf="@id/til_counseling_type"
+                    app:layout_constraintTop_toBottomOf="@id/til_contraception_option"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
                     <AutoCompleteTextView
@@ -488,7 +481,26 @@
                     <RadioButton android:id="@+id/rb_is_counseling_received_no" android:text="Tidak" style="@style/FormRadioButton"/>
                 </RadioGroup>
 
-                <TextView android:id="@+id/tv_is_iron_received_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_counseling_received" app:layout_constraintStart_toStartOf="parent" android:text="Menerima Tablet Tambah Darah?"/>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_counseling_type"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Jenis Konseling"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_counseling_received"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_counseling_type"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView android:id="@+id/tv_is_iron_received_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/til_counseling_type" app:layout_constraintStart_toStartOf="parent" android:text="Menerima Tablet Tambah Darah?"/>
                 <RadioGroup android:id="@+id/rg_is_iron_received" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_iron_received_label" app:layout_constraintStart_toStartOf="parent">
                     <RadioButton android:id="@+id/rb_is_iron_received_yes" android:text="Ya" style="@style/FormRadioButton"/>
                     <RadioButton android:id="@+id/rb_is_iron_received_no" android:text="Tidak" style="@style/FormRadioButton"/>
@@ -659,6 +671,8 @@
                     android:hint="Tgl Kunjungan Berikutnya"
                     app:endIconDrawable="@drawable/ic_calendar"
                     app:endIconMode="custom"
+                    android:clickable="true"
+                    android:focusable="true"
                     app:layout_constraintTop_toBottomOf="@id/til_tpk_notes"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
@@ -666,8 +680,10 @@
                         android:id="@+id/et_next_visit_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:cursorVisible="false"
                         android:focusable="false"
-                        android:inputType="date" />
+                        android:focusableInTouchMode="false" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
