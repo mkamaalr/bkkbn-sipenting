@@ -48,11 +48,12 @@ class PregnantMotherRegistrationFragment1 : Fragment() {
 
     private fun setupListeners() {
         binding.btnNext.setOnClickListener {
-            if (validateForm()) {
+//            Temporary Disable validation
+//            if (validateForm()) {
+                // If it is, then save the data and navigate
+                saveUIToViewModel()
                 findNavController().navigate(R.id.action_pregnantMotherRegistrationFragment1_to_pregnantMotherRegistrationFragment2)
-            } else {
-                Toast.makeText(requireContext(), "Harap lengkapi semua field yang wajib diisi.", Toast.LENGTH_SHORT).show()
-            }
+//            }
         }
 
         // Listener untuk text fields yang bisa diedit
@@ -126,6 +127,26 @@ class PregnantMotherRegistrationFragment1 : Fragment() {
         // =======================================================================
     }
 
+    private fun saveUIToViewModel() {
+        val rwName = binding.etRw.text.toString()
+        val rwId = viewModel.rws.value?.find { it.name == rwName }?.id
+
+        val rtName = binding.etRt.text.toString()
+        val rtId = viewModel.rts.value?.find { it.name == rtName }?.id
+
+        viewModel.updatePregnantMotherData(
+            name = binding.etName.text.toString().trim(),
+            nik = binding.etNik.text.toString().trim(),
+            dateOfBirth = binding.etDateOfBirth.text.toString().trim(),
+            phoneNumber = binding.etPhoneNumber.text.toString().trim(),
+            fullAddress = binding.etFullAddress.text.toString().trim(),
+            rwName = rwName,
+            rwId = rwId,
+            rtName = rtName,
+            rtId = rtId
+        )
+    }
+
     private fun showDatePickerDialog(editText: TextInputEditText) {
         val datePicker = MaterialDatePicker.Builder.datePicker()
             .setTitleText("Pilih Tanggal")
@@ -138,8 +159,69 @@ class PregnantMotherRegistrationFragment1 : Fragment() {
     }
 
     private fun validateForm(): Boolean {
-        // Implementasi validasi
-        return true // Ganti dengan logika validasi yang sebenarnya
+        // Clear previous errors first
+        binding.tilName.error = null
+        binding.tilNik.error = null
+        binding.tilDateOfBirth.error = null
+        binding.tilRw.error = null
+        binding.tilRt.error = null
+        binding.tilFullAddress.error = null
+        binding.tilPhoneNumber.error = null
+
+        var isValid = true
+
+        // 1. Validate Name
+        if (binding.etName.text.isNullOrBlank()) {
+            binding.tilName.error = "Nama tidak boleh kosong"
+            isValid = false
+        }
+
+        // 2. Validate NIK
+        if (binding.etNik.text.isNullOrBlank()) {
+            binding.tilNik.error = "NIK tidak boleh kosong"
+            isValid = false
+        } else if (binding.etNik.text.toString().length != 16) {
+            binding.tilNik.error = "NIK harus 16 digit"
+            isValid = false
+        }
+
+        // 3. Validate Date of Birth
+        if (binding.etDateOfBirth.text.isNullOrBlank()) {
+            binding.tilDateOfBirth.error = "Tanggal lahir tidak boleh kosong"
+            isValid = false
+        }
+
+        // 4. Validate RW
+        if (binding.etPhoneNumber.text.isNullOrBlank()) {
+            binding.tilPhoneNumber.error = "Nomor Telepon tidak boleh kosong"
+            isValid = false
+        }
+
+        // 4. Validate RW
+        if (binding.etRw.text.isNullOrBlank()) {
+            binding.tilRw.error = "RW tidak boleh kosong"
+            isValid = false
+        }
+
+        // 5. Validate RT
+        if (binding.etRt.text.isNullOrBlank()) {
+            binding.tilRt.error = "RT tidak boleh kosong"
+            isValid = false
+        }
+
+        // 6. Validate Full Address
+        if (binding.etFullAddress.text.isNullOrBlank()) {
+            binding.tilFullAddress.error = "Alamat lengkap tidak boleh kosong"
+            isValid = false
+        }
+
+        return isValid
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Save the current state of the UI to the ViewModel when the user navigates away
+        saveUIToViewModel()
     }
 
     override fun onDestroyView() {

@@ -373,6 +373,12 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         datePicker.show(parentFragmentManager, "DATE_PICKER_TAG_${editText.id}")
     }
 
+    override fun onPause() {
+        super.onPause()
+        // Save the current state of the UI to the ViewModel when the user navigates away
+        saveUIToViewModel()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
