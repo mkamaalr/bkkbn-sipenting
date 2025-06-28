@@ -5,6 +5,8 @@ import com.bkkbnjabar.sipenting.domain.usecase.auth.LoginUseCase
 import com.bkkbnjabar.sipenting.domain.usecase.auth.LoginUseCaseImpl
 import com.bkkbnjabar.sipenting.domain.usecase.auth.ValidateTokenUseCase
 import com.bkkbnjabar.sipenting.domain.usecase.auth.ValidateTokenUseCaseImpl
+import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.CreateBreastfeedingMotherUseCase
+import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.CreateBreastfeedingMotherUseCaseImpl
 import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMotherUseCase
 import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMotherUseCaseImpl
 import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMotherVisitUseCase
@@ -50,4 +52,10 @@ abstract class UseCaseModule {
     abstract fun bindUpdatePregnantMotherVisitUseCase(
         updatePregnantMotherVisitUseCaseImpl: UpdatePregnantMotherVisitUseCaseImpl
     ): UpdatePregnantMotherVisitUseCase
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindCreateBreastfeedingMotherUseCase(
+        useCaseImpl: CreateBreastfeedingMotherUseCaseImpl
+    ): CreateBreastfeedingMotherUseCase
 }

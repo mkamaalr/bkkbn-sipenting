@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                tools:context=".ui.breastfeedingmother.edit.BreastfeedingMotherVisitEditFragment">
+
+                <TextView
+                    android:id="@+id/tv_title_fragment2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingBottom="16dp"
+                    android:text="Edit Data Kunjungan"
+                    android:visibility="gone"
+                    android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_visit_date"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="Tanggal Kunjungan"
+                    app:endIconDrawable="@drawable/ic_calendar"
+                    app:endIconMode="custom"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_title_fragment2">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_visit_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_pregnant_mother_status"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Status Ibu Saat Ini"
+                    app:layout_constraintTop_toBottomOf="@id/til_visit_date"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_pregnant_mother_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/tv_is_given_birth_label"
+                    style="@style/FormLabel"
+                    android:text="Sudah Melahirkan?"
+                    app:layout_constraintTop_toBottomOf="@id/til_pregnant_mother_status"
+                    app:layout_constraintStart_toStartOf="parent" />
+                <RadioGroup
+                    android:id="@+id/rg_is_given_birth"
+                    style="@style/FormRadioGroup"
+                    app:layout_constraintTop_toBottomOf="@id/tv_is_given_birth_label"
+                    app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_given_birth_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_given_birth_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_given_birth_status"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Status Kelahiran"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_given_birth"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_given_birth_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_child_number"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Ini Kehamilan Anak Ke-"
+                    app:layout_constraintTop_toBottomOf="@id/til_given_birth_status"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_child_number"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_date_of_birth_last_child"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Tgl Lahir Anak Terakhir"
+                    app:endIconDrawable="@drawable/ic_calendar"
+                    app:endIconMode="custom"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/til_child_number"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_date_of_birth_last_child"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_pregnancy_data"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/til_date_of_birth_last_child"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_pregnancy_week"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:hint="Usia Hamil (Mg)">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_pregnancy_week"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_weight_trimester_1"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:hint="BB Trimester 1 (kg)">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_weight_trimester_1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_current_measures"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/layout_pregnancy_data"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_current_weight"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:hint="Berat Badan Kini (kg)">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_current_weight"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_current_height"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:hint="Tinggi Badan (cm)">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_current_height"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_lila"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/layout_current_measures"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:hint="LILA (cm)">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_lila"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/tv_hb_check_label"
+                    style="@style/FormLabel"
+                    android:text="Pemeriksaan HB Dilakukan?"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/til_lila" />
+                <RadioGroup
+                    android:id="@+id/rg_is_hb_checked"
+                    style="@style/FormRadioGroup"
+                    app:layout_constraintTop_toBottomOf="@id/tv_hb_check_label"
+                    app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_hb_checked_yes" style="@style/FormRadioButton" android:text="Ya"/>
+                    <RadioButton android:id="@+id/rb_hb_checked_no" style="@style/FormRadioButton" android:text="Tidak"/>
+                </RadioGroup>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_hb"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Kadar HB (g/dL)"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_hb_checked"
+                    tools:visibility="visible">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_hb"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_hb_reason"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Alasan Tidak Diperiksa"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_hb_checked">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_hb_reason"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/barrier_hb_section"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="rg_is_hb_checked,til_hb,til_hb_reason" />
+
+                <TextView
+                    android:id="@+id/tv_tfu_label"
+                    style="@style/FormLabel"
+                    android:text="Pengukuran Tinggi Fundus Uteri (TFU)"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/barrier_hb_section"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:visibility="visible"/>
+
+                <RadioGroup
+                    android:id="@+id/rg_tfu_status"
+                    style="@style/FormRadioGroup"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/tv_tfu_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:visibility="visible">
+                    <RadioButton
+                        android:id="@+id/rb_tfu_diukur"
+                        style="@style/FormRadioButton"
+                        android:text="Diukur"/>
+                    <RadioButton
+                        android:id="@+id/rb_tfu_tidak_diukur"
+                        style="@style/FormRadioButton"
+                        android:text="Tidak Diukur"/>
+                </RadioGroup>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_tfu"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="TFU (cm)"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/rg_tfu_status"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:visibility="visible">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_tfu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_delivery_place"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Rencana Tempat Persalinan"
+                    app:layout_constraintTop_toBottomOf="@id/til_tfu"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_delivery_place"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_birth_assistant"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Rencana Penolong Kelahiran"
+                    app:layout_constraintTop_toBottomOf="@id/til_delivery_place"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_birth_assistant"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_contraception_option"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Metode KB Setelah Melahirkan"
+                    app:layout_constraintTop_toBottomOf="@id/til_birth_assistant"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_contraception_option"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_facilitating_referral_service"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="Status Fasilitasi Rujukan"
+                    app:layout_constraintTop_toBottomOf="@id/til_contraception_option"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_facilitating_referral_service"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_facilitating_social_assistance"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Status Fasilitasi Bansos"
+                    app:layout_constraintTop_toBottomOf="@id/til_facilitating_referral_service"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_facilitating_social_assistance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/tv_checkbox_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Status &amp; Pemeriksaan Lainnya:"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    app:layout_constraintTop_toBottomOf="@id/til_facilitating_social_assistance"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+                <TextView android:id="@+id/tv_is_alive_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/tv_checkbox_title" app:layout_constraintStart_toStartOf="parent" android:text="Ibu Masih Hidup?"/>
+                <RadioGroup android:id="@+id/rg_is_alive" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_alive_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_alive_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_alive_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
+                <TextView android:id="@+id/tv_is_twin_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_alive" app:layout_constraintStart_toStartOf="parent" android:text="Hamil Kembar?"/>
+                <RadioGroup android:id="@+id/rg_is_twin" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_twin_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_twin_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_twin_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_number_of_twins" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:visibility="gone"
+                    android:hint="Jumlah Kembar" app:layout_constraintTop_toBottomOf="@id/rg_is_twin" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" tools:visibility="visible">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_number_of_twins" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView android:id="@+id/tv_is_tbj_checked_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/til_number_of_twins" app:layout_constraintStart_toStartOf="parent" android:text="Taksiran Berat Janin Diperiksa?"/>
+                <RadioGroup android:id="@+id/rg_is_tbj_checked" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_tbj_checked_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_tbj_checked_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_tbj_checked_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_tbj" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:visibility="gone"
+                    android:hint="Taksiran Berat Janin (gram)" app:layout_constraintTop_toBottomOf="@id/rg_is_tbj_checked" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" tools:visibility="visible">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_tbj" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView android:id="@+id/tv_is_counseling_received_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/til_tbj" app:layout_constraintStart_toStartOf="parent" android:text="Menerima Konseling?"/>
+                <RadioGroup android:id="@+id/rg_is_counseling_received" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_counseling_received_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_counseling_received_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_counseling_received_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_counseling_type"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Jenis Konseling"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_counseling_received"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_counseling_type"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView android:id="@+id/tv_is_iron_received_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/til_counseling_type" app:layout_constraintStart_toStartOf="parent" android:text="Menerima Tablet Tambah Darah?"/>
+                <RadioGroup android:id="@+id/rg_is_iron_received" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_iron_received_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_iron_received_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_iron_received_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
+                <TextView android:id="@+id/tv_is_iron_taken_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_iron_received" app:layout_constraintStart_toStartOf="parent" android:text="Tablet Tambah Darah Diminum?"/>
+                <RadioGroup android:id="@+id/rg_is_iron_taken" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_iron_taken_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_iron_taken_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_iron_taken_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
+                <TextView android:id="@+id/tv_is_exposed_to_smoke_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_iron_taken" app:layout_constraintStart_toStartOf="parent" android:text="Terpapar Asap Rokok?"/>
+                <RadioGroup android:id="@+id/rg_is_exposed_to_smoke" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_exposed_to_smoke_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_exposed_to_smoke_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_exposed_to_smoke_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
+                <TextView android:id="@+id/tv_is_mbg_received_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_exposed_to_smoke" app:layout_constraintStart_toStartOf="parent" android:text="Menerima Makanan Bergizi Gratis (SPPG)?"/>
+                <RadioGroup android:id="@+id/rg_is_mbg_received" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_mbg_received_label" app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_mbg_received_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_mbg_received_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
+                <TextView
+                    android:id="@+id/tv_disease_history_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Riwayat Penyakit (Pilih)"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_mbg_received"
+                    app:layout_constraintStart_toStartOf="parent"/>
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_disease_history"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/tv_disease_history_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_drinking_water_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Sumber Air Minum Utama"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    app:layout_constraintTop_toBottomOf="@id/chip_group_disease_history"
+                    app:layout_constraintStart_toStartOf="parent"/>
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_drinking_water"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/tv_drinking_water_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_drinking_water_other"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Sebutkan Sumber Air Lainnya"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/chip_group_drinking_water">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_drinking_water_other"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/tv_defecation_facility_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Fasilitas Jamban"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    app:layout_constraintTop_toBottomOf="@id/til_drinking_water_other"
+                    app:layout_constraintStart_toStartOf="parent"/>
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_defecation_facility"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/tv_defecation_facility_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_defecation_facility_other"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Sebutkan Fasilitas Lainnya"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/chip_group_defecation_facility">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_defecation_facility_other"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/tv_social_assistance_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Fasilitasi Bantuan Sosial Diterima"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    app:layout_constraintTop_toBottomOf="@id/til_defecation_facility_other"
+                    app:layout_constraintStart_toStartOf="parent"/>
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_social_assistance"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/tv_social_assistance_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_social_assistance_other"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Sebutkan Bantuan Lainnya"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/chip_group_social_assistance">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_social_assistance_other"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_tpk_notes"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="Catatan dari TPK"
+                    app:layout_constraintTop_toBottomOf="@id/til_social_assistance_other"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_tpk_notes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top"
+                        android:inputType="textMultiLine"
+                        android:minLines="4" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_next_visit_date"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Tgl Kunjungan Berikutnya"
+                    app:endIconDrawable="@drawable/ic_calendar"
+                    app:endIconMode="custom"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/til_tpk_notes"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_next_visit_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/tv_attachment_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Dokumentasi &amp; Lokasi"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    app:layout_constraintTop_toBottomOf="@id/til_next_visit_date"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+                <LinearLayout
+                    android:id="@+id/layout_images"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/tv_attachment_title"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_marginEnd="8dp">
+                        <ImageView
+                            android:id="@+id/iv_preview1"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:scaleType="centerCrop"
+                            android:background="?attr/colorSurfaceVariant"
+                            app:srcCompat="@drawable/ic_menu_camera"/>
+                        <Button
+                            android:id="@+id/btn_capture1"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ambil Foto 1"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_marginStart="8dp">
+                        <ImageView
+                            android:id="@+id/iv_preview2"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:scaleType="centerCrop"
+                            android:background="?attr/colorSurfaceVariant"
+                            app:srcCompat="@drawable/ic_menu_camera"/>
+                        <Button
+                            android:id="@+id/btn_capture2"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ambil Foto 2"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_get_location"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:text="Ambil Lokasi GPS Saat Ini"
+                    app:icon="@drawable/ic_menu_gallery"
+                    app:layout_constraintTop_toBottomOf="@id/layout_images"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <TextView
+                    android:id="@+id/tv_location_result"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    app:layout_constraintTop_toBottomOf="@id/btn_get_location"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="Lat: -6.9175, Long: 107.6191" />
+
+                <LinearLayout
+                    android:id="@+id/button_container"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintTop_toBottomOf="@id/tv_location_result"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintVertical_bias="1.0">
+                    <Button
+                        android:id="@+id/btn_previous"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:text="Batal" />
+                    <Button
+                        android:id="@+id/btn_save"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="Simpan Perubahan" />
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            tools:visibility="visible"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

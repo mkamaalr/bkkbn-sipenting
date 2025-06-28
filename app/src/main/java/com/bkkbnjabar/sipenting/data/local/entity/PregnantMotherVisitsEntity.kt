@@ -60,9 +60,6 @@ data class PregnantMotherVisitsEntity(
     val socialAssistanceFacilitationOptionsOther: String?, // ADDED
     val syncStatus: SyncStatus = SyncStatus.PENDING,
     val createdAt: Long = System.currentTimeMillis(),
-    val deliveryPlaceId: Int?,
-    val birthAssistantId: Int?,
-    val contraceptionOptionId: Int?,
     val imagePath1: String?,
     val imagePath2: String?,
     val latitude: Double?,

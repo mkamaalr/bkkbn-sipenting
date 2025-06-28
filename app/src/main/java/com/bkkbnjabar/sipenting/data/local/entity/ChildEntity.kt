@@ -8,31 +8,30 @@ import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
 
 /**
  * Represents the "child" table in the local Room database.
- * This entity is linked to a mother via a foreign key.
+ * This entity is linked to a child via a foreign key.
  */
-@Entity(
-    tableName = "child",
-    foreignKeys = [
-        ForeignKey(
-            entity = PregnantMotherEntity::class, // Assuming a child is linked to a PregnantMother record
-            parentColumns = ["localId"],
-            childColumns = ["motherLocalId"],
-            onDelete = ForeignKey.SET_NULL // If mother is deleted, don't delete the child record
-        )
-    ],
-    indices = [Index(value = ["motherLocalId"])]
-)
+@Entity(tableName = "child")
 data class ChildEntity(
     @PrimaryKey(autoGenerate = true)
     val localId: Int = 0,
-    val id: String? = null, // Server ID after sync
-    val motherLocalId: Int?, // Foreign key to the mother
+    val id: String? = null, // ID from server after sync
     val name: String,
-    val nik: String?,
+    val nik: String,
     val dateOfBirth: String,
-    val gender: String, // e.g., "Laki-laki" or "Perempuan"
-    val birthWeight: Double?, // in kg
-    val birthHeight: Double?, // in cm
+    val phoneNumber: String?,
+    val provinsiName: String,
+    val provinsiId: Int,
+    val kabupatenName: String,
+    val kabupatenId: Int,
+    val kecamatanName: String,
+    val kecamatanId: Int,
+    val kelurahanName: String,
+    val kelurahanId: Int,
+    val rwName: String,
+    val rwId: Int,
+    val rtName: String,
+    val rtId: Int,
+    val fullAddress: String,
     val syncStatus: SyncStatus = SyncStatus.PENDING,
     val createdAt: Long = System.currentTimeMillis()
 )

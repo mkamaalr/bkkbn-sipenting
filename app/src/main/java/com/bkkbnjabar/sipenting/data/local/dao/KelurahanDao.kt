@@ -15,15 +15,15 @@ interface KelurahanDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllKelurahans(kelurahans: List<KelurahanEntity>) // Method for bulk insert
 
-    @Query("SELECT * FROM kelurahan_table")
+    @Query("SELECT * FROM kelurahan")
     fun getAllKelurahans(): Flow<List<KelurahanEntity>>
 
-    @Query("SELECT * FROM kelurahan_table WHERE kecamatanId = :kecamatanId")
+    @Query("SELECT * FROM kelurahan WHERE kecamatanId = :kecamatanId")
     fun getKelurahansByKecamatan(kecamatanId: Int): Flow<List<KelurahanEntity>>
 
-    @Query("SELECT * FROM kelurahan_table WHERE id = :kelurahanId")
+    @Query("SELECT * FROM kelurahan WHERE id = :kelurahanId")
     suspend fun getKelurahanById(kelurahanId: Int): KelurahanEntity?
 
-    @Query("DELETE FROM kelurahan_table")
+    @Query("DELETE FROM kelurahan")
     suspend fun deleteAllKelurahans()
 }

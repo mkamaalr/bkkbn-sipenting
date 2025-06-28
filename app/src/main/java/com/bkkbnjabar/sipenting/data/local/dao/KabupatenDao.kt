@@ -15,15 +15,15 @@ interface KabupatenDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllKabupatens(kabupatens: List<KabupatenEntity>) // Method for bulk insert
 
-    @Query("SELECT * FROM kabupaten_table")
+    @Query("SELECT * FROM kabupaten")
     fun getAllKabupatens(): Flow<List<KabupatenEntity>>
 
-    @Query("SELECT * FROM kabupaten_table WHERE provinsiId = :provinsiId")
+    @Query("SELECT * FROM kabupaten WHERE provinsiId = :provinsiId")
     fun getKabupatensByProvinsi(provinsiId: Int): Flow<List<KabupatenEntity>>
 
-    @Query("SELECT * FROM kabupaten_table WHERE id = :kabupatenId")
+    @Query("SELECT * FROM kabupaten WHERE id = :kabupatenId")
     suspend fun getKabupatenById(kabupatenId: Int): KabupatenEntity?
 
-    @Query("DELETE FROM kabupaten_table")
+    @Query("DELETE FROM kabupaten")
     suspend fun deleteAllKabupatens()
 }

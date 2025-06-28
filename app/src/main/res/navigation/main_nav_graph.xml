@@ -11,6 +11,7 @@
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
 
+<!--  PREGNANT MOTHER  --><!--  PREGNANT MOTHER  --><!--  PREGNANT MOTHER  -->
     <fragment
         android:id="@+id/nav_pregnant_mother_list"
         android:name="com.bkkbnjabar.sipenting.ui.pregnantmother.PregnantMotherListFragment"
@@ -55,18 +56,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_child_list"
-        android:name="com.bkkbnjabar.sipenting.ui.child.ChildListFragment"
-        android:label="@string/menu_child"
-        tools:layout="@layout/fragment_child_list" />
-
-    <fragment
-        android:id="@+id/nav_breastfeeding_mother_list"
-        android:name="com.bkkbnjabar.sipenting.ui.breastfeedingmother.BreastfeedingMotherListFragment"
-        android:label="@string/menu_breastfeeding_mother"
-        tools:layout="@layout/fragment_breastfeeding_mother_list" />
-
-    <fragment
         android:id="@+id/pregnantMotherRegistrationFragment1"
         android:name="com.bkkbnjabar.sipenting.ui.pregnantmother.registration.PregnantMotherRegistrationFragment1"
         android:label="@string/form_title_pregnant_mother_data"
@@ -85,6 +74,142 @@
             android:id="@+id/action_pregnantMotherRegistrationFragment2_to_nav_pregnant_mother_list"
             app:destination="@id/nav_pregnant_mother_list"
             app:popUpTo="@id/nav_pregnant_mother_list"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+
+<!--  CHILD  --><!--  CHILD  --><!--  CHILD  --><!--  CHILD  --><!--  CHILD  --><!--  CHILD  --><!--  CHILD  -->
+    <fragment
+        android:id="@+id/nav_child_list"
+        android:name="com.bkkbnjabar.sipenting.ui.child.ChildListFragment"
+        android:label="@string/menu_child"
+        tools:layout="@layout/fragment_child_list">
+        <action
+            android:id="@+id/action_nav_child_list_to_childRegistrationFragment1"
+            app:destination="@id/childRegistrationFragment1" />
+        <action
+            android:id="@+id/action_nav_child_list_to_childDetailFragment"
+            app:destination="@id/childDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/childDetailFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.child.detail.ChildDetailFragment"
+        android:label="Detail Ibu Hamil"
+        tools:layout="@layout/fragment_child_detail" >
+        <argument
+            android:name="motherId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_childDetailFragment_to_childRegistrationFragment2"
+            app:destination="@id/childRegistrationFragment2" />
+        <action
+            android:id="@+id/action_childDetailFragment_to_childVisitEditFragment"
+            app:destination="@id/childVisitEditFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/childVisitEditFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.child.edit.ChildVisitEditFragment"
+        android:label="Edit Kunjungan Ibu Hamil"
+        tools:layout="@layout/fragment_child_visit_edit">
+        <argument
+            android:name="visitId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_childVisitEditFragment_to_childDetailFragment"
+            app:popUpTo="@id/childDetailFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/childRegistrationFragment1"
+        android:name="com.bkkbnjabar.sipenting.ui.child.registration.ChildRegistrationFragment1"
+        android:label="@string/form_title_child_data"
+        tools:layout="@layout/fragment_child_registration_1">
+        <action
+            android:id="@+id/action_childRegistrationFragment1_to_childRegistrationFragment2"
+            app:destination="@id/childRegistrationFragment2" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/childRegistrationFragment2"
+        android:name="com.bkkbnjabar.sipenting.ui.child.registration.ChildRegistrationFragment2"
+        android:label="@string/form_title_child_visit"
+        tools:layout="@layout/fragment_child_registration_2">
+        <action
+            android:id="@+id/action_childRegistrationFragment2_to_nav_child_list"
+            app:destination="@id/nav_child_list"
+            app:popUpTo="@id/nav_child_list"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+<!-- BREASTFEEDING MOTHER   --><!-- BREASTFEEDING MOTHER   --><!-- BREASTFEEDING MOTHER   -->
+
+    <fragment
+        android:id="@+id/nav_breastfeeding_mother_list"
+        android:name="com.bkkbnjabar.sipenting.ui.breastfeedingmother.BreastfeedingMotherListFragment"
+        android:label="@string/menu_breastfeeding_mother"
+        tools:layout="@layout/fragment_breastfeeding_mother_list">
+
+        <action
+            android:id="@+id/action_nav_breastfeeding_mother_list_to_breastfeedingMotherRegistrationFragment1"
+            app:destination="@id/breastfeedingMotherRegistrationFragment1" />
+
+        <action
+            android:id="@+id/action_nav_breastfeeding_mother_list_to_breastfeedingMotherDetailFragment1"
+            app:destination="@id/breastfeedingMotherDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/breastfeedingMotherRegistrationFragment1"
+        android:name="com.bkkbnjabar.sipenting.ui.breastfeedingmother.registration.BreastfeedingMotherRegistrationFragment1"
+        android:label="Data Ibu Menyusui"
+        tools:layout="@layout/fragment_pregnant_mother_registration_1" >
+        <action
+            android:id="@+id/action_breastfeedingMotherRegistrationFragment1_to_breastfeedingMotherRegistrationFragment2"
+            app:destination="@id/breastfeedingMotherRegistrationFragment2" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/breastfeedingMotherRegistrationFragment2"
+        android:name="com.bkkbnjabar.sipenting.ui.breastfeedingmother.registration.BreastfeedingMotherRegistrationFragment2"
+        android:label="Kunjungan Ibu Menyusui"
+        tools:layout="@layout/fragment_breastfeeding_mother_registration_2" >
+        <action
+            android:id="@+id/action_breastfeedingMotherRegistrationFragment2_to_nav_breastfeeding_mother_list"
+            app:destination="@id/nav_breastfeeding_mother_list"
+            app:popUpTo="@id/nav_breastfeeding_mother_list"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/breastfeedingMotherDetailFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.breastfeedingmother.detail.BreastfeedingMotherDetailFragment"
+        android:label="Detail Ibu Hamil"
+        tools:layout="@layout/fragment_breastfeeding_mother_detail" >
+        <argument
+            android:name="motherId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_breastfeedingMotherDetailFragment_to_breastfeedingMotherRegistrationFragment2"
+            app:destination="@id/breastfeedingMotherRegistrationFragment2" />
+        <action
+            android:id="@+id/action_breastfeedingMotherDetailFragment_to_breastfeedingMotherVisitEditFragment"
+            app:destination="@id/breastfeedingMotherVisitEditFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/breastfeedingMotherVisitEditFragment"
+        android:name="com.bkkbnjabar.sipenting.ui.breastfeedingmother.edit.BreastfeedingMotherVisitEditFragment"
+        android:label="Edit Kunjungan Ibu Hamil"
+        tools:layout="@layout/fragment_breastfeeding_mother_visit_edit">
+        <argument
+            android:name="visitId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_breastfeedingMotherVisitEditFragment_to_breastfeedingMotherDetailFragment"
+            app:popUpTo="@id/breastfeedingMotherDetailFragment"
             app:popUpToInclusive="true" />
     </fragment>
 

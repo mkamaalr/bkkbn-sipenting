@@ -15,12 +15,12 @@ interface ProvinsiDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllProvinsis(provinsis: List<ProvinsiEntity>) // Method for bulk insert
 
-    @Query("SELECT * FROM provinsi_table")
+    @Query("SELECT * FROM provinsi")
     fun getAllProvinsis(): Flow<List<ProvinsiEntity>>
 
-    @Query("SELECT * FROM provinsi_table WHERE id = :provinsiId")
+    @Query("SELECT * FROM provinsi WHERE id = :provinsiId")
     suspend fun getProvinsiById(provinsiId: Int): ProvinsiEntity?
 
-    @Query("DELETE FROM provinsi_table")
+    @Query("DELETE FROM provinsi")
     suspend fun deleteAllProvinsis()
 }

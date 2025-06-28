@@ -15,15 +15,15 @@ interface RtDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllRTS(rts: List<RtEntity>) // Method for bulk insert
 
-    @Query("SELECT * FROM rt_table")
+    @Query("SELECT * FROM rt")
     fun getAllRTS(): Flow<List<RtEntity>>
 
-    @Query("SELECT * FROM rt_table WHERE rwId = :rwId")
+    @Query("SELECT * FROM rt WHERE rwId = :rwId")
     fun getRTSByRw(rwId: Int): Flow<List<RtEntity>>
 
-    @Query("SELECT * FROM rt_table WHERE id = :rtId")
+    @Query("SELECT * FROM rt WHERE id = :rtId")
     suspend fun getRtById(rtId: Int): RtEntity?
 
-    @Query("DELETE FROM rt_table")
+    @Query("DELETE FROM rt")
     suspend fun deleteAllRTS()
 }

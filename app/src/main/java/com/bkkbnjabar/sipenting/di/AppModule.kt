@@ -1,6 +1,8 @@
 package com.bkkbnjabar.sipenting.di
 
 import android.content.Context
+import com.bkkbnjabar.sipenting.data.local.dao.BreastfeedingMotherDao
+import com.bkkbnjabar.sipenting.data.local.dao.BreastfeedingMotherVisitsDao
 import com.bkkbnjabar.sipenting.data.remote.AuthApiService
 import com.bkkbnjabar.sipenting.data.remote.LookupApiService
 import com.bkkbnjabar.sipenting.data.remote.PregnantMotherApiService
@@ -20,6 +22,8 @@ import javax.inject.Singleton
 import com.bkkbnjabar.sipenting.data.local.dao.LookupDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherVisitsDao
+import com.bkkbnjabar.sipenting.data.repository.BreastfeedingMotherRepository
+import com.bkkbnjabar.sipenting.data.repository.BreastfeedingMotherRepositoryImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -63,5 +67,14 @@ object AppModule {
         pregnantMotherVisitsDao: PregnantMotherVisitsDao // Disediakan dari DatabaseModule
     ): PregnantMotherRepository {
         return PregnantMotherRepositoryImpl(pregnantMotherDao, pregnantMotherVisitsDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBreastfeedingMotherRepository(
+        breastfeedingMotherDao: BreastfeedingMotherDao,
+        breastfeedingMotherVisitsDao: BreastfeedingMotherVisitsDao
+    ): BreastfeedingMotherRepository {
+        return BreastfeedingMotherRepositoryImpl(breastfeedingMotherDao, breastfeedingMotherVisitsDao)
     }
 }

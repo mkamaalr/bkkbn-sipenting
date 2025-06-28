@@ -15,15 +15,15 @@ interface RwDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllRWS(rws: List<RwEntity>) // Method for bulk insert
 
-    @Query("SELECT * FROM rw_table")
+    @Query("SELECT * FROM rw")
     fun getAllRWS(): Flow<List<RwEntity>>
 
-    @Query("SELECT * FROM rw_table WHERE kelurahanId = :kelurahanId")
+    @Query("SELECT * FROM rw WHERE kelurahanId = :kelurahanId")
     fun getRWSByKelurahan(kelurahanId: Int): Flow<List<RwEntity>>
 
-    @Query("SELECT * FROM rw_table WHERE id = :rwId")
+    @Query("SELECT * FROM rw WHERE id = :rwId")
     suspend fun getRwById(rwId: Int): RwEntity?
 
-    @Query("DELETE FROM rw_table")
+    @Query("DELETE FROM rw")
     suspend fun deleteAllRWS()
 }
