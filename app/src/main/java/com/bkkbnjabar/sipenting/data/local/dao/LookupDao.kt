@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.Flow
 
 /**
  * Data Access Object (DAO) for all lookup-related entities.
- * This interface provides methods to interact with the location tables
- * (provinsi, kabupaten, kecamatan, etc.) in the local Room database.
+ * This interface provides methods to interact with the location and lookup item tables
+ * in the local Room database.
  */
 @Dao
 interface LookupDao {
 
-    // --- INSERT METHODS (for preloading data from API) ---
+    // --- INSERT METHODS (for preloading data) ---
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllProvinsis(provinsis: List<ProvinsiEntity>)
@@ -35,17 +35,41 @@ interface LookupDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllRts(rts: List<RtEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLookupItems(items: List<LookupItemEntity>)
 
-    // --- GET ALL METHODS (Reactive, using Flow) ---
+
+    // --- CLEAR/DELETE METHODS (for resetting data before preload) ---
+
+    @Query("DELETE FROM provinsi")
+    suspend fun clearAllProvinsis()
+
+    @Query("DELETE FROM kabupaten")
+    suspend fun clearAllKabupatens()
+
+    @Query("DELETE FROM kecamatan")
+    suspend fun clearAllKecamatans()
+
+    @Query("DELETE FROM kelurahan")
+    suspend fun clearAllKelurahans()
+
+    @Query("DELETE FROM rw")
+    suspend fun clearAllRws()
+
+    @Query("DELETE FROM rt")
+    suspend fun clearAllRts()
+
+    @Query("DELETE FROM lookup_item")
+    suspend fun clearAllLookupItems()
+
+
+    // --- GET ALL & FILTERED LIST METHODS (Reactive, using Flow) ---
 
     @Query("SELECT * FROM provinsi ORDER BY name ASC")
     fun getAllProvinsis(): Flow<List<ProvinsiEntity>>
 
     @Query("SELECT * FROM kabupaten ORDER BY name ASC")
     fun getAllKabupatens(): Flow<List<KabupatenEntity>>
-
-
-    // --- GET FILTERED LIST METHODS (Reactive, using Flow) ---
 
     @Query("SELECT * FROM kecamatan WHERE kabupatenId = :kabupatenId ORDER BY name ASC")
     fun getKecamatansByKabupaten(kabupatenId: Int): Flow<List<KecamatanEntity>>
@@ -59,8 +83,11 @@ interface LookupDao {
     @Query("SELECT * FROM rt WHERE rwId = :rwId ORDER BY name ASC")
     fun getRtsByRw(rwId: Int): Flow<List<RtEntity>>
 
+    @Query("SELECT * FROM lookup_item WHERE type = :type ORDER BY name ASC")
+    fun getLookupItemsByType(type: String): Flow<List<LookupItemEntity>>
 
-    // --- GET SINGLE ITEM BY ID METHODS (One-shot, suspend) ---
+
+    // --- GET SINGLE ITEM BY ID & COUNT METHODS ---
 
     @Query("SELECT * FROM provinsi WHERE id = :id LIMIT 1")
     suspend fun getProvinsiById(id: Int?): ProvinsiEntity?
@@ -74,31 +101,6 @@ interface LookupDao {
     @Query("SELECT * FROM kelurahan WHERE id = :id LIMIT 1")
     suspend fun getKelurahanById(id: Int?): KelurahanEntity?
 
-
-    // ================== FUNGSI BARU UNTUK MEMERIKSA DATA ==================
-    /**
-     * Menghitung jumlah provinsi di database.
-     * Digunakan untuk memeriksa apakah data lookup sudah pernah diunduh.
-     * @return Jumlah baris di tabel provinsi.
-     */
     @Query("SELECT COUNT(id) FROM provinsi")
     suspend fun getProvinsiCount(): Int
-    // ====================================================================
-    // ================== FUNGSI BARU UNTUK LOOKUP ITEMS ==================
-
-    /**
-     * Menyimpan daftar LookupItemEntity ke database.
-     */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertLookupItems(items: List<LookupItemEntity>)
-
-    /**
-     * Mengambil daftar LookupItemEntity dari database berdasarkan tipenya.
-     * @param type Jenis lookup yang ingin diambil (misal: "disease_histories").
-     * @return Flow yang berisi daftar item yang sesuai.
-     */
-    @Query("SELECT * FROM lookup_item WHERE type = :type ORDER BY name ASC")
-    fun getLookupItemsByType(type: String): Flow<List<LookupItemEntity>>
-
-    // ====================================================================
 }

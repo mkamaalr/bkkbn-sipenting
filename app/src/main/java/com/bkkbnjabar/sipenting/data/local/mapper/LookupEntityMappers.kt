@@ -5,7 +5,12 @@ import com.bkkbnjabar.sipenting.domain.model.*
 import kotlin.jvm.JvmName
 
 // --- Entity to Domain Mappers (for single objects) ---
-
+fun LookupItemEntity.toDomain(): LookupItem {
+    return LookupItem(
+        id = this.serverId,
+        name = this.name
+    )
+}
 fun ProvinsiEntity.toDomain(): Provinsi = Provinsi(id = this.id, name = this.name)
 fun KabupatenEntity.toDomain(): Kabupaten = Kabupaten(id = this.id, provinsiId = this.provinsiId, name = this.name)
 fun KecamatanEntity.toDomain(): Kecamatan = Kecamatan(id = this.id, kabupatenId = this.kabupatenId, name = this.name)
@@ -17,6 +22,9 @@ fun RtEntity.toDomain(): Rt = Rt(id = this.id, rwId = this.rwId, name = this.nam
 // --- Entity List to Domain List Mappers (for lists of objects) ---
 
 // Menggunakan @JvmName untuk memberikan nama unik pada level JVM
+@JvmName("lookupItemEntityToDomain")
+fun List<LookupItemEntity>.toDomain(): List<LookupItem> = this.map { it.toDomain() }
+
 @JvmName("provinsiEntityToDomain")
 fun List<ProvinsiEntity>.toDomain(): List<Provinsi> = this.map { it.toDomain() }
 

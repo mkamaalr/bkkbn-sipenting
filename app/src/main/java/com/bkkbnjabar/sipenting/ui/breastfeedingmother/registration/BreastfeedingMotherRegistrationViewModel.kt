@@ -73,7 +73,18 @@ class BreastfeedingMotherRegistrationViewModel @Inject constructor(
     val diseaseHistories: LiveData<List<LookupItem>> = lookupRepository.getLookupOptions("disease-histories").asLiveData()
     val mainSourcesOfDrinkingWater: LiveData<List<LookupItem>> = lookupRepository.getLookupOptions("main-sources-of-drinking-water").asLiveData()
     val defecationFacilities: LiveData<List<LookupItem>> = lookupRepository.getLookupOptions("defecation-facilities").asLiveData()
+    val postpartumComplication: LiveData<List<LookupItem>> = lookupRepository.getLookupOptions("postpartum-complication-options").asLiveData()
     val socialAssistanceOptions: LiveData<List<LookupItem>> = lookupRepository.getLookupOptions("social-assistance-facilitation-options").asLiveData()
+
+    // 1. Renamed for clarity: This list is for the "Yes" case.
+    val contraceptionTypes: LiveData<List<LookupItem>> =
+        lookupRepository.getLookupOptions("contraception-options").asLiveData()
+
+    // 2. Added the new list for the "No" case.
+    val contraceptionRejectionReasons: LiveData<List<LookupItem>> =
+        lookupRepository.getLookupOptions("contraception-options-reject").asLiveData()
+    // ===============================================================
+
 
     init {
         resetForm()
@@ -193,6 +204,8 @@ class BreastfeedingMotherRegistrationViewModel @Inject constructor(
 
     fun updateBreastfeedingMotherVisitData(
         visitDate: String? = null,
+        lastBirthDate: String? = null,
+        modeOfDelivery: String? = null,
         currentHeight: Double? = null,
         currentWeight: Double? = null,
         isTwin: Boolean? = null,
@@ -205,11 +218,12 @@ class BreastfeedingMotherRegistrationViewModel @Inject constructor(
         facilitatingSocialAssistanceStatus: String? = null,
         nextVisitDate: String? = null,
         tpkNotes: String? = null,
-        isAlive: Boolean? = null,
+        isPostpartumComplication: Boolean? = null,
+        postpartumComplication: List<String>? = null,
+        postpartumComplicationOther: String? = null,
         breastfeedingMotherStatusId: Int? = null,
         deliveryPlaceId: Int? = null,
         birthAssistantId: Int? = null,
-        contraceptionOptionId: Int? = null,
         mainSourceOfDrinkingWater: List<String>? = null,
         mainSourceOfDrinkingWaterOther: String? = null,
         defecationFacility: List<String>? = null,
@@ -222,10 +236,17 @@ class BreastfeedingMotherRegistrationViewModel @Inject constructor(
         longitude: Double? = null,
         isReceivedMbg: Boolean? = null,
         isAsiExclusive: Boolean? = null,
+        onContraception: Boolean? = null,
+        contraceptionTypeId: Int? = null,
+        contraceptionReasonForUse: String? = null,
+        contraceptionRejectionReasonId: Int? = null
+
     ) {
         val currentData = _currentBreastFeedingMotherVisit.value ?: BreastfeedingMotherVisitData()
         val updatedData = currentData.copy(
             visitDate = visitDate ?: currentData.visitDate,
+            lastBirthDate = lastBirthDate ?: currentData.lastBirthDate,
+            modeOfDelivery = modeOfDelivery ?: currentData.modeOfDelivery,
             currentHeight = currentHeight ?: currentData.currentHeight,
             currentWeight = currentWeight ?: currentData.currentWeight,
             isTwin = isTwin ?: currentData.isTwin,
@@ -238,10 +259,11 @@ class BreastfeedingMotherRegistrationViewModel @Inject constructor(
             facilitatingSocialAssistanceStatus = facilitatingSocialAssistanceStatus ?: currentData.facilitatingSocialAssistanceStatus,
             nextVisitDate = nextVisitDate ?: currentData.nextVisitDate,
             tpkNotes = tpkNotes ?: currentData.tpkNotes,
-            isAlive = isAlive ?: currentData.isAlive,
+            isPostpartumComplication = isPostpartumComplication ?: currentData.isPostpartumComplication,
+            postpartumComplication = postpartumComplication ?: currentData.postpartumComplication,
+            postpartumComplicationOther = postpartumComplicationOther ?: currentData.postpartumComplicationOther,
             deliveryPlaceId = deliveryPlaceId ?: currentData.deliveryPlaceId,
             birthAssistantId = birthAssistantId ?: currentData.birthAssistantId,
-            contraceptionOptionId = contraceptionOptionId ?: currentData.contraceptionOptionId,
             mainSourceOfDrinkingWater = mainSourceOfDrinkingWater ?: currentData.mainSourceOfDrinkingWater,
             mainSourceOfDrinkingWaterOther = mainSourceOfDrinkingWaterOther ?: currentData.mainSourceOfDrinkingWaterOther,
             defecationFacility = defecationFacility ?: currentData.defecationFacility,
@@ -255,6 +277,10 @@ class BreastfeedingMotherRegistrationViewModel @Inject constructor(
             isReceivedMbg = isReceivedMbg ?: currentData.isReceivedMbg,
             breastfeedingMotherStatusId = breastfeedingMotherStatusId ?: currentData.breastfeedingMotherStatusId,
             isAsiExclusive = isAsiExclusive ?: currentData.isAsiExclusive,
+            onContraception = onContraception ?: currentData.onContraception,
+            contraceptionTypeId = contraceptionTypeId ?: currentData.contraceptionTypeId,
+            contraceptionReasonForUse = contraceptionReasonForUse ?: currentData.contraceptionReasonForUse,
+            contraceptionRejectionReasonId = contraceptionRejectionReasonId ?: currentData.contraceptionRejectionReasonId
         )
         _currentBreastFeedingMotherVisit.value = updatedData
     }

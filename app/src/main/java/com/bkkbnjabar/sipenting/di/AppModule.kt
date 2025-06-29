@@ -24,6 +24,7 @@ import javax.inject.Singleton
 import com.bkkbnjabar.sipenting.data.local.dao.LookupDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherVisitsDao
+import com.bkkbnjabar.sipenting.data.local.db.AppDatabase
 import com.bkkbnjabar.sipenting.data.repository.BreastfeedingMotherRepository
 import com.bkkbnjabar.sipenting.data.repository.BreastfeedingMotherRepositoryImpl
 import com.bkkbnjabar.sipenting.data.repository.ChildRepository
@@ -55,12 +56,12 @@ object AppModule {
     fun provideLookupRepository(
         lookupApiService: LookupApiService, // Disediakan dari NetworkModule
         lookupDao: LookupDao,               // Disediakan dari DatabaseModule
-        sharedPrefsManager: SharedPrefsManager
+        database: AppDatabase
     ): LookupRepository {
         return LookupRepositoryImpl(
             lookupApiService,
             lookupDao,
-            sharedPrefsManager
+            database
         )
     }
 

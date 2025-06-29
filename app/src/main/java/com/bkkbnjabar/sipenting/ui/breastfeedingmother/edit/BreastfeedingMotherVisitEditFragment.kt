@@ -58,6 +58,12 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
     private var drinkingWaterOptions: List<LookupItem> = emptyList()
     private var defecationFacilityOptions: List<LookupItem> = emptyList()
     private var socialAssistanceOptions: List<LookupItem> = emptyList()
+    private val modeOfDeliveryOptions = listOf("Normal", "Tindakan/Caesar")
+    private val twinStatusOptions = listOf("Minimal 1 hidup", "Tidak ada yang hidup")
+    private val singletonStatusOptions = listOf("Hidup", "Meninggal")
+    private val contraceptionReasonForUseOptions = listOf("Ingin Anak di Tunda", "Tidak Ingin Anak Lagi")
+    private var contraceptionTypeOptions: List<LookupItem> = emptyList()
+    private var contraceptionRejectionReasonOptions: List<LookupItem> = emptyList()
 
     private var latestTmpUri: Uri? = null
     private var captureRequestIndex: Int = 0
@@ -95,8 +101,24 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeViewModel()
         setupListeners()
+        observeViewModel()
+
+        // It's more efficient to set up static adapters once, here.
+        val adapterModeOfDelivery = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, modeOfDeliveryOptions)
+        binding.etModeOfDelivery.setAdapter(adapterModeOfDelivery)
+
+        // Setup the adapter for the SINGLETON (not twin) dropdown
+        val singletonAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, singletonStatusOptions)
+        binding.etBabyStatusSingleton.setAdapter(singletonAdapter)
+
+        val twinAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, twinStatusOptions)
+        binding.etBabyStatusTwin.setAdapter(twinAdapter)
+
+        val reasonAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, contraceptionReasonForUseOptions)
+        binding.etContraceptionReasonForUse.setAdapter(reasonAdapter)
+
+
         viewModel.loadVisitForEditing(args.visitId)
     }
 
@@ -119,6 +141,82 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
         binding.btnCapture1.setOnClickListener { handleImageCapture(1) }
         binding.btnCapture2.setOnClickListener { handleImageCapture(2) }
         binding.btnGetLocation.setOnClickListener { handleLocationCapture() }
+
+        binding.rgIsTwin.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.rb_is_twin_yes -> {
+                    // If YES is checked: Show twin dropdown, hide singleton dropdown
+                    binding.tilBabyStatusTwin.isVisible = true
+                    binding.tilBabyStatusSingleton.isVisible = false
+                    // Clear any previous selection from the other dropdown
+                    binding.etBabyStatusSingleton.setText("", false)
+                }
+                R.id.rb_is_twin_no -> {
+                    // If NO is checked: Show singleton dropdown, hide twin dropdown
+                    binding.tilBabyStatusTwin.isVisible = false
+                    binding.tilBabyStatusSingleton.isVisible = true
+                    // Clear any previous selection from the other dropdown
+                    binding.etBabyStatusTwin.setText("", false)
+                }
+                else -> {
+                    // If nothing is checked (e.g., cleared), hide both
+                    binding.tilBabyStatusTwin.isVisible = false
+                    binding.tilBabyStatusSingleton.isVisible = false
+                    binding.etBabyStatusTwin.setText("", false)
+                    binding.etBabyStatusSingleton.setText("", false)
+                }
+            }
+        }
+
+        binding.rgIsPostpartumComplication.setOnCheckedChangeListener { _, checkedId ->
+            val hasComplication = (checkedId == R.id.rb_is_postpartum_complication_yes)
+
+            // Set the visibility of the ChipGroup and its related views
+            binding.tvPostpartumComplicationTypeLabel.isVisible = hasComplication
+            binding.chipGroupPostpartumComplication.isVisible = hasComplication
+            binding.tilPostpartumComplicationOther.isVisible = false // Always hide "Other" field initially
+
+            if (hasComplication) {
+                // If user selects "Yes", no extra action is needed here.
+                // The ChipGroup appears in its last state.
+            } else {
+                // If user selects "No", we need to hide AND RESET the ChipGroup state.
+
+                // 1. Clear any selections.
+                binding.chipGroupPostpartumComplication.clearCheck()
+
+                // 2. THIS IS THE FIX: Re-enable all the chips inside the group.
+                binding.chipGroupPostpartumComplication.children.forEach { chip ->
+                    chip.isEnabled = true
+                }
+            }
+        }
+
+        binding.rgOnContraception.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.rb_on_contraception_yes -> {
+                    // USER SELECTED "YES"
+                    // Show the "Yes" section
+                    binding.tilContraceptionType.isVisible = true
+                    binding.tilContraceptionReasonForUse.isVisible = true
+
+                    // Hide and reset the "No" section
+                    binding.tilContraceptionRejectionReason.isVisible = false
+                    binding.etContraceptionRejectionReason.setText("", false)
+                }
+                R.id.rb_on_contraception_no -> {
+                    // USER SELECTED "NO"
+                    // Show the "No" section
+                    binding.tilContraceptionRejectionReason.isVisible = true
+
+                    // Hide and reset the "Yes" section
+                    binding.tilContraceptionType.isVisible = false
+                    binding.tilContraceptionReasonForUse.isVisible = false
+                    binding.etContraceptionType.setText("", false)
+                    binding.etContraceptionReasonForUse.setText("", false)
+                }
+            }
+        }
 
         setupDateField(binding.tilVisitDate, binding.etVisitDate)
         setupDateField(binding.tilNextVisitDate, binding.etNextVisitDate)
@@ -156,10 +254,27 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
             birthAssistantOptions = it ?: emptyList()
             binding.etBirthAssistant.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, birthAssistantOptions.map { it.name }))
         }
-        viewModel.contraceptionOptions.observe(viewLifecycleOwner) {
-            contraceptionOptions = it ?: emptyList()
-            binding.etContraceptionOption.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, contraceptionOptions.map { it.name }))
+//        viewModel.contraceptionOptions.observe(viewLifecycleOwner) {
+//            contraceptionOptions = it ?: emptyList()
+//            binding.etContraceptionOption.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, contraceptionOptions.map { it.name }))
+//        }
+
+        // CORRECTED: Observe the LiveData property from the ViewModel
+        viewModel.contraceptionTypes.observe(viewLifecycleOwner) { options ->
+            // This 'options' list contains "IUD", "Pil", etc.
+            contraceptionTypeOptions = options
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, options.map { it.name })
+            binding.etContraceptionType.setAdapter(adapter)
         }
+
+        // CORRECTED: Observe the other LiveData property for rejection reasons
+        viewModel.contraceptionRejectionReasons.observe(viewLifecycleOwner) { options ->
+            // This 'options' list contains "Ingin hamil", "Alasan kesehatan", etc.
+            contraceptionRejectionReasonOptions = options
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, options.map { it.name })
+            binding.etContraceptionRejectionReason.setAdapter(adapter)
+        }
+
         viewModel.referralStatusOptions.observe(viewLifecycleOwner) {
             referralStatusOptions = it ?: emptyList()
             binding.etFacilitatingReferralService.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, referralStatusOptions))
@@ -193,62 +308,48 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
     private fun updateFormFromData(data: BreastfeedingMotherVisitData?) {
         if (data == null) return
 
-//        binding.etVisitDate.setText(data.visitDate)
-//        binding.etChildNumber.setText(data.childNumber?.toString() ?: "")
-//        binding.etDateOfBirthLastChild.setText(data.dateOfBirthLastChild)
-//        binding.etPregnancyWeek.setText(data.pregnancyWeekAge?.toString() ?: "")
-//        binding.etWeightTrimester1.setText(data.weightTrimester1?.toString() ?: "")
-//        binding.etCurrentWeight.setText(data.currentWeight?.toString() ?: "")
-//        binding.etCurrentHeight.setText(data.currentHeight?.toString() ?: "")
-//        binding.etLila.setText(data.upperArmCircumference?.toString() ?: "")
-//        binding.etHb.setText(data.hemoglobinLevel?.toString() ?: "")
-//        binding.etHbReason.setText(data.hemoglobinLevelReason)
-//        binding.etNumberOfTwins.setText(data.numberOfTwins?.toString() ?: "")
-//        binding.etTbj.setText(data.tbj?.toString() ?: "")
-//        binding.etTpkNotes.setText(data.tpkNotes)
-//        binding.etNextVisitDate.setText(data.nextVisitDate)
-//        binding.etTfu.setText(data.tfu?.toString() ?: "")
-//        binding.tilGivenBirthStatus.isVisible = (data.isGivenBirth == true)
-//
-//        binding.rgIsAlive.check(if (data.isAlive == true) R.id.rb_is_alive_yes else R.id.rb_is_alive_no)
-//        binding.rgIsGivenBirth.check(if (data.isGivenBirth == true) R.id.rb_is_given_birth_yes else R.id.rb_is_given_birth_no)
-//        binding.rgIsHbChecked.check(if (data.isHbChecked == true) R.id.rb_hb_checked_yes else R.id.rb_hb_checked_no)
-//        binding.rgIsTwin.check(if (data.isTwin == true) R.id.rb_is_twin_yes else R.id.rb_is_twin_no)
-//        binding.rgIsTbjChecked.check(if (data.isEstimatedFetalWeightChecked == true) R.id.rb_is_tbj_checked_yes else R.id.rb_is_tbj_checked_no)
-//        binding.rgIsCounselingReceived.check(if (data.isCounselingReceived == true) R.id.rb_is_counseling_received_yes else R.id.rb_is_counseling_received_no)
-//        binding.tilCounselingType.isVisible = data.isCounselingReceived == true
-//
-//        binding.rgIsIronReceived.check(if (data.isIronTablesReceived == true) R.id.rb_is_iron_received_yes else R.id.rb_is_iron_received_no)
-//        binding.rgIsIronTaken.check(if (data.isIronTablesTaken == true) R.id.rb_is_iron_taken_yes else R.id.rb_is_iron_taken_no)
-//        binding.rgIsExposedToSmoke.check(if (data.isExposedToCigarettes == true) R.id.rb_is_exposed_to_smoke_yes else R.id.rb_is_exposed_to_smoke_no)
-//        binding.rgIsMbgReceived.check(if (data.isReceivedMbg == true) R.id.rb_is_mbg_received_yes else R.id.rb_is_mbg_received_no)
-//        binding.rgTfuStatus.check(if (data.isTfuMeasured == true) R.id.rb_tfu_diukur else R.id.rb_tfu_tidak_diukur)
-//        binding.etBreastfeedingMotherStatus.setText(pregnantMotherStatusOptions.find { it.id == data.pregnantMotherStatusId }?.name ?: "", false)
-//        binding.tilGivenBirthStatus.isVisible = (data.isGivenBirth == true)
-//        binding.etGivenBirthStatus.setText(givenBirthStatusOptions.find { it.id == data.givenBirthStatusId }?.name ?: "", false)
-//        binding.etCounselingType.setText(counselingTypeOptions.find { it.id == data.counselingTypeId }?.name ?: "", false)
-//        binding.etDeliveryPlace.setText(deliveryPlaceOptions.find { it.id == data.deliveryPlaceId }?.name ?: "", false)
-//        binding.etBirthAssistant.setText(birthAssistantOptions.find { it.id == data.birthAssistantId }?.name ?: "", false)
+        binding.etVisitDate.setText(data.visitDate)
+        binding.etLastBirthDate.setText(data.lastBirthDate)
+        binding.etCurrentWeight.setText(data.currentWeight?.toString() ?: "")
+        binding.etCurrentHeight.setText(data.currentHeight?.toString() ?: "")
+        binding.etTpkNotes.setText(data.tpkNotes)
+        binding.etNextVisitDate.setText(data.nextVisitDate)
+
+        binding.rgIsTwin.check(if (data.isTwin == true) R.id.rb_is_twin_yes else R.id.rb_is_twin_no)
+        binding.rgIsCounselingReceived.check(if (data.isCounselingReceived == true) R.id.rb_is_counseling_received_yes else R.id.rb_is_counseling_received_no)
+        binding.tilCounselingType.isVisible = data.isCounselingReceived == true
+        binding.rgIsIronReceived.check(if (data.isIronTablesReceived == true) R.id.rb_is_iron_received_yes else R.id.rb_is_iron_received_no)
+        binding.rgIsIronTaken.check(if (data.isIronTablesTaken == true) R.id.rb_is_iron_taken_yes else R.id.rb_is_iron_taken_no)
+        binding.rgIsExposedToSmoke.check(if (data.isExposedToCigarettes == true) R.id.rb_is_exposed_to_smoke_yes else R.id.rb_is_exposed_to_smoke_no)
+        binding.rgIsMbgReceived.check(if (data.isReceivedMbg == true) R.id.rb_is_mbg_received_yes else R.id.rb_is_mbg_received_no)
+        binding.rgIsAsiExclusive.check(if (data.isAsiExclusive == true) R.id.rb_is_asi_exclusive_yes else R.id.rb_is_asi_exclusive_no)
+        binding.rgIsPostpartumComplication.check(if (data.isPostpartumComplication == true) R.id.rb_is_postpartum_complication_yes else R.id.rb_is_postpartum_complication_no)
+
+        binding.etBreastfeedingMotherStatus.setText(pregnantMotherStatusOptions.find { it.id == data.breastfeedingMotherStatusId }?.name ?: "", false)
+        binding.etCounselingType.setText(counselingTypeOptions.find { it.id == data.counselingTypeId }?.name ?: "", false)
+        binding.etDeliveryPlace.setText(deliveryPlaceOptions.find { it.id == data.deliveryPlaceId }?.name ?: "", false)
+        binding.etBirthAssistant.setText(birthAssistantOptions.find { it.id == data.birthAssistantId }?.name ?: "", false)
 //        binding.etContraceptionOption.setText(contraceptionOptions.find { it.id == data.contraceptionOptionId }?.name ?: "", false)
-//        binding.etFacilitatingReferralService.setText(data.facilitatingReferralServiceStatus ?: "", false)
-//        binding.etFacilitatingSocialAssistance.setText(data.facilitatingSocialAssistanceStatus ?: "", false)
-//
-//        updateChipGroupState(binding.chipGroupDiseaseHistory, data.diseaseHistory ?: emptyList(), listOf("Tidak Ada"))
-//        updateChipGroupState(binding.chipGroupDrinkingWater, data.mainSourceOfDrinkingWater ?: emptyList(), listOf("Lainnya"))
-//        updateChipGroupState(binding.chipGroupDefecationFacility, data.defecationFacility ?: emptyList(), listOf("Tidak ada", "Ya, lainnya"))
-//        updateChipGroupState(binding.chipGroupSocialAssistance, data.socialAssistanceFacilitationOptions ?: emptyList(), listOf("Lainnya"))
-//
-//        binding.etDrinkingWaterOther.setText(data.mainSourceOfDrinkingWaterOther)
-//        binding.etDefecationFacilityOther.setText(data.defecationFacilityOther)
-//        binding.etSocialAssistanceOther.setText(data.socialAssistanceFacilitationOptionsOther)
-//
-//        data.imagePath1?.let { binding.ivPreview1.tag = it; binding.ivPreview1.setImageURI(Uri.parse(it)) }
-//        data.imagePath2?.let { binding.ivPreview2.tag = it; binding.ivPreview2.setImageURI(Uri.parse(it)) }
-//        if (data.latitude != null && data.longitude != null) {
-//            binding.tvLocationResult.text = String.format(Locale.US, "Lat: %.6f, Long: %.6f", data.latitude, data.longitude)
-//        } else {
-//            binding.tvLocationResult.text = ""
-//        }
+        binding.etFacilitatingReferralService.setText(data.facilitatingReferralServiceStatus ?: "", false)
+        binding.etFacilitatingSocialAssistance.setText(data.facilitatingSocialAssistanceStatus ?: "", false)
+
+        updateChipGroupState(binding.chipGroupDrinkingWater, data.mainSourceOfDrinkingWater ?: emptyList(), listOf("Lainnya"))
+        updateChipGroupState(binding.chipGroupDefecationFacility, data.defecationFacility ?: emptyList(), listOf("Tidak ada", "Ya, lainnya"))
+        updateChipGroupState(binding.chipGroupSocialAssistance, data.socialAssistanceFacilitationOptions ?: emptyList(), listOf("Lainnya"))
+        updateChipGroupState(binding.chipGroupPostpartumComplication, data.postpartumComplication ?: emptyList(), listOf("Lainnya"))
+
+        binding.etDrinkingWaterOther.setText(data.mainSourceOfDrinkingWaterOther)
+        binding.etPostpartumComplicationOther.setText(data.postpartumComplicationOther)
+        binding.etDefecationFacilityOther.setText(data.defecationFacilityOther)
+        binding.etSocialAssistanceOther.setText(data.socialAssistanceFacilitationOptionsOther)
+        binding.etCounselingType.setText(counselingTypeOptions.find { it.id == data.counselingTypeId }?.name ?: "", false)
+        data.imagePath1?.let { binding.ivPreview1.tag = it; binding.ivPreview1.setImageURI(Uri.parse(it)) }
+        data.imagePath2?.let { binding.ivPreview2.tag = it; binding.ivPreview2.setImageURI(Uri.parse(it)) }
+        if (data.latitude != null && data.longitude != null) {
+            binding.tvLocationResult.text = String.format(Locale.US, "Lat: %.6f, Long: %.6f", data.latitude, data.longitude)
+        } else {
+            binding.tvLocationResult.text = ""
+        }
     }
 
     private fun saveUIToViewModel() {
@@ -276,13 +377,17 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
             isIronTablesTaken = binding.rgIsIronTaken.checkedRadioButtonId == R.id.rb_is_iron_taken_yes,
             nextVisitDate = binding.etNextVisitDate.text.toString().trim(),
             tpkNotes = binding.etTpkNotes.text.toString().trim(),
-            isAlive = binding.rgIsAlive.checkedRadioButtonId == R.id.rb_is_alive_yes,
             isReceivedMbg = binding.rgIsMbgReceived.checkedRadioButtonId == R.id.rb_is_mbg_received_yes,
             isAsiExclusive = binding.rgIsAsiExclusive.checkedRadioButtonId == R.id.rb_is_asi_exclusive_yes,
             counselingTypeId = counselingTypeOptions.find { it.name == binding.etCounselingType.text.toString() }?.id,
             deliveryPlaceId = deliveryPlaceOptions.find { it.name == binding.etDeliveryPlace.text.toString() }?.id,
             birthAssistantId = birthAssistantOptions.find { it.name == binding.etBirthAssistant.text.toString() }?.id,
-            contraceptionOptionId = contraceptionOptions.find { it.name == binding.etContraceptionOption.text.toString() }?.id,
+
+            onContraception = binding.rgOnContraception.checkedRadioButtonId == R.id.rb_on_contraception_yes,
+            contraceptionTypeId = findIdByName(contraceptionTypeOptions, binding.etContraceptionType.text.toString()),
+            contraceptionReasonForUse = binding.etContraceptionReasonForUse.text.toString(),
+            contraceptionRejectionReasonId = findIdByName(contraceptionRejectionReasonOptions, binding.etContraceptionRejectionReason.text.toString()),
+
             facilitatingReferralServiceStatus = binding.etFacilitatingReferralService.text.toString(),
             facilitatingSocialAssistanceStatus = binding.etFacilitatingSocialAssistance.text.toString(),
             mainSourceOfDrinkingWater = getSelectedChipTexts(binding.chipGroupDrinkingWater),
@@ -495,6 +600,9 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
             textInputLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear_text)
         }
     }
+
+    private fun findIdByName(options: List<LookupItem>, name: String): Int? = options.find { it.name == name }?.id
+
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -65,13 +65,38 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_last_birth_date"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="Tanggal Melahirkan"
+                    app:endIconDrawable="@drawable/ic_calendar"
+                    app:endIconMode="custom"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/til_visit_date">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_last_birth_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_breastfeeding_mother_status"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="Status Ibu Saat Ini"
-                    app:layout_constraintTop_toBottomOf="@id/til_visit_date"
+                    app:layout_constraintTop_toBottomOf="@id/til_last_birth_date"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
                     <AutoCompleteTextView
@@ -81,13 +106,32 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_mode_of_delivery"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Cara Persalinan"
+                    app:layout_constraintTop_toBottomOf="@id/til_breastfeeding_mother_status"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/et_mode_of_delivery"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <LinearLayout
                     android:id="@+id/layout_current_measures"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginTop="8dp"
-                    app:layout_constraintTop_toBottomOf="@id/til_breastfeeding_mother_status"
+                    app:layout_constraintTop_toBottomOf="@id/til_mode_of_delivery"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
                     <com.google.android.material.textfield.TextInputLayout
@@ -156,23 +200,155 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Label for the RadioGroup -->
+                <TextView
+                    android:id="@+id/tv_is_postpartum_complication_label"
+                    style="@style/FormLabel"
+                    android:text="Ada Komplikasi Nifas?"
+                    app:layout_constraintTop_toBottomOf="@id/til_birth_assistant"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <!-- The Yes/No RadioGroup -->
+                <RadioGroup
+                    android:id="@+id/rg_is_postpartum_complication"
+                    style="@style/FormRadioGroup"
+                    app:layout_constraintTop_toBottomOf="@id/tv_is_postpartum_complication_label"
+                    app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_is_postpartum_complication_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_is_postpartum_complication_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
+                <!-- The following views are hidden by default and will be shown by the Kotlin code -->
+
+                <!-- Label for the ChipGroup -->
+                <TextView
+                    android:id="@+id/tv_postpartum_complication_type_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Jenis Komplikasi Nifas (Pilih)"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_postpartum_complication"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:visibility="visible"/>
+
+                <!-- The ChipGroup for selecting specific complications -->
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_postpartum_complication"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/tv_postpartum_complication_type_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:visibility="visible"/>
+
+                <!-- The "Other" text field, which is also hidden -->
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_contraception_option"
+                    android:id="@+id/til_postpartum_complication_other"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Sebutkan Komplikasi Lainnya"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/chip_group_postpartum_complication"
+                    tools:visibility="visible">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_postpartum_complication_other"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <!-- Label for the main RadioGroup -->
+                <TextView
+                    android:id="@+id/tv_on_contraception_label"
+                    style="@style/FormLabel"
+                    android:text="Menggunakan Kontrasepsi?"
+                    app:layout_constraintTop_toBottomOf="@id/til_postpartum_complication_other"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <!-- The Main Yes/No RadioGroup -->
+                <RadioGroup
+                    android:id="@+id/rg_on_contraception"
+                    style="@style/FormRadioGroup"
+                    app:layout_constraintTop_toBottomOf="@id/tv_on_contraception_label"
+                    app:layout_constraintStart_toStartOf="parent">
+                    <RadioButton android:id="@+id/rb_on_contraception_yes" android:text="Ya" style="@style/FormRadioButton"/>
+                    <RadioButton android:id="@+id/rb_on_contraception_no" android:text="Tidak" style="@style/FormRadioButton"/>
+                </RadioGroup>
+
+                <!-- The following views are all hidden by default -->
+
+                <!-- Section for when the user selects "Ya" (Yes) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_contraception_type"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:hint="Metode KB Setelah Melahirkan"
-                    app:layout_constraintTop_toBottomOf="@id/til_birth_assistant"
+                    android:hint="Jenis Kontrasepsi"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/rg_on_contraception"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:visibility="visible">
                     <AutoCompleteTextView
-                        android:id="@+id/et_contraception_option"
+                        android:id="@+id/et_contraception_type"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_contraception_reason_for_use"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Alasan Menggunakan KB"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/til_contraception_type"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:visibility="visible">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_contraception_reason_for_use"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_contraception_rejection_reason"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Alasan Tidak Menggunakan KB"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rg_on_contraception"
+                    tools:visibility="visible">
+                    <AutoCompleteTextView
+                        android:id="@+id/et_contraception_rejection_reason"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/barrier_contraception"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="til_contraception_reason_for_use, til_contraception_rejection_reason" />
 
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -182,7 +358,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:hint="Status Fasilitasi Rujukan"
-                    app:layout_constraintTop_toBottomOf="@id/til_contraception_option"
+                    app:layout_constraintTop_toBottomOf="@id/barrier_contraception"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
                     <AutoCompleteTextView
@@ -225,14 +401,73 @@
                     <RadioButton android:id="@+id/rb_is_alive_no" android:text="Tidak" style="@style/FormRadioButton"/>
                 </RadioGroup>
 
-                <TextView android:id="@+id/tv_is_twin_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_alive" app:layout_constraintStart_toStartOf="parent" android:text="Hamil Kembar?"/>
-                <RadioGroup android:id="@+id/rg_is_twin" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_twin_label" app:layout_constraintStart_toStartOf="parent">
+                <TextView
+                    android:id="@+id/tv_is_twin_label"
+                    style="@style/FormLabel"
+                    android:text="Hamil Kembar?"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_alive"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <RadioGroup
+                    android:id="@+id/rg_is_twin"
+                    style="@style/FormRadioGroup"
+                    app:layout_constraintTop_toBottomOf="@id/tv_is_twin_label"
+                    app:layout_constraintStart_toStartOf="parent">
                     <RadioButton android:id="@+id/rb_is_twin_yes" android:text="Ya" style="@style/FormRadioButton"/>
                     <RadioButton android:id="@+id/rb_is_twin_no" android:text="Tidak" style="@style/FormRadioButton"/>
                 </RadioGroup>
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_baby_status_twin"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Status Bayi Kembar"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_twin"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:visibility="visible">
 
-                <TextView android:id="@+id/tv_is_counseling_received_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/rg_is_twin" app:layout_constraintStart_toStartOf="parent" android:text="Menerima Konseling?"/>
+                    <AutoCompleteTextView
+                        android:id="@+id/et_baby_status_twin"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_baby_status_singleton"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Status Bayi"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/rg_is_twin"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:visibility="visible">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/et_baby_status_singleton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/barrier_twin_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="rg_is_twin,til_baby_status_twin,til_baby_status_singleton" />
+
+
+                <TextView android:id="@+id/tv_is_counseling_received_label" style="@style/FormLabel" app:layout_constraintTop_toBottomOf="@id/barrier_twin_status" app:layout_constraintStart_toStartOf="parent" android:text="Menerima Konseling?"/>
                 <RadioGroup android:id="@+id/rg_is_counseling_received" style="@style/FormRadioGroup" app:layout_constraintTop_toBottomOf="@id/tv_is_counseling_received_label" app:layout_constraintStart_toStartOf="parent">
                     <RadioButton android:id="@+id/rb_is_counseling_received_yes" android:text="Ya" style="@style/FormRadioButton"/>
                     <RadioButton android:id="@+id/rb_is_counseling_received_no" android:text="Tidak" style="@style/FormRadioButton"/>

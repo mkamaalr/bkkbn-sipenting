@@ -25,18 +25,14 @@ data class BreastfeedingMotherVisitsEntity(
     val visitDate: String,
     val breastfeedingMotherStatusId: Int?,
     val lastBirthDate: String,
-    val deliveryPlaceId: Int?, // MOVED HERE
-    val birthAssistantId: Int?, // MOVED HERE
-    val contraceptionOptionId: Int?, // MOVED HERE
+    val deliveryPlaceId: Int?,
+    val birthAssistantId: Int?,
     val modeOfDelivery: String?,
     val isTwin: Boolean,
     val babyStatus: String?, // e.g., "Hidup", "Meninggal"
     val isPostpartumComplication: Boolean,
     val postpartumComplication: List<String>?,
     val postpartumComplicationOther: String?,
-    val onContraception: Boolean,
-    val contraceptionType: List<String>?,
-    val contraceptionOther: String?,
     val isExposedToCigarettes: Boolean,
     val mainSourceOfDrinkingWater: List<String>?,
     val mainSourceOfDrinkingWaterOther: String?,
@@ -53,12 +49,28 @@ data class BreastfeedingMotherVisitsEntity(
     val facilitatingReferralServiceStatus: String?,
     val facilitatingSocialAssistanceStatus: String?,
     val socialAssistanceFacilitationOptions: List<String>?,
-    val socialAssistanceFacilitationOptionsOther: String?, // ADDED
+    val socialAssistanceFacilitationOptionsOther: String?,
     val nextVisitDate: String?,
     val tpkNotes: String?,
     val imagePath1: String?,
     val imagePath2: String?,
     val latitude: Double?,
     val longitude: Double?,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+
+    // --- ADJUSTED CONTRACEPTION FIELDS ---
+
+    // This field corresponds to the main "Yes/No" radio button.
+    val onContraception: Boolean,
+
+    // If 'onContraception' is TRUE, this stores the ID of the selected contraception type (e.g., IUD, Pil).
+    // This was changed from List<String> to a single Int? to match the dropdown menu.
+    val contraceptionTypeId: Int?,
+
+    // If 'onContraception' is TRUE, this stores the selection from the reason dropdown
+    // (e.g., "Ingin Anak di Tunda", "Tidak Ingin Anak Lagi"). Stored as a String.
+    val contraceptionReasonForUse: String?,
+
+    // If 'onContraception' is FALSE, this stores the ID of the selected rejection reason.
+    val contraceptionRejectionReasonId: Int?
 )
