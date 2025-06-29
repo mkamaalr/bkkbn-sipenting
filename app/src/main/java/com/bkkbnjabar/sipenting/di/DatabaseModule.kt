@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.bkkbnjabar.sipenting.data.local.converter.ListStringConverter
 import com.bkkbnjabar.sipenting.data.local.dao.BreastfeedingMotherDao
+import com.bkkbnjabar.sipenting.data.local.dao.BreastfeedingMotherVisitsDao
 import com.bkkbnjabar.sipenting.data.local.dao.ChildDao
+import com.bkkbnjabar.sipenting.data.local.dao.ChildVisitsDao
 import com.bkkbnjabar.sipenting.data.local.dao.LookupDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherVisitsDao
@@ -82,5 +84,17 @@ object DatabaseModule {
     @Singleton
     fun providePregnantMotherVisitsDao(database: AppDatabase): PregnantMotherVisitsDao {
         return database.pregnantMotherVisitsDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBreastfeedingMotherVisitsDao(database: AppDatabase): BreastfeedingMotherVisitsDao {
+        return database.breastfeedingMotherVisitsDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideChildVisitsDao(database: AppDatabase): ChildVisitsDao {
+        return database.childVisitsDao()
     }
 }

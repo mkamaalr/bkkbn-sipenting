@@ -9,7 +9,7 @@ import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
 data class ChildVisitData(
     val localVisitId: Int? = null,
     val id: String? = null, // ADDED: To hold the server-side ID of the visit
-    val pregnantMotherLocalId: Int? = null,
+    val childLocalId: Int? = null,
     val visitDate: String? = null,
     val childNumber: Int? = null,
     val dateOfBirthLastChild: String? = null,

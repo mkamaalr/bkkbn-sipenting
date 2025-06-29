@@ -3,6 +3,8 @@ package com.bkkbnjabar.sipenting.di
 import android.content.Context
 import com.bkkbnjabar.sipenting.data.local.dao.BreastfeedingMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.BreastfeedingMotherVisitsDao
+import com.bkkbnjabar.sipenting.data.local.dao.ChildDao
+import com.bkkbnjabar.sipenting.data.local.dao.ChildVisitsDao
 import com.bkkbnjabar.sipenting.data.remote.AuthApiService
 import com.bkkbnjabar.sipenting.data.remote.LookupApiService
 import com.bkkbnjabar.sipenting.data.remote.PregnantMotherApiService
@@ -24,6 +26,8 @@ import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherVisitsDao
 import com.bkkbnjabar.sipenting.data.repository.BreastfeedingMotherRepository
 import com.bkkbnjabar.sipenting.data.repository.BreastfeedingMotherRepositoryImpl
+import com.bkkbnjabar.sipenting.data.repository.ChildRepository
+import com.bkkbnjabar.sipenting.data.repository.ChildRepositoryImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -76,5 +80,14 @@ object AppModule {
         breastfeedingMotherVisitsDao: BreastfeedingMotherVisitsDao
     ): BreastfeedingMotherRepository {
         return BreastfeedingMotherRepositoryImpl(breastfeedingMotherDao, breastfeedingMotherVisitsDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChildRepository(
+        childDao: ChildDao,
+        childVisitsDao: ChildVisitsDao
+    ): ChildRepository {
+        return ChildRepositoryImpl(childDao, childVisitsDao)
     }
 }

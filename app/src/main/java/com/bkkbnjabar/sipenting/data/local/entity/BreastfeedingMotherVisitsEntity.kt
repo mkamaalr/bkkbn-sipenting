@@ -23,6 +23,7 @@ data class BreastfeedingMotherVisitsEntity(
     val id: Int = 0,
     val breastfeedingMotherId: Int,
     val visitDate: String,
+    val breastfeedingMotherStatusId: Int?,
     val lastBirthDate: String,
     val deliveryPlaceId: Int?, // MOVED HERE
     val birthAssistantId: Int?, // MOVED HERE
@@ -31,8 +32,16 @@ data class BreastfeedingMotherVisitsEntity(
     val isTwin: Boolean,
     val babyStatus: String?, // e.g., "Hidup", "Meninggal"
     val isPostpartumComplication: Boolean,
+    val postpartumComplication: List<String>?,
+    val postpartumComplicationOther: String?,
     val onContraception: Boolean,
+    val contraceptionType: List<String>?,
+    val contraceptionOther: String?,
     val isExposedToCigarettes: Boolean,
+    val mainSourceOfDrinkingWater: List<String>?,
+    val mainSourceOfDrinkingWaterOther: String?,
+    val defecationFacility: List<String>?,
+    val defecationFacilityOther: String?,
     val isCounselingReceived: Boolean,
     val counselingTypeId: Int?,
     val isIronTablesReceived: Boolean,
@@ -42,6 +51,14 @@ data class BreastfeedingMotherVisitsEntity(
     val currentHeight: Double?,
     val currentWeight: Double?,
     val facilitatingReferralServiceStatus: String?,
+    val facilitatingSocialAssistanceStatus: String?,
+    val socialAssistanceFacilitationOptions: List<String>?,
+    val socialAssistanceFacilitationOptionsOther: String?, // ADDED
+    val nextVisitDate: String?,
     val tpkNotes: String?,
+    val imagePath1: String?,
+    val imagePath2: String?,
+    val latitude: Double?,
+    val longitude: Double?,
     val createdAt: Long = System.currentTimeMillis()
 )

@@ -15,7 +15,7 @@ class CreateChildVisitUseCaseImpl @Inject constructor(
 
     override suspend fun execute(data: ChildVisitData): Resource<Unit> {
         // Validate that the visit is linked to a mother.
-        if (data.pregnantMotherLocalId == null || data.pregnantMotherLocalId == 0) {
+        if (data.childLocalId == null || data.childLocalId == 0) {
             return Resource.Error("Data kunjungan tidak terhubung dengan data ibu.")
         }
 

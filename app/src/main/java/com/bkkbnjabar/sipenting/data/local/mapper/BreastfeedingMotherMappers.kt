@@ -31,34 +31,6 @@ fun BreastfeedingMotherRegistrationData.toEntity(): BreastfeedingMotherEntity {
     )
 }
 
-fun BreastfeedingMotherVisitData.toEntity(): BreastfeedingMotherVisitsEntity {
-    return BreastfeedingMotherVisitsEntity(
-        id = this.id ?: 0,
-        breastfeedingMotherId = this.breastfeedingMotherId ?: 0,
-        visitDate = this.visitDate ?: "",
-        lastBirthDate = this.lastBirthDate ?: "",
-        deliveryPlaceId = this.deliveryPlaceId,
-        birthAssistantId = this.birthAssistantId,
-        contraceptionOptionId = this.contraceptionOptionId,
-        modeOfDelivery = this.modeOfDelivery,
-        isTwin = this.isTwin ?: false,
-        babyStatus = this.babyStatus,
-        isPostpartumComplication = this.isPostpartumComplication ?: false,
-        onContraception = this.onContraception ?: false,
-        isExposedToCigarettes = this.isExposedToCigarettes ?: false,
-        isCounselingReceived = this.isCounselingReceived ?: false,
-        counselingTypeId = this.counselingTypeId,
-        isIronTablesReceived = this.isIronTablesReceived ?: false,
-        isIronTablesTaken = this.isIronTablesTaken ?: false,
-        isReceivedMbg = this.isReceivedMbg ?: false,
-        isAsiExclusive = this.isAsiExclusive ?: false,
-        currentHeight = this.currentHeight,
-        currentWeight = this.currentWeight,
-        facilitatingReferralServiceStatus = this.facilitatingReferralServiceStatus,
-        tpkNotes = this.tpkNotes
-    )
-}
-
 /**
  * ADDED: Converts a database entity object into a registration form data object.
  * This is useful when editing or adding a new visit to an existing mother.

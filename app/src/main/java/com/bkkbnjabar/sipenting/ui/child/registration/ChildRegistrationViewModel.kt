@@ -86,7 +86,7 @@ class ChildRegistrationViewModel @Inject constructor(
 
         if (visitEntity != null) {
             // Also use .first() to get the associated mother data.
-            val motherEntity = repository.getChildById(visitEntity.pregnantMotherLocalId).first()
+            val motherEntity = repository.getChildById(visitEntity.childLocalId).first()
 
             if (motherEntity != null) {
                 // Now that we have all data, update the LiveData once.
@@ -306,7 +306,7 @@ class ChildRegistrationViewModel @Inject constructor(
         _currentChild.value = child.toRegistrationData()
 
         // Clear only the visit data, but crucially link it to the mother
-        _currentChildVisit.value = ChildVisitData(pregnantMotherLocalId = child.localId)
+        _currentChildVisit.value = ChildVisitData(childLocalId = child.localId)
         _saveResult.value = Resource.Idle
     }
 
@@ -334,7 +334,7 @@ class ChildRegistrationViewModel @Inject constructor(
                 is Resource.Success -> {
                     val newMotherId = motherResult.data
                     if (newMotherId != null) {
-                        val finalVisitData = visitData.copy(pregnantMotherLocalId = newMotherId.toInt())
+                        val finalVisitData = visitData.copy(childLocalId = newMotherId.toInt())
                         val visitResult = createChildVisitUseCase.execute(finalVisitData)
                         _saveResult.value = visitResult
                     } else {

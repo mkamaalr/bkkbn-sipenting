@@ -193,20 +193,9 @@ class BreastfeedingMotherRegistrationViewModel @Inject constructor(
 
     fun updateBreastfeedingMotherVisitData(
         visitDate: String? = null,
-        childNumber: Int? = null,
-        dateOfBirthLastChild: String? = null,
-        pregnancyWeekAge: Int? = null,
-        weightTrimester1: Double? = null,
         currentHeight: Double? = null,
         currentWeight: Double? = null,
-        isHbChecked: Boolean? = null,
-        hemoglobinLevel: Double? = null,
-        hemoglobinLevelReason: String? = null, // ADDED
-        upperArmCircumference: Double? = null,
         isTwin: Boolean? = null,
-        numberOfTwins: Int? = null,
-        isEstimatedFetalWeightChecked: Boolean? = null,
-        tbj: Double? = null, // ADDED
         isExposedToCigarettes: Boolean? = null,
         isCounselingReceived: Boolean? = null,
         counselingTypeId: Int? = null,
@@ -217,13 +206,10 @@ class BreastfeedingMotherRegistrationViewModel @Inject constructor(
         nextVisitDate: String? = null,
         tpkNotes: String? = null,
         isAlive: Boolean? = null,
-        isGivenBirth: Boolean? = null,
-        givenBirthStatusId: Int? = null,
-        pregnantMotherStatusId: Int? = null,
+        breastfeedingMotherStatusId: Int? = null,
         deliveryPlaceId: Int? = null,
         birthAssistantId: Int? = null,
         contraceptionOptionId: Int? = null,
-        diseaseHistory: List<String>? = null,
         mainSourceOfDrinkingWater: List<String>? = null,
         mainSourceOfDrinkingWaterOther: String? = null,
         defecationFacility: List<String>? = null,
@@ -235,56 +221,40 @@ class BreastfeedingMotherRegistrationViewModel @Inject constructor(
         latitude: Double? = null,
         longitude: Double? = null,
         isReceivedMbg: Boolean? = null,
-        isTfuMeasured: Boolean? = null,
-        tfu: Double? = null
+        isAsiExclusive: Boolean? = null,
     ) {
         val currentData = _currentBreastFeedingMotherVisit.value ?: BreastfeedingMotherVisitData()
         val updatedData = currentData.copy(
             visitDate = visitDate ?: currentData.visitDate,
-//            childNumber = childNumber ?: currentData.childNumber,
-//            dateOfBirthLastChild = dateOfBirthLastChild ?: currentData.dateOfBirthLastChild,
-//            pregnancyWeekAge = pregnancyWeekAge ?: currentData.pregnancyWeekAge,
-//            weightTrimester1 = weightTrimester1 ?: currentData.weightTrimester1,
             currentHeight = currentHeight ?: currentData.currentHeight,
             currentWeight = currentWeight ?: currentData.currentWeight,
-//            isHbChecked = isHbChecked ?: currentData.isHbChecked,
-//            hemoglobinLevel = hemoglobinLevel ?: currentData.hemoglobinLevel,
-//            hemoglobinLevelReason = hemoglobinLevelReason ?: currentData.hemoglobinLevelReason, // ADDED
-//            upperArmCircumference = upperArmCircumference ?: currentData.upperArmCircumference,
             isTwin = isTwin ?: currentData.isTwin,
-//            numberOfTwins = numberOfTwins ?: currentData.numberOfTwins,
-//            isEstimatedFetalWeightChecked = isEstimatedFetalWeightChecked ?: currentData.isEstimatedFetalWeightChecked,
-//            tbj = tbj ?: currentData.tbj, // ADDED
             isExposedToCigarettes = isExposedToCigarettes ?: currentData.isExposedToCigarettes,
             isCounselingReceived = isCounselingReceived ?: currentData.isCounselingReceived,
             counselingTypeId = counselingTypeId ?: currentData.counselingTypeId,
             isIronTablesReceived = isIronTablesReceived ?: currentData.isIronTablesReceived,
             isIronTablesTaken = isIronTablesTaken ?: currentData.isIronTablesTaken,
             facilitatingReferralServiceStatus = facilitatingReferralServiceStatus ?: currentData.facilitatingReferralServiceStatus,
-//            facilitatingSocialAssistanceStatus = facilitatingSocialAssistanceStatus ?: currentData.facilitatingSocialAssistanceStatus,
-//            nextVisitDate = nextVisitDate ?: currentData.nextVisitDate,
+            facilitatingSocialAssistanceStatus = facilitatingSocialAssistanceStatus ?: currentData.facilitatingSocialAssistanceStatus,
+            nextVisitDate = nextVisitDate ?: currentData.nextVisitDate,
             tpkNotes = tpkNotes ?: currentData.tpkNotes,
-//            isAlive = isAlive ?: currentData.isAlive,
-//            isGivenBirth = isGivenBirth ?: currentData.isGivenBirth,
-//            givenBirthStatusId = givenBirthStatusId ?: currentData.givenBirthStatusId,
-//            pregnantMotherStatusId = pregnantMotherStatusId ?: currentData.pregnantMotherStatusId,
+            isAlive = isAlive ?: currentData.isAlive,
             deliveryPlaceId = deliveryPlaceId ?: currentData.deliveryPlaceId,
             birthAssistantId = birthAssistantId ?: currentData.birthAssistantId,
             contraceptionOptionId = contraceptionOptionId ?: currentData.contraceptionOptionId,
-//            diseaseHistory = diseaseHistory ?: currentData.diseaseHistory,
-//            mainSourceOfDrinkingWater = mainSourceOfDrinkingWater ?: currentData.mainSourceOfDrinkingWater,
-//            mainSourceOfDrinkingWaterOther = mainSourceOfDrinkingWaterOther ?: currentData.mainSourceOfDrinkingWaterOther,
-//            defecationFacility = defecationFacility ?: currentData.defecationFacility,
-//            defecationFacilityOther = defecationFacilityOther ?: currentData.defecationFacilityOther,
-//            socialAssistanceFacilitationOptions = socialAssistanceFacilitationOptions ?: currentData.socialAssistanceFacilitationOptions,
-//            socialAssistanceFacilitationOptionsOther = socialAssistanceFacilitationOptionsOther ?: currentData.socialAssistanceFacilitationOptionsOther,
-//            imagePath1 = imagePath1 ?: currentData.imagePath1,
-//            imagePath2 = imagePath2 ?: currentData.imagePath2,
-//            latitude = latitude ?: currentData.latitude,
-//            longitude = longitude ?: currentData.longitude,
+            mainSourceOfDrinkingWater = mainSourceOfDrinkingWater ?: currentData.mainSourceOfDrinkingWater,
+            mainSourceOfDrinkingWaterOther = mainSourceOfDrinkingWaterOther ?: currentData.mainSourceOfDrinkingWaterOther,
+            defecationFacility = defecationFacility ?: currentData.defecationFacility,
+            defecationFacilityOther = defecationFacilityOther ?: currentData.defecationFacilityOther,
+            socialAssistanceFacilitationOptions = socialAssistanceFacilitationOptions ?: currentData.socialAssistanceFacilitationOptions,
+            socialAssistanceFacilitationOptionsOther = socialAssistanceFacilitationOptionsOther ?: currentData.socialAssistanceFacilitationOptionsOther,
+            imagePath1 = imagePath1 ?: currentData.imagePath1,
+            imagePath2 = imagePath2 ?: currentData.imagePath2,
+            latitude = latitude ?: currentData.latitude,
+            longitude = longitude ?: currentData.longitude,
             isReceivedMbg = isReceivedMbg ?: currentData.isReceivedMbg,
-//            isTfuMeasured = isTfuMeasured ?: currentData.isTfuMeasured,
-//            tfu = tfu ?: currentData.tfu
+            breastfeedingMotherStatusId = breastfeedingMotherStatusId ?: currentData.breastfeedingMotherStatusId,
+            isAsiExclusive = isAsiExclusive ?: currentData.isAsiExclusive,
         )
         _currentBreastFeedingMotherVisit.value = updatedData
     }
@@ -349,7 +319,6 @@ class BreastfeedingMotherRegistrationViewModel @Inject constructor(
 
     fun updateChipGroupData(chipGroupId: Int, newSelection: List<String>) {
         when (chipGroupId) {
-            R.id.chip_group_disease_history -> updateBreastfeedingMotherVisitData(diseaseHistory = newSelection)
             R.id.chip_group_drinking_water -> updateBreastfeedingMotherVisitData(mainSourceOfDrinkingWater = newSelection)
             R.id.chip_group_defecation_facility -> updateBreastfeedingMotherVisitData(defecationFacility = newSelection)
             R.id.chip_group_social_assistance -> updateBreastfeedingMotherVisitData(socialAssistanceFacilitationOptions = newSelection)

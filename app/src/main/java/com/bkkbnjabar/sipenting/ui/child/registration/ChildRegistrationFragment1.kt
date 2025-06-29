@@ -51,7 +51,7 @@ class ChildRegistrationFragment1 : Fragment() {
 //            if (validateForm()) {
                 // If it is, then save the data and navigate
                 saveUIToViewModel()
-                findNavController().navigate(R.id.action_pregnantMotherRegistrationFragment1_to_pregnantMotherRegistrationFragment2)
+                findNavController().navigate(R.id.action_childRegistrationFragment1_to_childRegistrationFragment2)
 //            }
         }
 

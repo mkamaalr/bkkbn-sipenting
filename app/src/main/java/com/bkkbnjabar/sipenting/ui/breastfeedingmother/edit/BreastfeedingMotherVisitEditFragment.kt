@@ -20,7 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bkkbnjabar.sipenting.R
 import com.bkkbnjabar.sipenting.data.model.breastfeedingmother.BreastfeedingMotherVisitData
-import com.bkkbnjabar.sipenting.databinding.FragmentPregnantMotherVisitEditBinding
+import com.bkkbnjabar.sipenting.databinding.FragmentBreastfeedingMotherVisitEditBinding
 import com.bkkbnjabar.sipenting.domain.model.LookupItem
 import com.bkkbnjabar.sipenting.ui.breastfeedingmother.registration.BreastfeedingMotherRegistrationViewModel
 import com.bkkbnjabar.sipenting.utils.Resource
@@ -38,7 +38,7 @@ import java.util.*
 @AndroidEntryPoint
 class BreastfeedingMotherVisitEditFragment : Fragment() {
 
-    private var _binding: FragmentPregnantMotherVisitEditBinding? = null
+    private var _binding: FragmentBreastfeedingMotherVisitEditBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: BreastfeedingMotherRegistrationViewModel by activityViewModels()
@@ -89,7 +89,7 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentPregnantMotherVisitEditBinding.inflate(inflater, container, false)
+        _binding = FragmentBreastfeedingMotherVisitEditBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -106,44 +106,6 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
             saveUIToViewModel()
             viewModel.saveAllData()
         }
-        binding.rgIsHbChecked.setOnCheckedChangeListener { _, checkedId ->
-            val isChecked = (checkedId == R.id.rb_hb_checked_yes)
-            binding.tilHb.isVisible = isChecked
-            binding.tilHbReason.isVisible = !isChecked
-            if (!isChecked) binding.etHb.text?.clear()
-            if (isChecked) binding.etHbReason.text?.clear()
-        }
-        binding.rgIsTwin.setOnCheckedChangeListener { _, checkedId ->
-            binding.tilNumberOfTwins.isVisible = (checkedId == R.id.rb_is_twin_yes)
-            if (checkedId != R.id.rb_is_twin_yes) binding.etNumberOfTwins.text?.clear()
-        }
-        binding.rgIsTbjChecked.setOnCheckedChangeListener { _, checkedId ->
-            binding.tilTbj.isVisible = (checkedId == R.id.rb_is_tbj_checked_yes)
-            if (checkedId != R.id.rb_is_tbj_checked_yes) binding.etTbj.text?.clear()
-        }
-        binding.rgTfuStatus.setOnCheckedChangeListener { _, checkedId ->
-            binding.tilTfu.isVisible = (checkedId == R.id.rb_tfu_diukur)
-            if (checkedId != R.id.rb_tfu_diukur) binding.etTfu.text?.clear()
-        }
-        binding.rgIsGivenBirth.setOnCheckedChangeListener { _, checkedId ->
-            val isGivenBirth = (checkedId == R.id.rb_is_given_birth_yes)
-            binding.tilGivenBirthStatus.isVisible = isGivenBirth
-            if (!isGivenBirth) {
-                binding.etGivenBirthStatus.setText("", false)
-            }
-        }
-        binding.etPregnancyWeek.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                val week = binding.etPregnancyWeek.text.toString().toIntOrNull() ?: 0
-                val isTfuEligible = week >= 20
-                binding.tvTfuLabel.isVisible = isTfuEligible
-                binding.rgTfuStatus.isVisible = isTfuEligible
-                if (!isTfuEligible) {
-                    binding.rgTfuStatus.clearCheck()
-                    binding.tilTfu.isVisible = false
-                }
-            }
-        }
 
         binding.rgIsCounselingReceived.setOnCheckedChangeListener { _, checkedId ->
             val isChecked = (checkedId == R.id.rb_is_counseling_received_yes)
@@ -159,7 +121,6 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
         binding.btnGetLocation.setOnClickListener { handleLocationCapture() }
 
         setupDateField(binding.tilVisitDate, binding.etVisitDate)
-        setupDateField(binding.tilDateOfBirthLastChild, binding.etDateOfBirthLastChild)
         setupDateField(binding.tilNextVisitDate, binding.etNextVisitDate)
     }
 
@@ -181,11 +142,7 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
 
         viewModel.pregnantMotherStatuses.observe(viewLifecycleOwner) {
             pregnantMotherStatusOptions = it ?: emptyList()
-            binding.etPregnantMotherStatus.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, pregnantMotherStatusOptions.map { it.name }))
-        }
-        viewModel.givenBirthStatuses.observe(viewLifecycleOwner) {
-            givenBirthStatusOptions = it ?: emptyList()
-            binding.etGivenBirthStatus.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, givenBirthStatusOptions.map { it.name }))
+            binding.etBreastfeedingMotherStatus.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, pregnantMotherStatusOptions.map { it.name }))
         }
         viewModel.counselingTypes.observe(viewLifecycleOwner) {
             counselingTypeOptions = it ?: emptyList()
@@ -212,10 +169,6 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
             binding.etFacilitatingSocialAssistance.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, socialAssistanceStatusOptions))
         }
 
-        viewModel.diseaseHistories.observe(viewLifecycleOwner) {
-            diseaseHistoryOptions = it ?: emptyList()
-            setupDynamicChips(binding.chipGroupDiseaseHistory, diseaseHistoryOptions, listOf("Tidak Ada"), "", null)
-        }
         viewModel.mainSourcesOfDrinkingWater.observe(viewLifecycleOwner) {
             drinkingWaterOptions = it ?: emptyList()
             setupDynamicChips(binding.chipGroupDrinkingWater, drinkingWaterOptions, listOf("Lainnya"), "Lainnya", binding.tilDrinkingWaterOther)
@@ -270,7 +223,7 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
 //        binding.rgIsExposedToSmoke.check(if (data.isExposedToCigarettes == true) R.id.rb_is_exposed_to_smoke_yes else R.id.rb_is_exposed_to_smoke_no)
 //        binding.rgIsMbgReceived.check(if (data.isReceivedMbg == true) R.id.rb_is_mbg_received_yes else R.id.rb_is_mbg_received_no)
 //        binding.rgTfuStatus.check(if (data.isTfuMeasured == true) R.id.rb_tfu_diukur else R.id.rb_tfu_tidak_diukur)
-//        binding.etPregnantMotherStatus.setText(pregnantMotherStatusOptions.find { it.id == data.pregnantMotherStatusId }?.name ?: "", false)
+//        binding.etBreastfeedingMotherStatus.setText(pregnantMotherStatusOptions.find { it.id == data.pregnantMotherStatusId }?.name ?: "", false)
 //        binding.tilGivenBirthStatus.isVisible = (data.isGivenBirth == true)
 //        binding.etGivenBirthStatus.setText(givenBirthStatusOptions.find { it.id == data.givenBirthStatusId }?.name ?: "", false)
 //        binding.etCounselingType.setText(counselingTypeOptions.find { it.id == data.counselingTypeId }?.name ?: "", false)
@@ -314,20 +267,9 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
 
         viewModel.updateBreastfeedingMotherVisitData(
             visitDate = binding.etVisitDate.text.toString().trim(),
-            childNumber = binding.etChildNumber.text.toString().toIntOrNull(),
-            dateOfBirthLastChild = binding.etDateOfBirthLastChild.text.toString().trim(),
-            pregnancyWeekAge = binding.etPregnancyWeek.text.toString().toIntOrNull(),
-            weightTrimester1 = binding.etWeightTrimester1.text.toString().toDoubleOrNull(),
             currentHeight = binding.etCurrentHeight.text.toString().toDoubleOrNull(),
             currentWeight = binding.etCurrentWeight.text.toString().toDoubleOrNull(),
-            isHbChecked = binding.rgIsHbChecked.checkedRadioButtonId == R.id.rb_hb_checked_yes,
-            hemoglobinLevel = binding.etHb.text.toString().toDoubleOrNull(),
-            hemoglobinLevelReason = binding.etHbReason.text.toString().trim(),
-            upperArmCircumference = binding.etLila.text.toString().toDoubleOrNull(),
             isTwin = binding.rgIsTwin.checkedRadioButtonId == R.id.rb_is_twin_yes,
-            numberOfTwins = binding.etNumberOfTwins.text.toString().toIntOrNull(),
-            isEstimatedFetalWeightChecked = binding.rgIsTbjChecked.checkedRadioButtonId == R.id.rb_is_tbj_checked_yes,
-            tbj = binding.etTbj.text.toString().toDoubleOrNull(),
             isExposedToCigarettes = binding.rgIsExposedToSmoke.checkedRadioButtonId == R.id.rb_is_exposed_to_smoke_yes,
             isCounselingReceived = binding.rgIsCounselingReceived.checkedRadioButtonId == R.id.rb_is_counseling_received_yes,
             isIronTablesReceived = binding.rgIsIronReceived.checkedRadioButtonId == R.id.rb_is_iron_received_yes,
@@ -335,19 +277,14 @@ class BreastfeedingMotherVisitEditFragment : Fragment() {
             nextVisitDate = binding.etNextVisitDate.text.toString().trim(),
             tpkNotes = binding.etTpkNotes.text.toString().trim(),
             isAlive = binding.rgIsAlive.checkedRadioButtonId == R.id.rb_is_alive_yes,
-            isGivenBirth = binding.rgIsGivenBirth.checkedRadioButtonId == R.id.rb_is_given_birth_yes,
-            tfu = binding.etTfu.text.toString().toDoubleOrNull(),
             isReceivedMbg = binding.rgIsMbgReceived.checkedRadioButtonId == R.id.rb_is_mbg_received_yes,
-            isTfuMeasured = binding.rgTfuStatus.checkedRadioButtonId == R.id.rb_tfu_diukur,
-            pregnantMotherStatusId = pregnantMotherStatusOptions.find { it.name == binding.etPregnantMotherStatus.text.toString() }?.id,
-            givenBirthStatusId = givenBirthStatusOptions.find { it.name == binding.etGivenBirthStatus.text.toString() }?.id,
+            isAsiExclusive = binding.rgIsAsiExclusive.checkedRadioButtonId == R.id.rb_is_asi_exclusive_yes,
             counselingTypeId = counselingTypeOptions.find { it.name == binding.etCounselingType.text.toString() }?.id,
             deliveryPlaceId = deliveryPlaceOptions.find { it.name == binding.etDeliveryPlace.text.toString() }?.id,
             birthAssistantId = birthAssistantOptions.find { it.name == binding.etBirthAssistant.text.toString() }?.id,
             contraceptionOptionId = contraceptionOptions.find { it.name == binding.etContraceptionOption.text.toString() }?.id,
             facilitatingReferralServiceStatus = binding.etFacilitatingReferralService.text.toString(),
             facilitatingSocialAssistanceStatus = binding.etFacilitatingSocialAssistance.text.toString(),
-            diseaseHistory = getSelectedChipTexts(binding.chipGroupDiseaseHistory),
             mainSourceOfDrinkingWater = getSelectedChipTexts(binding.chipGroupDrinkingWater),
             mainSourceOfDrinkingWaterOther = binding.etDrinkingWaterOther.text.toString().trim(),
             defecationFacility = getSelectedChipTexts(binding.chipGroupDefecationFacility),

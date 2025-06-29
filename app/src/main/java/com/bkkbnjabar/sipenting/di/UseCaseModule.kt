@@ -7,6 +7,16 @@ import com.bkkbnjabar.sipenting.domain.usecase.auth.ValidateTokenUseCase
 import com.bkkbnjabar.sipenting.domain.usecase.auth.ValidateTokenUseCaseImpl
 import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.CreateBreastfeedingMotherUseCase
 import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.CreateBreastfeedingMotherUseCaseImpl
+import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.CreateBreastfeedingMotherVisitUseCase
+import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.CreateBreastfeedingMotherVisitUseCaseImpl
+import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.UpdateBreastfeedingMotherVisitUseCase
+import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.UpdateBreastfeedingMotherVisitUseCaseImpl
+import com.bkkbnjabar.sipenting.domain.usecase.child.CreateChildUseCase
+import com.bkkbnjabar.sipenting.domain.usecase.child.CreateChildUseCaseImpl
+import com.bkkbnjabar.sipenting.domain.usecase.child.CreateChildVisitUseCase
+import com.bkkbnjabar.sipenting.domain.usecase.child.CreateChildVisitUseCaseImpl
+import com.bkkbnjabar.sipenting.domain.usecase.child.UpdateChildVisitUseCase
+import com.bkkbnjabar.sipenting.domain.usecase.child.UpdateChildVisitUseCaseImpl
 import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMotherUseCase
 import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMotherUseCaseImpl
 import com.bkkbnjabar.sipenting.domain.usecase.pregnantmother.CreatePregnantMotherVisitUseCase
@@ -58,4 +68,29 @@ abstract class UseCaseModule {
     abstract fun bindCreateBreastfeedingMotherUseCase(
         useCaseImpl: CreateBreastfeedingMotherUseCaseImpl
     ): CreateBreastfeedingMotherUseCase
+
+    @Binds
+    abstract fun bindCreateBreastfeedingMotherVisitUseCase(
+        createBreastfeedingMotherVisitUseCaseImpl: CreateBreastfeedingMotherVisitUseCaseImpl
+    ): CreateBreastfeedingMotherVisitUseCase
+
+    @Binds
+    abstract fun bindUpdateBreastfeedingMotherVisitUseCase(
+        updateBreastfeedingMotherVisitUseCaseImpl: UpdateBreastfeedingMotherVisitUseCaseImpl
+    ): UpdateBreastfeedingMotherVisitUseCase
+
+    @Binds
+    abstract fun bindCreateChildUseCase(
+        createChildUseCaseImpl: CreateChildUseCaseImpl
+    ): CreateChildUseCase
+
+    @Binds
+    abstract fun bindUpdateChildVisitUseCase(
+        updateChildVisitUseCaseImpl: UpdateChildVisitUseCaseImpl
+    ): UpdateChildVisitUseCase
+
+    @Binds
+    abstract fun bindCreateChildVisitUseCase(
+        createChildVisitUseCaseImpl: CreateChildVisitUseCaseImpl
+    ): CreateChildVisitUseCase
 }

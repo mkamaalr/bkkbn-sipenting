@@ -22,7 +22,7 @@ data class ChildVisitsEntity(
     @PrimaryKey(autoGenerate = true)
     val localVisitId: Int = 0,
     val id: String? = null,
-    val pregnantMotherLocalId: Int,
+    val childLocalId: Int,
     val visitDate: String,
     val childNumber: Int?,
     val dateOfBirthLastChild: String?,

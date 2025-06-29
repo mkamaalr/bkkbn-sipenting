@@ -41,11 +41,10 @@ interface BreastfeedingMotherDao {
     @Query("""
         SELECT 
             pm.*,
-            (SELECT pmv.pregnantMotherStatusId FROM pregnant_mother_visits pmv WHERE pmv.pregnantMotherLocalId = pm.localId ORDER BY pmv.createdAt DESC LIMIT 1) as pregnantMotherStatusId,
-            (SELECT pmv.nextVisitDate FROM pregnant_mother_visits pmv WHERE pmv.pregnantMotherLocalId = pm.localId ORDER BY pmv.createdAt DESC LIMIT 1) as nextVisitDate,
-            (SELECT pmv.pregnancyWeekAge FROM pregnant_mother_visits pmv WHERE pmv.pregnantMotherLocalId = pm.localId ORDER BY pmv.createdAt DESC LIMIT 1) as pregnancyWeekAge
+            (SELECT pmv.breastfeedingMotherStatusId FROM breastfeeding_mother_visits pmv WHERE pmv.breastfeedingMotherId = pm.localId ORDER BY pmv.createdAt DESC LIMIT 1) as breastfeedingMotherStatusId,
+            (SELECT pmv.nextVisitDate FROM breastfeeding_mother_visits pmv WHERE pmv.breastfeedingMotherId = pm.localId ORDER BY pmv.createdAt DESC LIMIT 1) as nextVisitDate
         FROM 
-            pregnant_mother pm 
+            breastfeeding_mother pm 
         ORDER BY 
             pm.createdAt DESC
     """)

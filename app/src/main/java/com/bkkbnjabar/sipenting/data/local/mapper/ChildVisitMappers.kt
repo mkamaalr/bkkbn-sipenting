@@ -7,7 +7,7 @@ fun ChildVisitData.toEntity(): ChildVisitsEntity {
     return ChildVisitsEntity(
         localVisitId = this.localVisitId ?: 0,
         id = this.id,
-        pregnantMotherLocalId = this.pregnantMotherLocalId ?: 0,
+        childLocalId = this.childLocalId ?: 0,
         visitDate = this.visitDate ?: "",
         childNumber = this.childNumber,
         dateOfBirthLastChild = this.dateOfBirthLastChild,
@@ -60,7 +60,7 @@ fun ChildVisitsEntity.toData(): ChildVisitData {
     return ChildVisitData(
         localVisitId = this.localVisitId,
         id = this.id,
-        pregnantMotherLocalId = this.pregnantMotherLocalId,
+        childLocalId = this.childLocalId,
         visitDate = this.visitDate,
         childNumber = this.childNumber,
         dateOfBirthLastChild = this.dateOfBirthLastChild,
