@@ -72,5 +72,5 @@ data class BreastfeedingMotherVisitsEntity(
     val contraceptionReasonForUse: String?,
 
     // If 'onContraception' is FALSE, this stores the ID of the selected rejection reason.
-    val contraceptionRejectionReasonId: Int?
+    val contraceptionRTypeId: Int?
 )

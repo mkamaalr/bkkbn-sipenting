@@ -51,7 +51,7 @@ fun BreastfeedingMotherVisitsEntity.toData(): BreastfeedingMotherVisitData {
         onContraception = this.onContraception,
         contraceptionTypeId = this.contraceptionTypeId,
         contraceptionReasonForUse = this.contraceptionReasonForUse,
-        contraceptionRejectionReasonId = this.contraceptionRejectionReasonId
+        contraceptionRejectionReasonId = this.contraceptionRTypeId
     )
 }
 
@@ -103,6 +103,6 @@ fun BreastfeedingMotherVisitData.toEntity(): BreastfeedingMotherVisitsEntity {
         onContraception = this.onContraception ?: false,
         contraceptionTypeId = this.contraceptionTypeId,
         contraceptionReasonForUse = this.contraceptionReasonForUse,
-        contraceptionRejectionReasonId = this.contraceptionRejectionReasonId
+        contraceptionRTypeId = this.contraceptionRejectionReasonId
     )
 }

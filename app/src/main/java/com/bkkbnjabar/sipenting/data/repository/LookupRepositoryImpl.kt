@@ -109,7 +109,8 @@ class LookupRepositoryImpl @Inject constructor(
             LookupItemEntity(
                 serverId = dto.id,
                 name = dto.name,
-                type = type // Assign the correct type here
+                type = type, // Assign the correct type here
+                isRisky = dto.isRisky
             )
         }
         lookupDao.insertLookupItems(entities)

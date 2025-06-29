@@ -5,12 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherVisitsEntity
+import com.bkkbnjabar.sipenting.data.local.entity.BreastfeedingMotherVisitsEntity
 import com.bkkbnjabar.sipenting.databinding.ItemVisitHistoryBinding
 
 class BreastfeedingMotherVisitHistoryAdapter(
-    private val onItemClick: (PregnantMotherVisitsEntity) -> Unit
-) : ListAdapter<PregnantMotherVisitsEntity, BreastfeedingMotherVisitHistoryAdapter.VisitViewHolder>(DiffCallback()) {
+    private val onItemClick: (BreastfeedingMotherVisitsEntity) -> Unit
+) : ListAdapter<BreastfeedingMotherVisitsEntity, BreastfeedingMotherVisitHistoryAdapter.VisitViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VisitViewHolder {
         val binding = ItemVisitHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -29,19 +29,19 @@ class BreastfeedingMotherVisitHistoryAdapter(
 
     class VisitViewHolder(private val binding: ItemVisitHistoryBinding) : RecyclerView.ViewHolder(binding.root) {
         // Updated bind function to accept the visit number
-        fun bind(visit: PregnantMotherVisitsEntity, visitNumber: Int) {
+        fun bind(visit: BreastfeedingMotherVisitsEntity, visitNumber: Int) {
             binding.tvVisitTitle.text = "Kunjungan ke-${visitNumber}"
             binding.tvVisitDate.text = visit.visitDate
-            val summary = "Usia Hamil: ${visit.pregnancyWeekAge ?: '-'} mg, BB: ${visit.currentWeight ?: '-'} kg"
+            val summary = ""
             binding.tvVisitSummary.text = summary
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<PregnantMotherVisitsEntity>() {
-        override fun areItemsTheSame(oldItem: PregnantMotherVisitsEntity, newItem: PregnantMotherVisitsEntity) =
+    class DiffCallback : DiffUtil.ItemCallback<BreastfeedingMotherVisitsEntity>() {
+        override fun areItemsTheSame(oldItem: BreastfeedingMotherVisitsEntity, newItem: BreastfeedingMotherVisitsEntity) =
             oldItem.localVisitId == newItem.localVisitId
 
-        override fun areContentsTheSame(oldItem: PregnantMotherVisitsEntity, newItem: PregnantMotherVisitsEntity) =
+        override fun areContentsTheSame(oldItem: BreastfeedingMotherVisitsEntity, newItem: BreastfeedingMotherVisitsEntity) =
             oldItem == newItem
     }
 }

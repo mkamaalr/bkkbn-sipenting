@@ -7,7 +7,6 @@ import com.bkkbnjabar.sipenting.data.local.mapper.toData
 import com.bkkbnjabar.sipenting.data.local.mapper.toRegistrationData
 import com.bkkbnjabar.sipenting.data.model.breastfeedingmother.BreastfeedingMotherRegistrationData
 import com.bkkbnjabar.sipenting.data.model.breastfeedingmother.BreastfeedingMotherVisitData
-import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherRegistrationData
 import com.bkkbnjabar.sipenting.data.repository.BreastfeedingMotherRepository
 import com.bkkbnjabar.sipenting.data.repository.LookupRepository
 import com.bkkbnjabar.sipenting.domain.model.LocationDetails

@@ -18,5 +18,7 @@ data class LookupItemEntity(
     val id: Int = 0,
     val serverId: Int?, // ID asli dari server, jika ada
     val name: String,
-    val type: String // Kunci untuk membedakan jenis lookup
+    val type: String, // Kunci untuk membedakan jenis lookup
+    val isRisky: Boolean? = false // Tambahkan kolom ini jika diperlukan // "Beresiko", "Tidak Beresiko", "Ideal"
+
 )

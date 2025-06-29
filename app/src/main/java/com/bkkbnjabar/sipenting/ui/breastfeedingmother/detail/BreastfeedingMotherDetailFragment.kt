@@ -10,41 +10,40 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.core.view.isVisible
 import com.bkkbnjabar.sipenting.R
-import com.bkkbnjabar.sipenting.databinding.FragmentPregnantMotherDetailBinding
+import com.bkkbnjabar.sipenting.databinding.FragmentBreastfeedingMotherDetailBinding
 import com.bkkbnjabar.sipenting.domain.model.InterpretationResult
-import com.bkkbnjabar.sipenting.ui.pregnantmother.registration.PregnantMotherRegistrationViewModel
-
+import com.bkkbnjabar.sipenting.ui.breastfeedingmother.registration.BreastfeedingMotherRegistrationViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class BreastfeedingMotherDetailFragment : Fragment() {
 
-    private var _binding: FragmentPregnantMotherDetailBinding? = null
+    private var _binding: FragmentBreastfeedingMotherDetailBinding? = null
     private val binding get() = _binding!!
-    // Use viewModels for the ViewModel specific to this screen
-    private val detailViewModel: BreastfeedingMotherDetailViewModel by viewModels()
-    // Use activityViewModels for the ViewModel shared across the registration flow
-    private val registrationViewModel: PregnantMotherRegistrationViewModel by activityViewModels()
 
+    private val viewModel: BreastfeedingMotherDetailViewModel by viewModels()
+    private val args: BreastfeedingMotherDetailFragmentArgs by navArgs()
+    private val registrationViewModel: BreastfeedingMotherRegistrationViewModel by activityViewModels()
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentPregnantMotherDetailBinding.inflate(inflater, container, false)
+        _binding = FragmentBreastfeedingMotherDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.setMotherId(args.motherId)
 
-        val visitAdapter = BreastfeedingMotherVisitHistoryAdapter { visit ->
+        val visitAdapter = BreastfeedingMotherVisitHistoryAdapter { visitEntity ->
             val action = BreastfeedingMotherDetailFragmentDirections
-                .actionBreastfeedingMotherDetailFragmentToBreastfeedingMotherVisitEditFragment(visit.localVisitId)
+                .actionBreastfeedingMotherDetailFragmentToBreastfeedingMotherVisitEditFragment(visitEntity.localVisitId)
             findNavController().navigate(action)
         }
 
@@ -53,71 +52,63 @@ class BreastfeedingMotherDetailFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
         }
 
-        // ADDED: FAB click listener
         binding.fabAddVisit.setOnClickListener {
-            // Get the current mother's data from the detailViewModel
-            detailViewModel.motherDetails.value?.let { motherEntity ->
-                // Prepare the shared registrationViewModel for adding a new visit
+            viewModel.motherDetails.value?.let { motherEntity ->
                 registrationViewModel.startNewVisitForExistingMother(motherEntity)
-
-                // Navigate to the visit registration screen
-                findNavController().navigate(R.id.action_pregnantMotherDetailFragment_to_pregnantMotherRegistrationFragment2)
+                findNavController().navigate(R.id.action_breastfeedingMotherDetailFragment_to_breastfeedingMotherRegistrationFragment2)
             }
         }
 
+        // This single call sets up all the observers.
         observeViewModel(visitAdapter)
     }
 
+    /**
+     * This function now contains the COMPLETE logic for observing all
+     * necessary LiveData from the ViewModel and updating the UI.
+     */
     private fun observeViewModel(adapter: BreastfeedingMotherVisitHistoryAdapter) {
-        detailViewModel.motherDetails.observe(viewLifecycleOwner) { mother ->
+
+        // --- Observer for Mother's Details ---
+        viewModel.motherDetails.observe(viewLifecycleOwner) { mother ->
             mother?.let {
+                // Populate all mother detail TextViews
                 binding.tvMotherNameDetail.text = it.name
                 binding.tvMotherNikDetail.text = "NIK: ${it.nik}"
-                // ADDED: Set new TextViews
                 binding.tvMotherDobDetail.text = "Tanggal Lahir: ${it.dateOfBirth}"
-                binding.tvMotherPhoneDetail.text = "No. HP: ${it.phoneNumber ?: '-'}"
+                binding.tvMotherPhoneDetail.text = "No. HP: ${it.phoneNumber ?: "-"}"
+
+                // Assuming address fields are available in your BreastfeedingMotherEntity
                 val address = "${it.fullAddress}, RT ${it.rtName}, RW ${it.rwName}, ${it.kelurahanName}"
                 binding.tvMotherAddressDetail.text = address
-                detailViewModel.calculateAllInterpretations()
             }
         }
 
-        detailViewModel.visitHistory.observe(viewLifecycleOwner) { visits ->
+        // --- Observer for Visit History ---
+        viewModel.visitHistory.observe(viewLifecycleOwner) { visits ->
+            // Submit the list of visits to the RecyclerView adapter
             adapter.submitList(visits)
-            detailViewModel.calculateAllInterpretations()
+
+            // Trigger the ViewModel to calculate interpretations based on the new visit list
+            viewModel.calculateAllInterpretations()
         }
 
-        detailViewModel.nextVisitDateText.observe(viewLifecycleOwner) { text ->
-            binding.tvNextVisitDate.text = text
-            binding.tvNextVisitDate.isVisible = !text.isNullOrEmpty()
-        }
-
-        // Observe raw values
-        detailViewModel.pregnancyWeekAgeText.observe(viewLifecycleOwner) { binding.tvInterpretationWeekAge.text = it }
-        detailViewModel.tbjValueText.observe(viewLifecycleOwner) { binding.tvInterpretationTbjValue.text = it }
-
-        // Observe all interpretation LiveData
-        detailViewModel.interpretationAge.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationAge, it) }
-        detailViewModel.interpretationChildCount.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationChildCount, it) }
-        detailViewModel.interpretationTfu.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationTfu, it) }
-        detailViewModel.interpretationImt.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationImt, it) }
-        detailViewModel.interpretationDisease.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationDisease, it) }
-        detailViewModel.interpretationHb.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationHb, it) }
-        detailViewModel.interpretationLila.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationLila, it) }
-        detailViewModel.interpretationTbj.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationTbj, it) }
-        detailViewModel.interpretationWater.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationWater, it) }
-        detailViewModel.interpretationBab.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationBab, it) }
-        detailViewModel.interpretationSmoke.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationSmoke, it) }
+        // --- Observers for each Health Interpretation value ---
+        // These will be triggered after calculateAllInterpretations() runs.
+        viewModel.interpretationComplication.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationComplication, it) }
+        viewModel.interpretationKb.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationKb, it) }
+        viewModel.interpretationWater.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationWater, it) }
+        viewModel.interpretationBab.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationBab, it) }
+        viewModel.interpretationSmoke.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationSmoke, it) }
     }
 
+    /**
+     * A helper function to update a TextView with the interpretation result,
+     * including text and color, exactly like in PregnantMotherDetailFragment.
+     */
     private fun updateInterpretationUI(textView: TextView, result: InterpretationResult?) {
         result ?: return
-        var displayText = result.text
-        if (!result.recommendation.isNullOrBlank()){
-            displayText += "\n${result.recommendation}"
-        }
-
-        textView.text = displayText
+        textView.text = result.text
         textView.setTextColor(ContextCompat.getColor(requireContext(), result.color))
     }
 
