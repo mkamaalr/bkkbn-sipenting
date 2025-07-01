@@ -1,7 +1,6 @@
 package com.bkkbnjabar.sipenting.data.local.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -11,24 +10,35 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChildVisitsDao {
+
     /**
-     * Inserts a new visit record.
+     * Inserts a single child visit record.
+     * If a visit with the same primary key exists, it will be replaced.
      * @param visit The visit entity to insert.
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVisit(visit: ChildVisitsEntity)
 
     /**
-     * Gets all visit records for a specific pregnant mother, ordered by visit date.
-     * @param childId The local ID of the mother.
-     * @return A Flow emitting a list of visits for the specified mother.
+     * Updates an existing child visit record.
+     * @param visit The visit entity with updated information.
      */
-    @Query("SELECT * FROM child_visits WHERE localVisitId = :childId ORDER BY createdAt DESC")
-    fun getVisitsForChild(childId: Int): Flow<List<ChildVisitsEntity>>
-
     @Update
     suspend fun updateVisit(visit: ChildVisitsEntity)
 
-    @Query("SELECT * FROM child_visits WHERE localVisitId = :visitId")
-    fun getVisitById(visitId: Int): Flow<ChildVisitsEntity?>
+    /**
+     * Retrieves all visits for a specific child, ordered by the visit date descending.
+     * @param childId The localId of the child.
+     * @return A Flow emitting a list of all visits for that child.
+     */
+    @Query("SELECT * FROM child_visits WHERE childId = :childId ORDER BY visitDate DESC")
+    fun getVisitsForChild(childId: Int): Flow<List<ChildVisitsEntity>>
+
+    /**
+     * Retrieves a single visit by its unique local visit ID.
+     * @param localVisitId The primary key of the visit.
+     * @return A Flow emitting the ChildVisitsEntity, or null if not found.
+     */
+    @Query("SELECT * FROM child_visits WHERE localVisitId = :localVisitId")
+    fun getVisitById(localVisitId: Int): Flow<ChildVisitsEntity?>
 }

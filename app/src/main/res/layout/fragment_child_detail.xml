@@ -1,193 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context=".ui.child.detail.ChildDetailFragment">
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="80dp">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_child_details"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
 
-            <TextView
-                android:id="@+id/tv_mother_name_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                tools:text="Siti Aminah" />
-
-            <TextView
-                android:id="@+id/tv_mother_nik_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                tools:text="NIK: 3273xxxxxxxxxxxx" />
-
-            <TextView
-                android:id="@+id/tv_mother_dob_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                tools:text="Tanggal Lahir: 01/01/1990" />
-
-            <TextView
-                android:id="@+id/tv_mother_phone_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                tools:text="No. HP: 081234567890" />
-
-            <TextView
-                android:id="@+id/tv_mother_address_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                tools:text="Jl. Merdeka No. 1, Kel. Cihapit, Kec. Bandung Wetan" />
-
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest">
-                <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tv_child_name_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                    tools:text="Nama Anak" />
+
+                <TextView
+                    android:id="@+id/tv_child_nik_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    tools:text="NIK: 1234567890123456" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_health_interpretation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            app:layout_constraintTop_toBottomOf="@id/card_child_details"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Interpretasi Kesehatan (Kunjungan Terakhir)"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
+
+                <TableLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_marginTop="8dp"
+                    android:stretchColumns="1">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Interpretasi Kesehatan (Kunjungan Terakhir)"
-                        android:textAppearance="?attr/textAppearanceTitleMedium"
-                        android:textColor="?attr/colorOnSurface"/>
+                    <TableRow>
+                        <TextView android:text="Usia Anak" style="@style/InterpretationLabel" />
+                        <TextView android:id="@+id/tv_interpretation_age" tools:text="1 Tahun, 2 Bulan" style="@style/InterpretationValue" />
+                    </TableRow>
 
-                    <TableLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:stretchColumns="1">
+                    <TableRow>
+                        <TextView android:text="Berat Badan" style="@style/InterpretationLabel" />
+                        <TextView android:id="@+id/tv_interpretation_weight" tools:text="10.5 kg (Ideal)" style="@style/InterpretationValue" />
+                    </TableRow>
 
-                        <TableRow>
-                            <TextView android:text="Usia Kehamilan" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_week_age" style="@style/InterpretationValue" tools:text="30 Minggu"/>
-                        </TableRow>
+                    <TableRow>
+                        <TextView android:text="Tinggi Badan" style="@style/InterpretationLabel" />
+                        <TextView android:id="@+id/tv_interpretation_height" tools:text="75 cm (Ideal)" style="@style/InterpretationValue" />
+                    </TableRow>
 
-                        <TableRow>
-                            <TextView android:text="Usia Ibu" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_age" style="@style/InterpretationValue" tools:text="Ideal"/>
-                        </TableRow>
+                    <TableRow>
+                        <TextView android:text="Lingkar Kepala" style="@style/InterpretationLabel" />
+                        <TextView android:id="@+id/tv_interpretation_head_circumference" tools:text="45 cm (Ideal)" style="@style/InterpretationValue" />
+                    </TableRow>
 
-                        <TableRow>
-                            <TextView android:text="Jumlah Anak Kandung" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_child_count" style="@style/InterpretationValue" tools:text="Ideal"/>
-                        </TableRow>
+                    <TableRow>
+                        <TextView android:text="ASI Eksklusif" style="@style/InterpretationLabel" />
+                        <TextView android:id="@+id/tv_interpretation_asi" tools:text="Ya (Ideal)" style="@style/InterpretationValue" />
+                    </TableRow>
 
-                        <TableRow>
-                            <TextView android:text="TFU" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_tfu" style="@style/InterpretationValue" tools:text="Ideal"/>
-                        </TableRow>
+                    <TableRow>
+                        <TextView android:text="MPASI" style="@style/InterpretationLabel" />
+                        <TextView android:id="@+id/tv_interpretation_mpasi" tools:text="Ya (Ideal)" style="@style/InterpretationValue" />
+                    </TableRow>
 
-                        <TableRow>
-                            <TextView android:text="TBJ (gram)" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_tbj_value" style="@style/InterpretationValue" tools:text="1319 gram"/>
-                        </TableRow>
+                    <TableRow>
+                        <TextView android:text="Posyandu" style="@style/InterpretationLabel" />
+                        <TextView android:id="@+id/tv_interpretation_posyandu" tools:text="Ya (Ideal)" style="@style/InterpretationValue" />
+                    </TableRow>
 
-                        <TableRow>
-                            <TextView android:text="Status Taksiran Berat Janin" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_tbj" style="@style/InterpretationValue" tools:text="Ideal"/>
-                        </TableRow>
+                </TableLayout>
 
-                        <TableRow>
-                            <TextView android:text="Indeks Masa Tubuh (IMT)" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_imt" style="@style/InterpretationValue" tools:text="Normal"/>
-                        </TableRow>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-                        <TableRow>
-                            <TextView android:text="Kadar Hemoglobin (g/dl)" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_hb" style="@style/InterpretationValue" tools:text="Normal"/>
-                        </TableRow>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_visit_history"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            app:layout_constraintTop_toBottomOf="@id/card_health_interpretation"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-                        <TableRow>
-                            <TextView android:text="Lingkar Lengan Atas (Cm)" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_lila" style="@style/InterpretationValue" tools:text="Normal"/>
-                        </TableRow>
-
-                        <TableRow>
-                            <TextView android:text="Riwayat Penyakit" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_disease" style="@style/InterpretationValue" tools:text="Tidak Beresiko"/>
-                        </TableRow>
-
-                        <TableRow>
-                            <TextView android:text="Air Minum" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_water" style="@style/InterpretationValue" tools:text="Layak"/>
-                        </TableRow>
-
-                        <TableRow>
-                            <TextView android:text="Fasilitas BAB" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_bab" style="@style/InterpretationValue" tools:text="Layak"/>
-                        </TableRow>
-
-                        <TableRow>
-                            <TextView android:text="Terpapar Rokok" style="@style/InterpretationLabel"/>
-                            <TextView android:id="@+id/tv_interpretation_smoke" style="@style/InterpretationValue" tools:text="Tidak Beresiko"/>
-                        </TableRow>
-
-                    </TableLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <TextView
-                android:id="@+id/tv_next_visit_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textStyle="bold"
-                app:drawableStartCompat="@drawable/ic_calendar"
-                app:drawableTint="?attr/colorPrimary"
-                tools:text="Kunjungan Berikutnya: 27 Nov 2025" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Riwayat Kunjungan TPK"
-                android:textAppearance="?attr/textAppearanceTitleMedium" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view_visits"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_visit_history"
-                tools:itemCount="3"/>
+                android:orientation="vertical"
+                android:padding="16dp">
 
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Riwayat Kunjungan"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_visit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:contentDescription="Tambah Kunjungan Baru"
-        app:srcCompat="@drawable/ic_add_white_24dp" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view_visits"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_child_visit_history"
+                    tools:itemCount="3"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add_visit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:srcCompat="@drawable/ic_add_white_24dp"
+            android:contentDescription="Tambah Kunjungan"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

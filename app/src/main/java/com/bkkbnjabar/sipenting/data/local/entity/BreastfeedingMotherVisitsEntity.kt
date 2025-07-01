@@ -57,20 +57,8 @@ data class BreastfeedingMotherVisitsEntity(
     val latitude: Double?,
     val longitude: Double?,
     val createdAt: Long = System.currentTimeMillis(),
-
-    // --- ADJUSTED CONTRACEPTION FIELDS ---
-
-    // This field corresponds to the main "Yes/No" radio button.
     val onContraception: Boolean,
-
-    // If 'onContraception' is TRUE, this stores the ID of the selected contraception type (e.g., IUD, Pil).
-    // This was changed from List<String> to a single Int? to match the dropdown menu.
     val contraceptionTypeId: Int?,
-
-    // If 'onContraception' is TRUE, this stores the selection from the reason dropdown
-    // (e.g., "Ingin Anak di Tunda", "Tidak Ingin Anak Lagi"). Stored as a String.
     val contraceptionReasonForUse: String?,
-
-    // If 'onContraception' is FALSE, this stores the ID of the selected rejection reason.
     val contraceptionRTypeId: Int?
 )

@@ -15,5 +15,6 @@ interface ChildRepository {
     suspend fun updateChildVisit(visitEntity: ChildVisitsEntity): Resource<Unit>
     fun getVisitById(visitId: Int): Flow<ChildVisitsEntity?>
     fun getAllChildsWithLatestStatus(): Flow<List<ChildWithLatestStatus>>
-
+    suspend fun uploadPendingData()
+    suspend fun syncFromServer()
 }

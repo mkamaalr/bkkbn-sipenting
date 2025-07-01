@@ -3,29 +3,29 @@ package com.bkkbnjabar.sipenting.ui.child
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherEntity
+import com.bkkbnjabar.sipenting.data.local.entity.ChildEntity
 import com.bkkbnjabar.sipenting.data.repository.LookupRepository
-import com.bkkbnjabar.sipenting.data.repository.PregnantMotherRepository
+import com.bkkbnjabar.sipenting.data.repository.ChildRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 /**
- * ViewModel untuk PregnantMotherListFragment.
+ * ViewModel untuk ChildListFragment.
  */
 @HiltViewModel
 class ChildListViewModel @Inject constructor(
-    private val repository: PregnantMotherRepository,
+    private val repository: ChildRepository,
     private val lookupRepository: LookupRepository
 ) : ViewModel() {
 
     /**
      * Menyediakan daftar semua ibu hamil dari database lokal sebagai LiveData.
      */
-    val allPregnantMothers: LiveData<List<PregnantMotherEntity>> = repository.getAllPregnantMothers().asLiveData()
+    val allChilds: LiveData<List<ChildEntity>> = repository.getAllChilds().asLiveData()
 
     // Define a new data class for the final UI state
-    data class PregnantMotherUI(
+    data class ChildUI(
         val localId: Int,
         val name: String,
         val nik: String,
@@ -35,17 +35,17 @@ class ChildListViewModel @Inject constructor(
     )
 
     // Combine the flow of mothers with the flow of lookup items to create the final UI list
-    val allPregnantMothersForUI = repository.getAllMothersWithLatestStatus()
+    val allChildsForUI = repository.getAllChildsWithLatestStatus()
         .combine(lookupRepository.getLookupOptions("pregnant-mother-statuses")) { mothersWithStatus, statuses ->
             mothersWithStatus.map { motherData ->
                 val statusName = statuses.find { it.id == motherData.pregnantMotherStatusId }?.name ?: "Belum Ada Kunjungan"
-                val details = "Usia Kehamilan: ${motherData.pregnancyWeekAge ?: '-'} mg, Kunjungan Berikutnya: ${motherData.nextVisitDate ?: '-'}"
+                val details = "Kunjungan Berikutnya: ${motherData.nextVisitDate ?: '-'}"
 
-                PregnantMotherUI(
-                    localId = motherData.mother.localId,
-                    name = motherData.mother.name,
-                    nik = motherData.mother.nik,
-                    syncStatus = motherData.mother.syncStatus,
+                ChildUI(
+                    localId = motherData.child.localId,
+                    name = motherData.child.name,
+                    nik = motherData.child.nik,
+                    syncStatus = motherData.child.syncStatus,
                     statusName = statusName,
                     details = details
                 )

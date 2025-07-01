@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -16,6 +17,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.bkkbnjabar.sipenting.R
 import com.bkkbnjabar.sipenting.databinding.ActivityMainBinding
 import com.bkkbnjabar.sipenting.ui.auth.AuthActivity
+import com.bkkbnjabar.sipenting.utils.EventObserver
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -37,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
         navController = navHostFragment.navController
         val navView: BottomNavigationView = binding.navViewBottom
+        navView.itemIconTintList = null
 
         appBarConfiguration = AppBarConfiguration(
             setOf(R.id.nav_home, R.id.nav_pregnant_mother_list, R.id.nav_child_list, R.id.nav_breastfeeding_mother_list)
@@ -86,7 +89,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        // ...
+        mainViewModel.logoutEvent.observe(this, EventObserver {
+            // When the event fires, navigate to the AuthActivity
+            val intent = Intent(this, AuthActivity::class.java)
+            // These flags clear the activity stack so the user can't press "back" to get into the app
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        })
+
     }
 
     // ================== MENGEMBALIKAN FUNGSI INI ==================

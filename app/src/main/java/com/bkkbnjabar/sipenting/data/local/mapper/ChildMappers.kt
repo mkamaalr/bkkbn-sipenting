@@ -1,13 +1,15 @@
 package com.bkkbnjabar.sipenting.data.local.mapper
 
 import com.bkkbnjabar.sipenting.data.local.entity.ChildEntity
-import com.bkkbnjabar.sipenting.data.model.child.ChildRegistrationData
+import com.bkkbnjabar.sipenting.data.model.child.ChildData
+import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
+
 
 /**
  * Converts the registration form data object into a database entity object.
  * It handles nullable fields by providing default values to ensure the entity is valid.
  */
-fun ChildRegistrationData.toEntity(): ChildEntity {
+fun ChildData.toEntity(): ChildEntity {
     return ChildEntity(
         localId = this.localId ?: 0, // Use 0 for auto-generation if localId is null
         name = this.name ?: "",
@@ -27,7 +29,8 @@ fun ChildRegistrationData.toEntity(): ChildEntity {
         rtName = this.rtName ?: "",
         rtId = this.rtId ?: 0,
         fullAddress = this.fullAddress ?: "",
-        syncStatus = this.syncStatus
+        syncStatus = this.syncStatus ?: SyncStatus.PENDING,
+        motherId = this.motherId ?: 0,
     )
 }
 
@@ -35,9 +38,10 @@ fun ChildRegistrationData.toEntity(): ChildEntity {
  * ADDED: Converts a database entity object into a registration form data object.
  * This is useful when editing or adding a new visit to an existing mother.
  */
-fun ChildEntity.toRegistrationData(): ChildRegistrationData {
-    return ChildRegistrationData(
+fun ChildEntity.toRegistrationData(): ChildData {
+    return ChildData(
         localId = this.localId,
+        motherId = this.motherId,
         name = this.name,
         nik = this.nik,
         dateOfBirth = this.dateOfBirth,
@@ -56,6 +60,6 @@ fun ChildEntity.toRegistrationData(): ChildRegistrationData {
         rtId = this.rtId,
         fullAddress = this.fullAddress,
         syncStatus = this.syncStatus,
-        createdAt = this.createdAt.toString()
+        createdAt = this.createdAt ?: System.currentTimeMillis()
     )
 }

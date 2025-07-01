@@ -1,109 +1,221 @@
 package com.bkkbnjabar.sipenting.data.local.mapper
 
+import com.bkkbnjabar.sipenting.data.local.entity.ChildEntity
+import com.bkkbnjabar.sipenting.data.local.entity.ChildMotherEntity
 import com.bkkbnjabar.sipenting.data.local.entity.ChildVisitsEntity
+import com.bkkbnjabar.sipenting.data.model.child.ChildData
+import com.bkkbnjabar.sipenting.data.model.child.ChildRegistrationData
+import com.bkkbnjabar.sipenting.data.model.child.ChildMotherData
 import com.bkkbnjabar.sipenting.data.model.child.ChildVisitData
+import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
+
+// --- Child Mappers ---
+//
+//fun ChildEntity.toDomain(): ChildRegistrationData {
+//    return ChildRegistrationData(
+//        localId = this.localId,
+//        motherId = this.motherId,
+//        name = this.name,
+//        nik = this.nik,
+//        dateOfBirth = this.dateOfBirth,
+//        phoneNumber = this.phoneNumber,
+//        provinsiName = this.provinsiName,
+//        provinsiId = this.provinsiId,
+//        kabupatenName = this.kabupatenName,
+//        kabupatenId = this.kabupatenId,
+//        kecamatanName = this.kecamatanName,
+//        kecamatanId = this.kecamatanId,
+//        kelurahanName = this.kelurahanName,
+//        kelurahanId = this.kelurahanId,
+//        rwName = this.rwName,
+//        rwId = this.rwId,
+//        rtName = this.rtName,
+//        rtId = this.rtId,
+//        fullAddress = this.fullAddress,
+//        syncStatus = this.syncStatus,
+//    )
+//}
+
+
+fun ChildEntity.toDomain(): ChildData {
+    return ChildData(
+        localId = this.localId,
+        motherId = this.motherId,
+        name = this.name,
+        nik = this.nik,
+        dateOfBirth = this.dateOfBirth,
+        phoneNumber = this.phoneNumber,
+        provinsiName = this.provinsiName,
+        provinsiId = this.provinsiId,
+        kabupatenName = this.kabupatenName,
+        kabupatenId = this.kabupatenId,
+        kecamatanName = this.kecamatanName,
+        kecamatanId = this.kecamatanId,
+        kelurahanName = this.kelurahanName,
+        kelurahanId = this.kelurahanId,
+        rwName = this.rwName,
+        rwId = this.rwId,
+        rtName = this.rtName,
+        rtId = this.rtId,
+        fullAddress = this.fullAddress,
+        syncStatus = this.syncStatus,
+    )
+}
+
+// --- Child's Mother Mappers ---
+
+fun ChildMotherEntity.toDomain(): ChildMotherData {
+    return ChildMotherData(
+        localId = this.localId,
+        id = this.id,
+        name = this.name,
+        nik = this.nik,
+        dateOfBirth = this.dateOfBirth,
+        phoneNumber = this.phoneNumber,
+        provinsiName = this.provinsiName,
+        provinsiId = this.provinsiId,
+        kabupatenName = this.kabupatenName,
+        kabupatenId = this.kabupatenId,
+        kecamatanName = this.kecamatanName,
+        kecamatanId = this.kecamatanId,
+        kelurahanName = this.kelurahanName,
+        kelurahanId = this.kelurahanId,
+        rwName = this.rwName,
+        rwId = this.rwId,
+        rtName = this.rtName,
+        rtId = this.rtId,
+        fullAddress = this.fullAddress,
+        syncStatus = this.syncStatus,
+        createdAt = this.createdAt
+    )
+}
+
+fun ChildMotherData.toEntity(): ChildMotherEntity {
+    return ChildMotherEntity(
+        localId = this.localId,
+        id = this.id,
+        name = this.name,
+        nik = this.nik,
+        dateOfBirth = this.dateOfBirth,
+        phoneNumber = this.phoneNumber,
+        provinsiName = this.provinsiName,
+        provinsiId = this.provinsiId,
+        kabupatenName = this.kabupatenName,
+        kabupatenId = this.kabupatenId,
+        kecamatanName = this.kecamatanName,
+        kecamatanId = this.kecamatanId,
+        kelurahanName = this.kelurahanName,
+        kelurahanId = this.kelurahanId,
+        rwName = this.rwName,
+        rwId = this.rwId,
+        rtName = this.rtName,
+        rtId = this.rtId,
+        fullAddress = this.fullAddress,
+        syncStatus = this.syncStatus ?: SyncStatus.PENDING,
+        createdAt = this.createdAt ?: System.currentTimeMillis()
+    )
+}
 
 fun ChildVisitData.toEntity(): ChildVisitsEntity {
     return ChildVisitsEntity(
-        localVisitId = this.localVisitId ?: 0,
+        localVisitId = this.localVisitId,
         id = this.id,
-        childLocalId = this.childLocalId ?: 0,
-        visitDate = this.visitDate ?: "",
-        childNumber = this.childNumber,
-        dateOfBirthLastChild = this.dateOfBirthLastChild,
-        pregnancyWeekAge = this.pregnancyWeekAge,
-        weightTrimester1 = this.weightTrimester1,
-        currentHeight = this.currentHeight,
-        currentWeight = this.currentWeight,
-        isHbChecked = this.isHbChecked ?: false,
-        hemoglobinLevel = this.hemoglobinLevel,
-        hemoglobinLevelReason = this.hemoglobinLevelReason,
-        upperArmCircumference = this.upperArmCircumference,
-        isTwin = this.isTwin ?: false,
-        numberOfTwins = this.numberOfTwins,
-        isEstimatedFetalWeightChecked = this.isEstimatedFetalWeightChecked ?: false,
-        tbj = this.tbj,
-        isExposedToCigarettes = this.isExposedToCigarettes ?: false,
-        isCounselingReceived = this.isCounselingReceived ?: false,
+        childId = this.childId ?: 0,
+        visitDate = this.visitDate,
+        pregnancyAgeWhenChildbirth = this.pregnancyAgeWhenChildbirth,
+        weightBirth = this.weightBirth,
+        heightBirth = this.heightBirth,
+        isAsiExclusive = this.isAsiExclusive,
+        onContraception = this.onContraception ?: false,
+        contraceptionTypeId = this.contraceptionTypeId,
+        contraceptionReasonForUse = this.contraceptionReasonForUse,
+        contraceptionRTypeId = this.contraceptionRTypeId,
+        measurementDate = this.measurementDate,
+        weightMeasurement = this.weightMeasurement,
+        heightMeasurement = this.heightMeasurement,
+        isOngoingAsi = this.isOngoingAsi,
+        isMpasi = this.isMpasi,
+        isKkaFilled = this.isKkaFilled,
+        kkaResult = this.kkaResult,
+        isExposedToCigarettes = this.isExposedToCigarettes,
+        isPosyanduMonth = this.isPosyanduMonth,
+        isBkbMonth = this.isBkbMonth,
+        isCounselingReceived = this.isCounselingReceived,
+        isReceivedMbg = this.isReceivedMbg,
+        headCircumference = this.headCircumference,
         counselingTypeId = this.counselingTypeId,
-        isIronTablesReceived = this.isIronTablesReceived ?: false,
-        isIronTablesTaken = this.isIronTablesTaken ?: false,
-        facilitatingReferralServiceStatus = this.facilitatingReferralServiceStatus,
-        facilitatingSocialAssistanceStatus = this.facilitatingSocialAssistanceStatus,
-        nextVisitDate = this.nextVisitDate,
-        tpkNotes = this.tpkNotes,
-        isAlive = this.isAlive ?: true,
-        isGivenBirth = this.isGivenBirth ?: false,
-        givenBirthStatusId = this.givenBirthStatusId,
-        pregnantMotherStatusId = this.pregnantMotherStatusId,
-        diseaseHistory = this.diseaseHistory,
+        immunizationsGiven = this.immunizationsGiven,
         mainSourceOfDrinkingWater = this.mainSourceOfDrinkingWater,
         mainSourceOfDrinkingWaterOther = this.mainSourceOfDrinkingWaterOther,
         defecationFacility = this.defecationFacility,
         defecationFacilityOther = this.defecationFacilityOther,
+        facilitatingReferralServiceStatus = this.facilitatingReferralServiceStatus,
+        facilitatingSocialAssistanceStatus = this.facilitatingSocialAssistanceStatus,
         socialAssistanceFacilitationOptions = this.socialAssistanceFacilitationOptions,
         socialAssistanceFacilitationOptionsOther = this.socialAssistanceFacilitationOptionsOther,
         syncStatus = this.syncStatus,
-        createdAt = System.currentTimeMillis(), // It's better to generate a new timestamp here
+        nextVisitDate = this.nextVisitDate,
+        tpkNotes = this.tpkNotes,
         imagePath1 = this.imagePath1,
         imagePath2 = this.imagePath2,
         latitude = this.latitude,
         longitude = this.longitude,
-        isReceivedMbg = this.isReceivedMbg ?: false,
-        isTfuMeasured = this.isTfuMeasured ?: false,
-        tfu = this.tfu
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt,
+        pregnantMotherStatusId = this.pregnantMotherStatusId
     )
-} // <--- THE CLOSING BRACE FOR toEntity() GOES HERE
+}
 
-// The toData() function should be at the top level, not nested.
-fun ChildVisitsEntity.toData(): ChildVisitData {
+/**
+ * Converts a [ChildVisitsEntity] from the local database into a [ChildVisitData]
+ * domain model, which is safer to use in the UI and business logic layers.
+ */
+fun ChildVisitsEntity.toDomain(): ChildVisitData {
     return ChildVisitData(
         localVisitId = this.localVisitId,
         id = this.id,
-        childLocalId = this.childLocalId,
+        childId = this.childId,
         visitDate = this.visitDate,
-        childNumber = this.childNumber,
-        dateOfBirthLastChild = this.dateOfBirthLastChild,
-        pregnancyWeekAge = this.pregnancyWeekAge,
-        weightTrimester1 = this.weightTrimester1,
-        currentHeight = this.currentHeight,
-        currentWeight = this.currentWeight,
-        isHbChecked = this.isHbChecked,
-        hemoglobinLevel = this.hemoglobinLevel,
-        hemoglobinLevelReason = this.hemoglobinLevelReason,
-        upperArmCircumference = this.upperArmCircumference,
-        isTwin = this.isTwin,
-        numberOfTwins = this.numberOfTwins,
-        isEstimatedFetalWeightChecked = this.isEstimatedFetalWeightChecked,
-        tbj = this.tbj,
+        pregnancyAgeWhenChildbirth = this.pregnancyAgeWhenChildbirth,
+        weightBirth = this.weightBirth,
+        heightBirth = this.heightBirth,
+        isAsiExclusive = this.isAsiExclusive,
+        onContraception = this.onContraception,
+        contraceptionTypeId = this.contraceptionTypeId,
+        contraceptionReasonForUse = this.contraceptionReasonForUse,
+        contraceptionRTypeId = this.contraceptionRTypeId,
+        measurementDate = this.measurementDate,
+        weightMeasurement = this.weightMeasurement,
+        heightMeasurement = this.heightMeasurement,
+        isOngoingAsi = this.isOngoingAsi,
+        isMpasi = this.isMpasi,
+        isKkaFilled = this.isKkaFilled,
+        kkaResult = this.kkaResult,
         isExposedToCigarettes = this.isExposedToCigarettes,
+        isPosyanduMonth = this.isPosyanduMonth,
+        isBkbMonth = this.isBkbMonth,
         isCounselingReceived = this.isCounselingReceived,
+        isReceivedMbg = this.isReceivedMbg,
+        headCircumference = this.headCircumference,
         counselingTypeId = this.counselingTypeId,
-        isIronTablesReceived = this.isIronTablesReceived,
-        isIronTablesTaken = this.isIronTablesTaken,
-        facilitatingReferralServiceStatus = this.facilitatingReferralServiceStatus,
-        facilitatingSocialAssistanceStatus = this.facilitatingSocialAssistanceStatus,
-        nextVisitDate = this.nextVisitDate,
-        tpkNotes = this.tpkNotes,
-        isAlive = this.isAlive,
-        isGivenBirth = this.isGivenBirth,
-        givenBirthStatusId = this.givenBirthStatusId,
-        pregnantMotherStatusId = this.pregnantMotherStatusId,
-        diseaseHistory = this.diseaseHistory,
+        immunizationsGiven = this.immunizationsGiven,
         mainSourceOfDrinkingWater = this.mainSourceOfDrinkingWater,
         mainSourceOfDrinkingWaterOther = this.mainSourceOfDrinkingWaterOther,
         defecationFacility = this.defecationFacility,
         defecationFacilityOther = this.defecationFacilityOther,
+        facilitatingReferralServiceStatus = this.facilitatingReferralServiceStatus,
+        facilitatingSocialAssistanceStatus = this.facilitatingSocialAssistanceStatus,
         socialAssistanceFacilitationOptions = this.socialAssistanceFacilitationOptions,
         socialAssistanceFacilitationOptionsOther = this.socialAssistanceFacilitationOptionsOther,
         syncStatus = this.syncStatus,
-        createdAt = this.createdAt.toString(),
+        nextVisitDate = this.nextVisitDate,
+        tpkNotes = this.tpkNotes,
         imagePath1 = this.imagePath1,
         imagePath2 = this.imagePath2,
         latitude = this.latitude,
         longitude = this.longitude,
-        isReceivedMbg = this.isReceivedMbg,
-        isTfuMeasured = this.isTfuMeasured,
-        tfu = this.tfu
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt,
+        pregnantMotherStatusId = this.pregnantMotherStatusId
     )
 }

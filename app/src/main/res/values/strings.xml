@@ -11,7 +11,7 @@
     <string name="nav_header_desc">Navigation header</string>
 
     <!-- Menu Titles -->
-    <string name="menu_home">Home</string>
+    <string name="menu_home">Beranda</string>
     <string name="menu_gallery">Galeri</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="menu_pregnant_mother">Ibu Hamil</string>

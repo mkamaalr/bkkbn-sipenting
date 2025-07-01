@@ -1,17 +1,16 @@
 package com.bkkbnjabar.sipenting.data.model.child
 
 import androidx.room.Embedded
-import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherEntity
+import com.bkkbnjabar.sipenting.data.local.entity.ChildEntity
 
 /**
- * A data class to hold the combined result of a PregnantMotherEntity
+ * A data class to hold the combined result of a ChildEntity
  * and the status ID from her most recent visit.
  */
 data class ChildWithLatestStatus(
     @Embedded
-    val mother: PregnantMotherEntity,
+    val child: ChildEntity,
 
     val pregnantMotherStatusId: Int?,
     val nextVisitDate: String?, // Also fetching the next visit date is useful for the list
-    val pregnancyWeekAge: Int? // And the current pregnancy age
 )

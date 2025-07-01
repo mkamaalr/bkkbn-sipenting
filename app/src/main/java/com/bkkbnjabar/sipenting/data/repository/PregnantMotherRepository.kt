@@ -15,5 +15,6 @@ interface PregnantMotherRepository {
     suspend fun updatePregnantMotherVisit(visitEntity: PregnantMotherVisitsEntity): Resource<Unit>
     fun getVisitById(visitId: Int): Flow<PregnantMotherVisitsEntity?>
     fun getAllMothersWithLatestStatus(): Flow<List<PregnantMotherWithLatestStatus>>
-
+    suspend fun uploadPendingData()
+    suspend fun syncFromServer()
 }

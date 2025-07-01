@@ -12,59 +12,59 @@ import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
         ForeignKey(
             entity = ChildEntity::class,
             parentColumns = ["localId"],
-            childColumns = ["childLocalId"],
+            childColumns = ["childId"],
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index(value = ["childLocalId"])]
+    indices = [Index(value = ["childId"])]
 )
 data class ChildVisitsEntity(
     @PrimaryKey(autoGenerate = true)
     val localVisitId: Int = 0,
-    val id: String? = null,
-    val childLocalId: Int,
-    val visitDate: String,
-    val childNumber: Int?,
-    val dateOfBirthLastChild: String?,
-    val pregnancyWeekAge: Int?,
-    val weightTrimester1: Double?,
-    val currentHeight: Double?,
-    val currentWeight: Double?,
-    val isHbChecked: Boolean,
-    val hemoglobinLevel: Double?,
-    val hemoglobinLevelReason: String?, // ADDED
-    val upperArmCircumference: Double?,
-    val isTwin: Boolean,
-    val numberOfTwins: Int?,
-    val isEstimatedFetalWeightChecked: Boolean,
-    val tbj: Double?, // ADDED: Taksiran Berat Janin in grams
-    val isExposedToCigarettes: Boolean,
-    val isCounselingReceived: Boolean,
+
+    val id: String? = null, // Server ID
+    val childId: Int, // Foreign key to ChildEntity's localId
+
+    val visitDate: String?,
+    val pregnancyAgeWhenChildbirth: String?,
+    val weightBirth: Double?,
+    val heightBirth: Double?,
+    val isAsiExclusive: Boolean?,
+    val onContraception: Boolean,
+    val contraceptionTypeId: Int?,
+    val contraceptionReasonForUse: String?,
+    val contraceptionRTypeId: Int?,
+    val measurementDate: String?,
+    val weightMeasurement: Double?,
+    val heightMeasurement: Double?,
+    val isOngoingAsi: Boolean?,
+    val isMpasi: Boolean?,
+    val isKkaFilled: Boolean?,
+    val kkaResult: String?,
+    val isExposedToCigarettes: Boolean?,
+    val isPosyanduMonth: Boolean?,
+    val isBkbMonth: Boolean?,
+    val isCounselingReceived: Boolean?,
+    val isReceivedMbg: Boolean?,
+    val headCircumference: Double?,
     val counselingTypeId: Int?,
-    val isIronTablesReceived: Boolean,
-    val isIronTablesTaken: Boolean,
-    val facilitatingReferralServiceStatus: String?,
-    val facilitatingSocialAssistanceStatus: String?,
-    val nextVisitDate: String?,
-    val tpkNotes: String?,
-    val isAlive: Boolean,
-    val isGivenBirth: Boolean,
-    val givenBirthStatusId: Int?,
-    val pregnantMotherStatusId: Int?,
-    val diseaseHistory: List<String>?,
+    val immunizationsGiven: List<String>?,
     val mainSourceOfDrinkingWater: List<String>?,
     val mainSourceOfDrinkingWaterOther: String?,
     val defecationFacility: List<String>?,
     val defecationFacilityOther: String?,
+    val facilitatingReferralServiceStatus: String?,
+    val facilitatingSocialAssistanceStatus: String?,
     val socialAssistanceFacilitationOptions: List<String>?,
-    val socialAssistanceFacilitationOptionsOther: String?, // ADDED
+    val socialAssistanceFacilitationOptionsOther: String?,
+    val pregnantMotherStatusId: Int?,
     val syncStatus: SyncStatus = SyncStatus.PENDING,
-    val createdAt: Long = System.currentTimeMillis(),
+    val nextVisitDate: String?,
+    val tpkNotes: String?,
     val imagePath1: String?,
     val imagePath2: String?,
     val latitude: Double?,
     val longitude: Double?,
-    val isReceivedMbg: Boolean,
-    val isTfuMeasured: Boolean?,
-    val tfu: Double?
+    val createdAt: Long?,
+    val updatedAt: Long?
 )

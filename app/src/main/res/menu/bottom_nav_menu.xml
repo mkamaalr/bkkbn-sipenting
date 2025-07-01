@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/ic_home"
+        android:icon="@drawable/ic_logo_white_background"
         android:title="@string/menu_home" />
 
     <item
@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/nav_child_list"
-        android:icon="@drawable/ic_balita"
+        android:icon="@drawable/ic_balita_vc"
         android:title="@string/menu_child" />
 
     <!-- Anda bisa menambahkan item menu lainnya di sini, misal untuk profil -->

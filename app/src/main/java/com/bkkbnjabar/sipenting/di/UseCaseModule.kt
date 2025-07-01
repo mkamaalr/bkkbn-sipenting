@@ -11,6 +11,8 @@ import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.CreateBreastf
 import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.CreateBreastfeedingMotherVisitUseCaseImpl
 import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.UpdateBreastfeedingMotherVisitUseCase
 import com.bkkbnjabar.sipenting.domain.usecase.breastfeedingmother.UpdateBreastfeedingMotherVisitUseCaseImpl
+import com.bkkbnjabar.sipenting.domain.usecase.child.CreateChildMotherUseCase
+import com.bkkbnjabar.sipenting.domain.usecase.child.CreateChildMotherUseCaseImpl
 import com.bkkbnjabar.sipenting.domain.usecase.child.CreateChildUseCase
 import com.bkkbnjabar.sipenting.domain.usecase.child.CreateChildUseCaseImpl
 import com.bkkbnjabar.sipenting.domain.usecase.child.CreateChildVisitUseCase
@@ -93,4 +95,10 @@ abstract class UseCaseModule {
     abstract fun bindCreateChildVisitUseCase(
         createChildVisitUseCaseImpl: CreateChildVisitUseCaseImpl
     ): CreateChildVisitUseCase
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindCreateChildMotherUseCase(
+        createChildMotherUseCaseImpl: CreateChildMotherUseCaseImpl
+    ): CreateChildMotherUseCase
 }

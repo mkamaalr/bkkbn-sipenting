@@ -6,6 +6,7 @@ import com.bkkbnjabar.sipenting.data.local.converter.ListStringConverter
 import com.bkkbnjabar.sipenting.data.local.dao.BreastfeedingMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.BreastfeedingMotherVisitsDao
 import com.bkkbnjabar.sipenting.data.local.dao.ChildDao
+import com.bkkbnjabar.sipenting.data.local.dao.ChildMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.ChildVisitsDao
 import com.bkkbnjabar.sipenting.data.local.dao.LookupDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherDao
@@ -48,6 +49,11 @@ object DatabaseModule {
     @Singleton // Pastikan DAO juga singleton jika database-nya singleton
     fun provideLookupDao(database: AppDatabase): LookupDao {
         return database.lookupDao()
+    }
+
+    @Provides
+    fun provideChildMotherDao(appDatabase: AppDatabase): ChildMotherDao {
+        return appDatabase.childMotherDao()
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.bkkbnjabar.sipenting.data.repository
 
+import android.util.Log
 import com.bkkbnjabar.sipenting.data.local.dao.ChildDao
 import com.bkkbnjabar.sipenting.data.local.dao.ChildVisitsDao
 import com.bkkbnjabar.sipenting.data.local.entity.ChildEntity
@@ -21,6 +22,7 @@ class ChildRepositoryImpl @Inject constructor(
             val newRowId = childDao.insertChild(motherEntity)
             Resource.Success(newRowId)
         } catch (e: Exception) {
+            Log.e("YourTag", "Gagal menyimpan data ibu hamil ke database: ${e.message}", e)
             Resource.Error("Gagal menyimpan data ibu hamil ke database: ${e.message}")
         }
     }
@@ -35,7 +37,7 @@ class ChildRepositoryImpl @Inject constructor(
     }
 
     override fun getAllChilds(): Flow<List<ChildEntity>> {
-        return childDao.getAllChilds()
+        return childDao.getAllChildren()
     }
 
     override fun getChildById(localId: Int): Flow<ChildEntity?> {
@@ -61,5 +63,13 @@ class ChildRepositoryImpl @Inject constructor(
 
     override fun getAllChildsWithLatestStatus(): Flow<List<ChildWithLatestStatus>> {
         return childDao.getAllChildsWithLatestStatus()
+    }
+
+    override suspend fun uploadPendingData() {
+        // TODO: Implement logic to get pending mothers and visits from DAO and upload to API
+    }
+
+    override suspend fun syncFromServer() {
+        // TODO: Implement logic to fetch data from API and insert/update local database
     }
 }

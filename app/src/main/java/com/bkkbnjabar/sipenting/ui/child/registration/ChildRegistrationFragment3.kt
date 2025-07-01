@@ -24,7 +24,7 @@ import java.util.*
  * Halaman pertama formulir pendaftaran ibu hamil (Data Diri & Alamat).
  */
 @AndroidEntryPoint
-class ChildRegistrationFragment1 : Fragment() {
+class ChildRegistrationFragment3 : Fragment() {
 
     private var _binding: FragmentChildRegistration1Binding? = null
     private val binding get() = _binding!!

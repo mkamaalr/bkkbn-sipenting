@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -19,8 +20,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.bkkbnjabar.sipenting.R
 import com.bkkbnjabar.sipenting.data.model.child.ChildVisitData
-import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherVisitData
-import com.bkkbnjabar.sipenting.databinding.FragmentPregnantMotherRegistration2Binding
+import com.bkkbnjabar.sipenting.databinding.FragmentChildRegistration2Binding
 import com.bkkbnjabar.sipenting.domain.model.LookupItem
 import com.bkkbnjabar.sipenting.utils.Resource
 import com.google.android.gms.location.LocationServices
@@ -37,25 +37,28 @@ import java.util.*
 @AndroidEntryPoint
 class ChildRegistrationFragment2 : Fragment() {
 
-    private var _binding: FragmentPregnantMotherRegistration2Binding? = null
+    private var _binding: FragmentChildRegistration2Binding? = null
     private val binding get() = _binding!!
 
     private val viewModel: ChildRegistrationViewModel by activityViewModels()
 
     private var isFormPopulated = false
 
-    private var pregnantMotherStatusOptions: List<LookupItem> = emptyList()
-    private var givenBirthStatusOptions: List<LookupItem> = emptyList()
+    // Local cache for all lookup options
+    private var immunizationOptions: List<LookupItem> = emptyList()
     private var counselingTypeOptions: List<LookupItem> = emptyList()
-    private var deliveryPlaceOptions: List<LookupItem> = emptyList()
-    private var birthAssistantOptions: List<LookupItem> = emptyList()
-    private var contraceptionOptions: List<LookupItem> = emptyList()
-    private var referralStatusOptions: List<String> = emptyList()
-    private var socialAssistanceStatusOptions: List<String> = emptyList()
-    private var diseaseHistoryOptions: List<LookupItem> = emptyList()
+    private var contraceptionTypeOptions: List<LookupItem> = emptyList()
+    private var contraceptionReasonOptions: List<LookupItem> = emptyList()
+    private var contraceptionRejectionReasonOptions: List<LookupItem> = emptyList()
+    private val contraceptionReasonForUseOptions = listOf("Ingin Anak di Tunda", "Tidak Ingin Anak Lagi")
+    private var kkaResultOptions: List<String> = emptyList()
     private var drinkingWaterOptions: List<LookupItem> = emptyList()
     private var defecationFacilityOptions: List<LookupItem> = emptyList()
     private var socialAssistanceOptions: List<LookupItem> = emptyList()
+    private var childStatusOptions: List<LookupItem> = emptyList()
+    private var referralStatusOptions: List<String> = emptyList()
+    private var socialAssistanceStatusOptions: List<String> = emptyList()
+    private var pregnantMotherStatusOptions: List<LookupItem> = emptyList()
 
     private var latestTmpUri: Uri? = null
     private var captureRequestIndex: Int = 0
@@ -87,7 +90,7 @@ class ChildRegistrationFragment2 : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentPregnantMotherRegistration2Binding.inflate(inflater, container, false)
+        _binding = FragmentChildRegistration2Binding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -95,6 +98,9 @@ class ChildRegistrationFragment2 : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupListeners()
         observeViewModel()
+
+        val reasonAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, contraceptionReasonForUseOptions)
+        binding.etContraceptionReasonForUse.setAdapter(reasonAdapter)
     }
 
     private fun setupListeners() {
@@ -104,52 +110,29 @@ class ChildRegistrationFragment2 : Fragment() {
             viewModel.saveAllData()
         }
 
-        binding.rgIsGivenBirth.setOnCheckedChangeListener { _, checkedId ->
-            val isGivenBirth = (checkedId == R.id.rb_is_given_birth_yes)
-            binding.tilGivenBirthStatus.isVisible = isGivenBirth
-            if (!isGivenBirth) {
-                binding.etGivenBirthStatus.setText("", false)
-            }
+        binding.rgIsKkaFilled.setOnCheckedChangeListener { _, checkedId ->
+            val isChecked = (checkedId == R.id.rb_kka_yes)
+            binding.tilKkaResult.isVisible = isChecked
+            if (!isChecked) binding.actvKkaResult.setText("", false)
         }
-        binding.rgIsHbChecked.setOnCheckedChangeListener { _, checkedId ->
-            val isChecked = (checkedId == R.id.rb_hb_checked_yes)
-            binding.tilHb.isVisible = isChecked
-            binding.tilHbReason.isVisible = !isChecked
-            if (!isChecked) binding.etHb.text?.clear()
-            if (isChecked) binding.etHbReason.text?.clear()
-        }
-        binding.rgIsTwin.setOnCheckedChangeListener { _, checkedId ->
-            binding.tilNumberOfTwins.isVisible = (checkedId == R.id.rb_is_twin_yes)
-            if (checkedId != R.id.rb_is_twin_yes) binding.etNumberOfTwins.text?.clear()
-        }
-        binding.rgIsTbjChecked.setOnCheckedChangeListener { _, checkedId ->
-            binding.tilTbj.isVisible = (checkedId == R.id.rb_is_tbj_checked_yes)
-            if (checkedId != R.id.rb_is_tbj_checked_yes) binding.etTbj.text?.clear()
-        }
-        binding.rgTfuStatus.setOnCheckedChangeListener { _, checkedId ->
-            binding.tilTfu.isVisible = (checkedId == R.id.rb_tfu_diukur)
-            if (checkedId != R.id.rb_tfu_diukur) binding.etTfu.text?.clear()
-        }
-        binding.etPregnancyWeek.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                val week = binding.etPregnancyWeek.text.toString().toIntOrNull() ?: 0
-                val isTfuEligible = week >= 20
-                binding.tvTfuLabel.isVisible = isTfuEligible
-                binding.rgTfuStatus.isVisible = isTfuEligible
-                if (!isTfuEligible) {
-                    binding.rgTfuStatus.clearCheck()
-                    binding.tilTfu.isVisible = false
-                }
+
+        binding.rgOnContraception.setOnCheckedChangeListener { _, checkedId ->
+            val isChecked = (checkedId == R.id.rb_contraception_yes)
+            binding.tilContraceptionType.isVisible = isChecked
+            binding.tilContraceptionReasonForUse.isVisible = isChecked
+            binding.tilContraceptionRejectionReason.isVisible = !isChecked
+            if (isChecked) {
+                binding.etContraceptionRejectionReason.setText("", false)
+            } else {
+                binding.actvContraceptionType.setText("", false)
+                binding.etContraceptionReasonForUse.setText("", false)
             }
         }
 
         binding.rgIsCounselingReceived.setOnCheckedChangeListener { _, checkedId ->
             val isChecked = (checkedId == R.id.rb_is_counseling_received_yes)
             binding.tilCounselingType.isVisible = isChecked
-            if (!isChecked) {
-                // Clear the selection if user chooses "Tidak"
-                binding.etCounselingType.setText("", false)
-            }
+            if (!isChecked) binding.etCounselingType.setText("", false)
         }
 
         binding.btnCapture1.setOnClickListener { handleImageCapture(1) }
@@ -157,7 +140,7 @@ class ChildRegistrationFragment2 : Fragment() {
         binding.btnGetLocation.setOnClickListener { handleLocationCapture() }
 
         setupDateField(binding.tilVisitDate, binding.etVisitDate)
-        setupDateField(binding.tilDateOfBirthLastChild, binding.etDateOfBirthLastChild)
+        setupDateField(binding.tilMeasurementDate, binding.etMeasurementDate)
         setupDateField(binding.tilNextVisitDate, binding.etNextVisitDate)
     }
 
@@ -171,68 +154,48 @@ class ChildRegistrationFragment2 : Fragment() {
                 is Resource.Success -> {
                     Toast.makeText(context, "Data berhasil disimpan!", Toast.LENGTH_LONG).show()
                     viewModel.resetForm()
-                    findNavController().navigate(R.id.action_pregnantMotherRegistrationFragment2_to_nav_pregnant_mother_list)
+                    findNavController().navigate(R.id.action_childRegistrationFragment2_to_nav_child_list)
                 }
                 is Resource.Error -> Toast.makeText(context, "Gagal menyimpan: ${result.message}", Toast.LENGTH_LONG).show()
                 else -> {}
             }
         }
 
+        // --- Observers for all lookup data ---
         viewModel.pregnantMotherStatuses.observe(viewLifecycleOwner) {
             pregnantMotherStatusOptions = it ?: emptyList()
             binding.etPregnantMotherStatus.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, pregnantMotherStatusOptions.map { it.name }))
-            updateFormFromData(viewModel.currentChildVisit.value)
         }
-        viewModel.givenBirthStatuses.observe(viewLifecycleOwner) {
-            givenBirthStatusOptions = it ?: emptyList()
-            binding.etGivenBirthStatus.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, givenBirthStatusOptions.map { it.name }))
-            updateFormFromData(viewModel.currentChildVisit.value)
+        viewModel.contraceptionTypes.observe(viewLifecycleOwner) {
+            contraceptionTypeOptions = it ?: emptyList()
+            binding.actvContraceptionType.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, contraceptionTypeOptions.map { it.name }))
+        }
+        viewModel.contraceptionRejectionReasons.observe(viewLifecycleOwner) { options ->
+            // This 'options' list contains "Ingin hamil", "Alasan kesehatan", etc.
+            contraceptionRejectionReasonOptions = options
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, options.map { it.name })
+            binding.etContraceptionRejectionReason.setAdapter(adapter)
         }
         viewModel.counselingTypes.observe(viewLifecycleOwner) {
             counselingTypeOptions = it ?: emptyList()
             binding.etCounselingType.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, counselingTypeOptions.map { it.name }))
+        }
+        viewModel.immunizations.observe(viewLifecycleOwner) {
+            immunizationOptions = it ?: emptyList()
+            setupDynamicChips(binding.chipGroupImmunizations, immunizationOptions, listOf("Tidak Ada"), "", null)
             updateFormFromData(viewModel.currentChildVisit.value)
         }
-        viewModel.deliveryPlaces.observe(viewLifecycleOwner) {
-            deliveryPlaceOptions = it ?: emptyList()
-            binding.etDeliveryPlace.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, deliveryPlaceOptions.map { it.name }))
-            updateFormFromData(viewModel.currentChildVisit.value)
-        }
-        viewModel.birthAssistants.observe(viewLifecycleOwner) {
-            birthAssistantOptions = it ?: emptyList()
-            binding.etBirthAssistant.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, birthAssistantOptions.map { it.name }))
-            updateFormFromData(viewModel.currentChildVisit.value)
-        }
-        viewModel.contraceptionOptions.observe(viewLifecycleOwner) {
-            contraceptionOptions = it ?: emptyList()
-            binding.etContraceptionOption.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, contraceptionOptions.map { it.name }))
-            updateFormFromData(viewModel.currentChildVisit.value)
-        }
-        viewModel.referralStatusOptions.observe(viewLifecycleOwner) {
-            referralStatusOptions = it ?: emptyList()
-            binding.etFacilitatingReferralService.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, referralStatusOptions))
-            updateFormFromData(viewModel.currentChildVisit.value)
-        }
-        viewModel.socialAssistanceStatusOptions.observe(viewLifecycleOwner) {
-            socialAssistanceStatusOptions = it ?: emptyList()
-            binding.etFacilitatingSocialAssistance.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, socialAssistanceStatusOptions))
-            updateFormFromData(viewModel.currentChildVisit.value)
-        }
-
-        viewModel.diseaseHistories.observe(viewLifecycleOwner) {
-            diseaseHistoryOptions = it ?: emptyList()
-            setupDynamicChips(binding.chipGroupDiseaseHistory, diseaseHistoryOptions, listOf("Tidak Ada"), "", null)
-            updateFormFromData(viewModel.currentChildVisit.value)
-        }
-        viewModel.mainSourcesOfDrinkingWater.observe(viewLifecycleOwner) {
+        viewModel.drinkingWaterSources.observe(viewLifecycleOwner) {
             drinkingWaterOptions = it ?: emptyList()
             setupDynamicChips(binding.chipGroupDrinkingWater, drinkingWaterOptions, listOf("Lainnya"), "Lainnya", binding.tilDrinkingWaterOther)
             updateFormFromData(viewModel.currentChildVisit.value)
+
         }
         viewModel.defecationFacilities.observe(viewLifecycleOwner) {
             defecationFacilityOptions = it ?: emptyList()
             setupDynamicChips(binding.chipGroupDefecationFacility, defecationFacilityOptions, listOf("Tidak ada", "Ya, lainnya"), "Ya, lainnya", binding.tilDefecationFacilityOther)
             updateFormFromData(viewModel.currentChildVisit.value)
+
         }
         viewModel.socialAssistanceOptions.observe(viewLifecycleOwner) {
             socialAssistanceOptions = it ?: emptyList()
@@ -240,8 +203,27 @@ class ChildRegistrationFragment2 : Fragment() {
             updateFormFromData(viewModel.currentChildVisit.value)
         }
 
+        viewModel.referralStatusOptions.observe(viewLifecycleOwner) {
+            referralStatusOptions = it ?: emptyList()
+            binding.etFacilitatingReferralService.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, referralStatusOptions))
+            updateFormFromData(viewModel.currentChildVisit.value)
+        }
+
+        viewModel.socialAssistanceStatusOptions.observe(viewLifecycleOwner) {
+            socialAssistanceStatusOptions = it ?: emptyList()
+            binding.etFacilitatingSocialAssistance.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, socialAssistanceStatusOptions))
+            updateFormFromData(viewModel.currentChildVisit.value)
+        }
+
+        viewModel.kkaResultOptions.observe(viewLifecycleOwner) {
+            kkaResultOptions = it ?: emptyList()
+            binding.actvKkaResult.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, kkaResultOptions))
+            updateFormFromData(viewModel.currentChildVisit.value)
+        }
+
+        // The MAIN observer to populate the form.
         viewModel.currentChildVisit.observe(viewLifecycleOwner) { visitData ->
-            if (!isFormPopulated) {
+            if (visitData != null && !isFormPopulated) {
                 updateFormFromData(visitData)
                 isFormPopulated = true
             }
@@ -252,64 +234,55 @@ class ChildRegistrationFragment2 : Fragment() {
         if (data == null) return
 
         binding.etVisitDate.setText(data.visitDate)
-        binding.etChildNumber.setText(data.childNumber?.toString() ?: "")
-        binding.etDateOfBirthLastChild.setText(data.dateOfBirthLastChild)
-        binding.etPregnancyWeek.setText(data.pregnancyWeekAge?.toString() ?: "")
-        binding.etWeightTrimester1.setText(data.weightTrimester1?.toString() ?: "")
-        binding.etCurrentWeight.setText(data.currentWeight?.toString() ?: "")
-        binding.etCurrentHeight.setText(data.currentHeight?.toString() ?: "")
-        binding.etLila.setText(data.upperArmCircumference?.toString() ?: "")
-        binding.etHb.setText(data.hemoglobinLevel?.toString() ?: "")
-        binding.etHbReason.setText(data.hemoglobinLevelReason)
-        binding.etNumberOfTwins.setText(data.numberOfTwins?.toString() ?: "")
-        binding.etTbj.setText(data.tbj?.toString() ?: "")
+        binding.etPregnantMotherStatus.setText(pregnantMotherStatusOptions.find { it.id == data.pregnantMotherStatusId }?.name ?: "", false)
+        binding.etPregnancyAgeWhenChildbirth.setText(data.pregnancyAgeWhenChildbirth)
+        binding.etWeightBirth.setText(data.weightBirth?.toString() ?: "")
+        binding.etHeightBirth.setText(data.heightBirth?.toString() ?: "")
+        binding.etMeasurementDate.setText(data.measurementDate)
+        binding.etWeightMeasurement.setText(data.weightMeasurement?.toString() ?: "")
+        binding.etHeightMeasurement.setText(data.heightMeasurement?.toString() ?: "")
+        binding.etHeadCircumference.setText(data.headCircumference?.toString() ?: "")
         binding.etTpkNotes.setText(data.tpkNotes)
         binding.etNextVisitDate.setText(data.nextVisitDate)
-        binding.etTfu.setText(data.tfu?.toString() ?: "")
-
-        binding.rgIsAlive.check(if (data.isAlive == true) R.id.rb_is_alive_yes else R.id.rb_is_alive_no)
-        binding.rgIsGivenBirth.check(if (data.isGivenBirth == true) R.id.rb_is_given_birth_yes else R.id.rb_is_given_birth_no)
-        binding.rgIsHbChecked.check(if (data.isHbChecked == true) R.id.rb_hb_checked_yes else R.id.rb_hb_checked_no)
-        binding.rgIsTwin.check(if (data.isTwin == true) R.id.rb_is_twin_yes else R.id.rb_is_twin_no)
-        binding.rgIsTbjChecked.check(if (data.isEstimatedFetalWeightChecked == true) R.id.rb_is_tbj_checked_yes else R.id.rb_is_tbj_checked_no)
-        binding.rgIsCounselingReceived.check(if (data.isCounselingReceived == true) R.id.rb_is_counseling_received_yes else R.id.rb_is_counseling_received_no)
-        binding.tilCounselingType.isVisible = data.isCounselingReceived == true
-        binding.rgIsIronReceived.check(if (data.isIronTablesReceived == true) R.id.rb_is_iron_received_yes else R.id.rb_is_iron_received_no)
-        binding.rgIsIronTaken.check(if (data.isIronTablesTaken == true) R.id.rb_is_iron_taken_yes else R.id.rb_is_iron_taken_no)
-        binding.rgIsExposedToSmoke.check(if (data.isExposedToCigarettes == true) R.id.rb_is_exposed_to_smoke_yes else R.id.rb_is_exposed_to_smoke_no)
-        binding.rgIsMbgReceived.check(if (data.isReceivedMbg == true) R.id.rb_is_mbg_received_yes else R.id.rb_is_mbg_received_no)
-        binding.rgTfuStatus.check(if (data.isTfuMeasured == true) R.id.rb_tfu_diukur else R.id.rb_tfu_tidak_diukur)
-
-        binding.etPregnantMotherStatus.setText(pregnantMotherStatusOptions.find { it.id == data.pregnantMotherStatusId }?.name ?: "", false)
-        binding.tilGivenBirthStatus.isVisible = (data.isGivenBirth == true)
-        binding.etGivenBirthStatus.setText(givenBirthStatusOptions.find { it.id == data.givenBirthStatusId }?.name ?: "", false)
-        binding.etCounselingType.setText(counselingTypeOptions.find { it.id == data.counselingTypeId }?.name ?: "", false)
-        binding.etDeliveryPlace.setText(deliveryPlaceOptions.find { it.id == data.deliveryPlaceId }?.name ?: "", false)
-        binding.etBirthAssistant.setText(birthAssistantOptions.find { it.id == data.birthAssistantId }?.name ?: "", false)
-        binding.etContraceptionOption.setText(contraceptionOptions.find { it.id == data.contraceptionOptionId }?.name ?: "", false)
-        binding.etFacilitatingReferralService.setText(data.facilitatingReferralServiceStatus ?: "", false)
-        binding.etFacilitatingSocialAssistance.setText(data.facilitatingSocialAssistanceStatus ?: "", false)
-
-        updateChipGroupState(binding.chipGroupDiseaseHistory, data.diseaseHistory ?: emptyList(), listOf("Tidak Ada"))
-        updateChipGroupState(binding.chipGroupDrinkingWater, data.mainSourceOfDrinkingWater ?: emptyList(), listOf("Lainnya"))
-        updateChipGroupState(binding.chipGroupDefecationFacility, data.defecationFacility ?: emptyList(), listOf("Tidak ada", "Ya, lainnya"))
-        updateChipGroupState(binding.chipGroupSocialAssistance, data.socialAssistanceFacilitationOptions ?: emptyList(), listOf("Lainnya"))
-
         binding.etDrinkingWaterOther.setText(data.mainSourceOfDrinkingWaterOther)
         binding.etDefecationFacilityOther.setText(data.defecationFacilityOther)
         binding.etSocialAssistanceOther.setText(data.socialAssistanceFacilitationOptionsOther)
+
+        binding.rgIsAsiExclusive.check(if (data.isAsiExclusive == true) R.id.rb_asi_exclusive_yes else R.id.rb_asi_exclusive_no)
+        binding.rgIsOngoingAsi.check(if (data.isOngoingAsi == true) R.id.rb_ongoing_asi_yes else R.id.rb_ongoing_asi_no)
+        binding.rgIsMpasi.check(if (data.isMpasi == true) R.id.rb_mpasi_yes else R.id.rb_mpasi_no)
+        binding.rgIsKkaFilled.check(if (data.isKkaFilled == true) R.id.rb_kka_yes else R.id.rb_kka_no)
+        binding.rgIsExposedToCigarettes.check(if (data.isExposedToCigarettes == true) R.id.rb_smoke_yes else R.id.rb_smoke_no)
+        binding.rgIsPosyanduMonth.check(if (data.isPosyanduMonth == true) R.id.rb_posyandu_yes else R.id.rb_posyandu_no)
+        binding.rgIsBkbMonth.check(if (data.isBkbMonth == true) R.id.rb_bkb_yes else R.id.rb_bkb_no)
+        binding.rgIsCounselingReceived.check(if (data.isCounselingReceived == true) R.id.rb_is_counseling_received_yes else R.id.rb_is_counseling_received_no)
+        binding.rgIsReceivedMbg.check(if (data.isReceivedMbg == true) R.id.rb_mbg_yes else R.id.rb_mbg_no)
+        binding.rgOnContraception.check(if (data.onContraception == true) R.id.rb_contraception_yes else R.id.rb_contraception_no)
+
+        binding.actvContraceptionType.setText(contraceptionTypeOptions.find { it.id == data.contraceptionTypeId }?.name ?: "", false)
+        binding.etContraceptionReasonForUse.setText(contraceptionReasonOptions.find { it.name == data.contraceptionReasonForUse }?.name ?: "", false)
+        binding.etContraceptionRejectionReason.setText(contraceptionRejectionReasonOptions.find { it.id == data.contraceptionRTypeId }?.name ?: "", false)
         binding.etCounselingType.setText(counselingTypeOptions.find { it.id == data.counselingTypeId }?.name ?: "", false)
+        binding.etFacilitatingReferralService.setText(data.facilitatingReferralServiceStatus ?: "", false)
+        binding.etFacilitatingSocialAssistance.setText(data.facilitatingSocialAssistanceStatus ?: "", false)
+        binding.actvKkaResult.setText(data.kkaResult ?: "", false)
+
+        updateChipGroupState(binding.chipGroupImmunizations, data.immunizationsGiven ?: emptyList())
+        updateChipGroupState(binding.chipGroupDrinkingWater, data.mainSourceOfDrinkingWater ?: emptyList())
+        updateChipGroupState(binding.chipGroupDefecationFacility, data.defecationFacility ?: emptyList())
+        updateChipGroupState(binding.chipGroupSocialAssistance, data.socialAssistanceFacilitationOptions ?: emptyList())
+
         data.imagePath1?.let { binding.ivPreview1.tag = it; binding.ivPreview1.setImageURI(Uri.parse(it)) }
         data.imagePath2?.let { binding.ivPreview2.tag = it; binding.ivPreview2.setImageURI(Uri.parse(it)) }
         if (data.latitude != null && data.longitude != null) {
             binding.tvLocationResult.text = String.format(Locale.US, "Lat: %.6f, Long: %.6f", data.latitude, data.longitude)
-        } else {
-            binding.tvLocationResult.text = ""
         }
     }
 
     private fun saveUIToViewModel() {
-        fun getSelectedChipTexts(chipGroup: ChipGroup): List<String> = chipGroup.children.filter { (it as Chip).isChecked }.map { (it as Chip).text.toString() }.toList()
+        fun getSelectedChipIds(chipGroup: ChipGroup, options: List<LookupItem>): List<String> = chipGroup.children
+            .filter { (it as Chip).isChecked }
+            .mapNotNull { view -> options.find { it.name == (view as Chip).text.toString() }?.id.toString() }.toList()
 
         var latitude: Double? = null
         var longitude: Double? = null
@@ -323,82 +296,46 @@ class ChildRegistrationFragment2 : Fragment() {
         }
 
         viewModel.updateChildVisitData(
-            visitDate = binding.etVisitDate.text.toString().trim(),
-            childNumber = binding.etChildNumber.text.toString().toIntOrNull(),
-            dateOfBirthLastChild = binding.etDateOfBirthLastChild.text.toString().trim(),
-            pregnancyWeekAge = binding.etPregnancyWeek.text.toString().toIntOrNull(),
-            weightTrimester1 = binding.etWeightTrimester1.text.toString().toDoubleOrNull(),
-            currentHeight = binding.etCurrentHeight.text.toString().toDoubleOrNull(),
-            currentWeight = binding.etCurrentWeight.text.toString().toDoubleOrNull(),
-            isHbChecked = binding.rgIsHbChecked.checkedRadioButtonId == R.id.rb_hb_checked_yes,
-            hemoglobinLevel = binding.etHb.text.toString().toDoubleOrNull(),
-            hemoglobinLevelReason = binding.etHbReason.text.toString().trim(),
-            upperArmCircumference = binding.etLila.text.toString().toDoubleOrNull(),
-            isTwin = binding.rgIsTwin.checkedRadioButtonId == R.id.rb_is_twin_yes,
-            numberOfTwins = binding.etNumberOfTwins.text.toString().toIntOrNull(),
-            isEstimatedFetalWeightChecked = binding.rgIsTbjChecked.checkedRadioButtonId == R.id.rb_is_tbj_checked_yes,
-            tbj = binding.etTbj.text.toString().toDoubleOrNull(),
-            isExposedToCigarettes = binding.rgIsExposedToSmoke.checkedRadioButtonId == R.id.rb_is_exposed_to_smoke_yes,
+            visitDate = binding.etVisitDate.text.toString(),
+            pregnancyAgeWhenChildbirth = binding.etPregnancyAgeWhenChildbirth.text.toString(),
+            weightBirth = binding.etWeightBirth.text.toString().toDoubleOrNull(),
+            heightBirth = binding.etHeightBirth.text.toString().toDoubleOrNull(),
+            isAsiExclusive = binding.rgIsAsiExclusive.checkedRadioButtonId == R.id.rb_asi_exclusive_yes,
+            onContraception = binding.rgOnContraception.checkedRadioButtonId == R.id.rb_contraception_yes,
+            contraceptionTypeId = contraceptionTypeOptions.find { it.name == binding.actvContraceptionType.text.toString() }?.id,
+            contraceptionReasonForUse = binding.etContraceptionReasonForUse.text.toString(),
+            contraceptionRTypeId = contraceptionRejectionReasonOptions.find { it.name == binding.etContraceptionRejectionReason.text.toString() }?.id,
+            measurementDate = binding.etMeasurementDate.text.toString(),
+            weightMeasurement = binding.etWeightMeasurement.text.toString().toDoubleOrNull(),
+            heightMeasurement = binding.etHeightMeasurement.text.toString().toDoubleOrNull(),
+            isOngoingAsi = binding.rgIsOngoingAsi.checkedRadioButtonId == R.id.rb_ongoing_asi_yes,
+            isMpasi = binding.rgIsMpasi.checkedRadioButtonId == R.id.rb_mpasi_yes,
+            isKkaFilled = binding.rgIsKkaFilled.checkedRadioButtonId == R.id.rb_kka_yes,
+            isExposedToCigarettes = binding.rgIsExposedToCigarettes.checkedRadioButtonId == R.id.rb_smoke_yes,
+            isPosyanduMonth = binding.rgIsPosyanduMonth.checkedRadioButtonId == R.id.rb_posyandu_yes,
+            isBkbMonth = binding.rgIsBkbMonth.checkedRadioButtonId == R.id.rb_bkb_yes,
             isCounselingReceived = binding.rgIsCounselingReceived.checkedRadioButtonId == R.id.rb_is_counseling_received_yes,
-            isIronTablesReceived = binding.rgIsIronReceived.checkedRadioButtonId == R.id.rb_is_iron_received_yes,
-            isIronTablesTaken = binding.rgIsIronTaken.checkedRadioButtonId == R.id.rb_is_iron_taken_yes,
-            nextVisitDate = binding.etNextVisitDate.text.toString().trim(),
-            tpkNotes = binding.etTpkNotes.text.toString().trim(),
-            isAlive = binding.rgIsAlive.checkedRadioButtonId == R.id.rb_is_alive_yes,
-            isGivenBirth = binding.rgIsGivenBirth.checkedRadioButtonId == R.id.rb_is_given_birth_yes,
-            tfu = binding.etTfu.text.toString().toDoubleOrNull(),
-            isReceivedMbg = binding.rgIsMbgReceived.checkedRadioButtonId == R.id.rb_is_mbg_received_yes,
-            isTfuMeasured = binding.rgTfuStatus.checkedRadioButtonId == R.id.rb_tfu_diukur,
-            pregnantMotherStatusId = pregnantMotherStatusOptions.find { it.name == binding.etPregnantMotherStatus.text.toString() }?.id,
-            givenBirthStatusId = givenBirthStatusOptions.find { it.name == binding.etGivenBirthStatus.text.toString() }?.id,
+            isReceivedMbg = binding.rgIsReceivedMbg.checkedRadioButtonId == R.id.rb_mbg_yes,
+            headCircumference = binding.etHeadCircumference.text.toString().toDoubleOrNull(),
             counselingTypeId = counselingTypeOptions.find { it.name == binding.etCounselingType.text.toString() }?.id,
-            deliveryPlaceId = deliveryPlaceOptions.find { it.name == binding.etDeliveryPlace.text.toString() }?.id,
-            birthAssistantId = birthAssistantOptions.find { it.name == binding.etBirthAssistant.text.toString() }?.id,
-            contraceptionOptionId = contraceptionOptions.find { it.name == binding.etContraceptionOption.text.toString() }?.id,
+            immunizationsGiven = getSelectedChipIds(binding.chipGroupImmunizations, immunizationOptions),
+            mainSourceOfDrinkingWater = getSelectedChipIds(binding.chipGroupDrinkingWater, drinkingWaterOptions),
+            mainSourceOfDrinkingWaterOther = binding.etDrinkingWaterOther.text.toString(),
+            defecationFacility = getSelectedChipIds(binding.chipGroupDefecationFacility, defecationFacilityOptions),
+            defecationFacilityOther = binding.etDefecationFacilityOther.text.toString(),
             facilitatingReferralServiceStatus = binding.etFacilitatingReferralService.text.toString(),
             facilitatingSocialAssistanceStatus = binding.etFacilitatingSocialAssistance.text.toString(),
-            diseaseHistory = getSelectedChipTexts(binding.chipGroupDiseaseHistory),
-            mainSourceOfDrinkingWater = getSelectedChipTexts(binding.chipGroupDrinkingWater),
-            mainSourceOfDrinkingWaterOther = binding.etDrinkingWaterOther.text.toString().trim(),
-            defecationFacility = getSelectedChipTexts(binding.chipGroupDefecationFacility),
-            defecationFacilityOther = binding.etDefecationFacilityOther.text.toString().trim(),
-            socialAssistanceFacilitationOptions = getSelectedChipTexts(binding.chipGroupSocialAssistance),
-            socialAssistanceFacilitationOptionsOther = binding.etSocialAssistanceOther.text.toString().trim(),
+            kkaResult = binding.actvKkaResult.text.toString(),
+            socialAssistanceFacilitationOptions = getSelectedChipIds(binding.chipGroupSocialAssistance, socialAssistanceOptions),
+            socialAssistanceFacilitationOptionsOther = binding.etSocialAssistanceOther.text.toString(),
+            pregnantMotherStatusId = pregnantMotherStatusOptions.find { it.name == binding.etPregnantMotherStatus.text.toString() }?.id,
+            nextVisitDate = binding.etNextVisitDate.text.toString(),
+            tpkNotes = binding.etTpkNotes.text.toString(),
             imagePath1 = binding.ivPreview1.tag as? String,
             imagePath2 = binding.ivPreview2.tag as? String,
             latitude = latitude,
             longitude = longitude
         )
-    }
-
-    private fun updateChipGroupState(chipGroup: ChipGroup, selectedItems: List<String>, exclusiveOptions: List<String>) {
-        val isAnExclusiveItemSelected = selectedItems.any { exclusiveOptions.contains(it) }
-
-        chipGroup.children.forEach { view ->
-            val chip = view as? Chip ?: return@forEach
-            val isThisChipSelected = selectedItems.contains(chip.text.toString())
-            if (chip.isChecked != isThisChipSelected) chip.isChecked = isThisChipSelected
-
-            val isThisChipExclusive = exclusiveOptions.contains(chip.text.toString())
-            chip.isEnabled = !isAnExclusiveItemSelected || isThisChipExclusive
-        }
-
-        val otherInputLayout = when(chipGroup.id) {
-            R.id.chip_group_drinking_water -> binding.tilDrinkingWaterOther
-            R.id.chip_group_defecation_facility -> binding.tilDefecationFacilityOther
-            R.id.chip_group_social_assistance -> binding.tilSocialAssistanceOther
-            else -> null
-        }
-        val otherOptionName = when(chipGroup.id) {
-            R.id.chip_group_drinking_water -> "Lainnya"
-            R.id.chip_group_defecation_facility -> "Ya, lainnya"
-            R.id.chip_group_social_assistance -> "Lainnya"
-            else -> ""
-        }
-
-        if (otherOptionName.isNotBlank()) {
-            otherInputLayout?.isVisible = selectedItems.contains(otherOptionName)
-        }
     }
 
     private fun setupDynamicChips(chipGroup: ChipGroup, options: List<LookupItem>, exclusiveOptions: List<String>, otherOptionName: String, otherInputLayout: TextInputLayout?) {
@@ -408,9 +345,7 @@ class ChildRegistrationFragment2 : Fragment() {
                 text = item.name
                 isCheckable = true
                 id = View.generateViewId()
-                setOnClickListener {
-                    handleChipClick(this, chipGroup, exclusiveOptions, otherOptionName, otherInputLayout)
-                }
+                setOnClickListener { handleChipClick(this, chipGroup, exclusiveOptions, otherOptionName, otherInputLayout) }
             }
             chipGroup.addView(chip)
         }
@@ -420,15 +355,14 @@ class ChildRegistrationFragment2 : Fragment() {
         val clickedText = clickedChip.text.toString()
         val isExclusive = exclusiveOptions.contains(clickedText)
 
-        if (isExclusive) {
-            if (clickedChip.isChecked) {
-                chipGroup.children.filter { it.id != clickedChip.id }.forEach { (it as Chip).isChecked = false }
+        if (isExclusive && clickedChip.isChecked) {
+            chipGroup.children.filter { it.id != clickedChip.id }.forEach {
+                (it as Chip).isChecked = false
             }
-        } else {
-            if (clickedChip.isChecked) {
-                exclusiveOptions.forEach { exclusiveText ->
-                    (chipGroup.children.firstOrNull { (it as Chip).text.toString() == exclusiveText } as? Chip)?.isChecked = false
-                }
+        } else if (clickedChip.isChecked) {
+            exclusiveOptions.forEach { exclusiveText ->
+                chipGroup.children.firstOrNull { (it as Chip).text.toString() == exclusiveText }
+                    ?.let { (it as Chip).isChecked = false }
             }
         }
 
@@ -447,6 +381,23 @@ class ChildRegistrationFragment2 : Fragment() {
             val chip = view as Chip
             chip.text.toString() == otherOptionName && chip.isChecked
         } != null)
+    }
+
+    private fun updateChipGroupState(chipGroup: ChipGroup, selectedIds: List<String>) {
+        val options = when (chipGroup.id) {
+            R.id.chip_group_immunizations -> immunizationOptions
+            R.id.chip_group_drinking_water -> drinkingWaterOptions
+            R.id.chip_group_defecation_facility -> defecationFacilityOptions
+            R.id.chip_group_social_assistance -> socialAssistanceOptions
+            else -> emptyList()
+        }
+        chipGroup.children.forEach { view ->
+            val chip = view as? Chip ?: return@forEach
+            val chipId = options.find { it.name == chip.text.toString() }?.id.toString()
+            if (chip.isChecked != selectedIds.contains(chipId)) {
+                chip.isChecked = selectedIds.contains(chipId)
+            }
+        }
     }
 
     private fun handleImageCapture(imageIndex: Int) {
@@ -490,68 +441,24 @@ class ChildRegistrationFragment2 : Fragment() {
         }
     }
 
+    private fun setupDateField(textInputLayout: TextInputLayout, editText: TextInputEditText) {
+        textInputLayout.setOnClickListener { showDatePickerDialog(editText) }
+        editText.setOnClickListener { showDatePickerDialog(editText) }
+    }
+
     private fun showDatePickerDialog(editText: TextInputEditText) {
         val datePicker = MaterialDatePicker.Builder.datePicker()
             .setTitleText(editText.hint)
             .build()
 
-        // This check prevents a crash if the user clicks the icon very rapidly
-        if (datePicker.isAdded) {
-            return
-        }
+        if (datePicker.isAdded) return
 
         datePicker.addOnPositiveButtonClickListener { selection ->
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             sdf.timeZone = TimeZone.getTimeZone("UTC")
-            val dateString = sdf.format(Date(selection))
-            editText.setText(dateString)
+            editText.setText(sdf.format(Date(selection)))
         }
-
         datePicker.show(parentFragmentManager, editText.id.toString())
-    }
-
-    private fun setupDateField(textInputLayout: TextInputLayout, editText: TextInputEditText) {
-        // This makes the entire layout box clickable to show the picker
-        textInputLayout.setOnClickListener {
-            showDatePickerDialog(editText)
-        }
-
-        // This makes the EditText itself also clickable
-        editText.setOnClickListener {
-            showDatePickerDialog(editText)
-        }
-
-        // This listener handles the action of the icon at the end of the field
-        textInputLayout.setEndIconOnClickListener {
-            // If the field has text, the icon is a 'clear' button. Clear the text.
-            if (editText.text.toString().isNotEmpty()) {
-                editText.text = null
-            }
-            // Otherwise, the icon is a calendar. Show the picker.
-            else {
-                showDatePickerDialog(editText)
-            }
-        }
-
-        // This watcher intelligently swaps the icon based on whether there is text
-        editText.addTextChangedListener(object : android.text.TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: android.text.Editable?) {
-                if (s.isNullOrBlank()) {
-                    textInputLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar)
-                } else {
-                    textInputLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear_text)
-                }
-            }
-        })
-
-        // Set the initial icon state
-        if (editText.text.isNullOrBlank()) {
-            textInputLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar)
-        } else {
-            textInputLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear_text)
-        }
     }
 
     override fun onPause() {

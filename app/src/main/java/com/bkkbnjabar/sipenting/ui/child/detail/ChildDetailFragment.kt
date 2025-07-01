@@ -9,14 +9,14 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.core.view.isVisible
 import com.bkkbnjabar.sipenting.R
 import com.bkkbnjabar.sipenting.databinding.FragmentChildDetailBinding
 import com.bkkbnjabar.sipenting.domain.model.InterpretationResult
 import com.bkkbnjabar.sipenting.ui.child.registration.ChildRegistrationViewModel
-
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,12 +24,10 @@ class ChildDetailFragment : Fragment() {
 
     private var _binding: FragmentChildDetailBinding? = null
     private val binding get() = _binding!!
-    // Use viewModels for the ViewModel specific to this screen
-    private val detailViewModel: ChildDetailViewModel by viewModels()
-    // Use activityViewModels for the ViewModel shared across the registration flow
+
+    private val viewModel: ChildDetailViewModel by viewModels()
+    private val args: ChildDetailFragmentArgs by navArgs()
     private val registrationViewModel: ChildRegistrationViewModel by activityViewModels()
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,9 +40,9 @@ class ChildDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val visitAdapter = ChildVisitHistoryAdapter { visit ->
+        val visitAdapter = ChildVisitHistoryAdapter { visitEntity ->
             val action = ChildDetailFragmentDirections
-                .actionChildDetailFragmentToChildVisitEditFragment(visit.localVisitId)
+                .actionChildDetailFragmentToChildVisitEditFragment(visitEntity.localVisitId)
             findNavController().navigate(action)
         }
 
@@ -53,15 +51,15 @@ class ChildDetailFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
         }
 
-        // ADDED: FAB click listener
         binding.fabAddVisit.setOnClickListener {
-            // Get the current mother's data from the detailViewModel
-            detailViewModel.childDetails.value?.let { childEntity ->
-                // Prepare the shared registrationViewModel for adding a new visit
-                registrationViewModel.startNewVisitForExistingMother(childEntity)
+            viewModel.childDetails.value?.let { childEntity ->
+                // Tell the shared Registration ViewModel to prepare for a new visit for this specific child
+                registrationViewModel.startNewVisitForExistingChild(childEntity)
 
-                // Navigate to the visit registration screen
-                findNavController().navigate(R.id.action_childDetailFragment_to_childRegistrationFragment2)
+                // Now, perform the navigation
+                val action = ChildDetailFragmentDirections.actionChildDetailFragmentToChildRegistrationFragment2()
+                // 3. Navigate to the registration screen.
+                findNavController().navigate(action)
             }
         }
 
@@ -69,55 +67,33 @@ class ChildDetailFragment : Fragment() {
     }
 
     private fun observeViewModel(adapter: ChildVisitHistoryAdapter) {
-        detailViewModel.childDetails.observe(viewLifecycleOwner) { mother ->
-            mother?.let {
-                binding.tvMotherNameDetail.text = it.name
-                binding.tvMotherNikDetail.text = "NIK: ${it.nik}"
-                // ADDED: Set new TextViews
-                binding.tvMotherDobDetail.text = "Tanggal Lahir: ${it.dateOfBirth}"
-                binding.tvMotherPhoneDetail.text = "No. HP: ${it.phoneNumber ?: '-'}"
-                val address = "${it.fullAddress}, RT ${it.rtName}, RW ${it.rwName}, ${it.kelurahanName}"
-                binding.tvMotherAddressDetail.text = address
-                detailViewModel.calculateAllInterpretations()
+
+        // Use the single MediatorLiveData to react to data changes
+        viewModel.detailDataMediator.observe(viewLifecycleOwner, Observer { (child, visits) ->
+            child?.let {
+                binding.tvChildNameDetail.text = it.name
+                binding.tvChildNikDetail.text = "NIK: ${it.nik}"
             }
-        }
 
-        detailViewModel.visitHistory.observe(viewLifecycleOwner) { visits ->
             adapter.submitList(visits)
-            detailViewModel.calculateAllInterpretations()
-        }
 
-        detailViewModel.nextVisitDateText.observe(viewLifecycleOwner) { text ->
-            binding.tvNextVisitDate.text = text
-            binding.tvNextVisitDate.isVisible = !text.isNullOrEmpty()
-        }
+            // Trigger calculation only once when data from either source changes
+            viewModel.calculateAllInterpretations()
+        })
 
-        // Observe raw values
-        detailViewModel.pregnancyWeekAgeText.observe(viewLifecycleOwner) { binding.tvInterpretationWeekAge.text = it }
-        detailViewModel.tbjValueText.observe(viewLifecycleOwner) { binding.tvInterpretationTbjValue.text = it }
-
-        // Observe all interpretation LiveData
-        detailViewModel.interpretationAge.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationAge, it) }
-        detailViewModel.interpretationChildCount.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationChildCount, it) }
-        detailViewModel.interpretationTfu.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationTfu, it) }
-        detailViewModel.interpretationImt.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationImt, it) }
-        detailViewModel.interpretationDisease.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationDisease, it) }
-        detailViewModel.interpretationHb.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationHb, it) }
-        detailViewModel.interpretationLila.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationLila, it) }
-        detailViewModel.interpretationTbj.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationTbj, it) }
-        detailViewModel.interpretationWater.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationWater, it) }
-        detailViewModel.interpretationBab.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationBab, it) }
-        detailViewModel.interpretationSmoke.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationSmoke, it) }
+        // --- Observers for each Health Interpretation value ---
+        viewModel.interpretationAge.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationAge, it) }
+        viewModel.interpretationWeight.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationWeight, it) }
+        viewModel.interpretationHeight.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationHeight, it) }
+        viewModel.interpretationHeadCircumference.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationHeadCircumference, it) }
+        viewModel.interpretationAsi.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationAsi, it) }
+        viewModel.interpretationMpasi.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationMpasi, it) }
+        viewModel.interpretationPosyandu.observe(viewLifecycleOwner) { updateInterpretationUI(binding.tvInterpretationPosyandu, it) }
     }
 
     private fun updateInterpretationUI(textView: TextView, result: InterpretationResult?) {
         result ?: return
-        var displayText = result.text
-        if (!result.recommendation.isNullOrBlank()){
-            displayText += "\n${result.recommendation}"
-        }
-
-        textView.text = displayText
+        textView.text = result.text
         textView.setTextColor(ContextCompat.getColor(requireContext(), result.color))
     }
 

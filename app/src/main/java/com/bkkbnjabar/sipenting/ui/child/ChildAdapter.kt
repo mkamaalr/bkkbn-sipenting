@@ -7,17 +7,17 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bkkbnjabar.sipenting.R
 import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
-import com.bkkbnjabar.sipenting.databinding.ItemPregnantMotherBinding
+import com.bkkbnjabar.sipenting.databinding.ItemChildBinding
 
 /**
  * Adapter untuk RecyclerView yang menampilkan daftar ibu hamil.
  */
 class ChildAdapter(
     private val onItemClicked: (Int) -> Unit // Pass the mother's localId instead of the whole entity
-) : ListAdapter<ChildListViewModel.PregnantMotherUI, ChildAdapter.MotherViewHolder>(DiffCallback()) {
+) : ListAdapter<ChildListViewModel.ChildUI, ChildAdapter.MotherViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MotherViewHolder {
-        val binding = ItemPregnantMotherBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemChildBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MotherViewHolder(binding)
     }
 
@@ -29,8 +29,8 @@ class ChildAdapter(
         holder.bind(currentItem)
     }
 
-    class MotherViewHolder(private val binding: ItemPregnantMotherBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(motherUI: ChildListViewModel.PregnantMotherUI) {
+    class MotherViewHolder(private val binding: ItemChildBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(motherUI: ChildListViewModel.ChildUI) {
             binding.apply {
                 tvMotherName.text = motherUI.name
                 tvMotherNik.text = "NIK: ${motherUI.nik}"
@@ -47,11 +47,11 @@ class ChildAdapter(
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<ChildListViewModel.PregnantMotherUI>() {
-        override fun areItemsTheSame(oldItem: ChildListViewModel.PregnantMotherUI, newItem: ChildListViewModel.PregnantMotherUI) =
+    class DiffCallback : DiffUtil.ItemCallback<ChildListViewModel.ChildUI>() {
+        override fun areItemsTheSame(oldItem: ChildListViewModel.ChildUI, newItem: ChildListViewModel.ChildUI) =
             oldItem.localId == newItem.localId
 
-        override fun areContentsTheSame(oldItem: ChildListViewModel.PregnantMotherUI, newItem: ChildListViewModel.PregnantMotherUI) =
+        override fun areContentsTheSame(oldItem: ChildListViewModel.ChildUI, newItem: ChildListViewModel.ChildUI) =
             oldItem == newItem
     }
 }

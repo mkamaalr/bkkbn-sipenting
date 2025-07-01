@@ -6,14 +6,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bkkbnjabar.sipenting.data.local.entity.ChildVisitsEntity
-import com.bkkbnjabar.sipenting.databinding.ItemVisitHistoryBinding
+import com.bkkbnjabar.sipenting.databinding.ItemChildVisitHistoryBinding
 
 class ChildVisitHistoryAdapter(
     private val onItemClick: (ChildVisitsEntity) -> Unit
 ) : ListAdapter<ChildVisitsEntity, ChildVisitHistoryAdapter.VisitViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VisitViewHolder {
-        val binding = ItemVisitHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemChildVisitHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return VisitViewHolder(binding)
     }
 
@@ -27,12 +27,13 @@ class ChildVisitHistoryAdapter(
         holder.bind(currentItem, visitNumber)
     }
 
-    class VisitViewHolder(private val binding: ItemVisitHistoryBinding) : RecyclerView.ViewHolder(binding.root) {
-        // Updated bind function to accept the visit number
+    class VisitViewHolder(private val binding: ItemChildVisitHistoryBinding) : RecyclerView.ViewHolder(binding.root) {
+        // Updated bind function to accept the visit number and a ChildVisitsEntity
         fun bind(visit: ChildVisitsEntity, visitNumber: Int) {
             binding.tvVisitTitle.text = "Kunjungan ke-${visitNumber}"
             binding.tvVisitDate.text = visit.visitDate
-            val summary = "Usia Hamil: ${visit.pregnancyWeekAge ?: '-'} mg, BB: ${visit.currentWeight ?: '-'} kg"
+            // Create a summary with key child visit data
+            val summary = "BB: ${visit.weightMeasurement ?: '-'} kg, TB: ${visit.heightMeasurement ?: '-'} cm"
             binding.tvVisitSummary.text = summary
         }
     }

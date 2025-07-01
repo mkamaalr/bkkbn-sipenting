@@ -40,4 +40,6 @@ interface LookupRepository {
      * @return A Flow emitting a list of LookupItem.
      */
     fun getLookupOptions(type: String): Flow<List<LookupItem>>
+    suspend fun uploadPendingData()
+    suspend fun syncFromServer()
 }

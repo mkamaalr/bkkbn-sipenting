@@ -20,11 +20,12 @@ import com.bkkbnjabar.sipenting.data.local.entity.*
         BreastfeedingMotherEntity::class,
         BreastfeedingMotherVisitsEntity::class,
         ChildEntity::class,
+        ChildMotherEntity::class,
         ChildVisitsEntity::class,
         LookupItemEntity::class,
         PregnantMotherVisitsEntity::class // FIXED: Tambahkan Entity ini
     ],
-    version = 1, // FIXED: MENINGKATKAN VERSI DATABASE! Naikkan dari 1 ke 10
+    version = 2, // FIXED: MENINGKATKAN VERSI DATABASE! Naikkan dari 1 ke 10
     exportSchema = false
 )
 @TypeConverters(ListStringConverter::class) // FIXED: Aktifkan TypeConverter ini jika Anda menyimpan List<String>
@@ -35,6 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun pregnantMotherDao(): PregnantMotherDao
     abstract fun breastfeedingMotherDao(): BreastfeedingMotherDao // Asumsi ada DAO ini
     abstract fun childDao(): ChildDao // Asumsi ada DAO ini
+    abstract fun childMotherDao(): ChildMotherDao // Asumsi ada DAO ini
     abstract fun breastfeedingMotherVisitsDao(): BreastfeedingMotherVisitsDao // ADDED
     abstract fun childVisitsDao(): ChildVisitsDao // ADDED
     abstract fun pregnantMotherVisitsDao(): PregnantMotherVisitsDao

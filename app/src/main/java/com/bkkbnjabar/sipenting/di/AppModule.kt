@@ -4,6 +4,7 @@ import android.content.Context
 import com.bkkbnjabar.sipenting.data.local.dao.BreastfeedingMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.BreastfeedingMotherVisitsDao
 import com.bkkbnjabar.sipenting.data.local.dao.ChildDao
+import com.bkkbnjabar.sipenting.data.local.dao.ChildMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.ChildVisitsDao
 import com.bkkbnjabar.sipenting.data.remote.AuthApiService
 import com.bkkbnjabar.sipenting.data.remote.LookupApiService
@@ -27,8 +28,12 @@ import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherVisitsDao
 import com.bkkbnjabar.sipenting.data.local.db.AppDatabase
 import com.bkkbnjabar.sipenting.data.repository.BreastfeedingMotherRepository
 import com.bkkbnjabar.sipenting.data.repository.BreastfeedingMotherRepositoryImpl
+import com.bkkbnjabar.sipenting.data.repository.ChildMotherRepository
+import com.bkkbnjabar.sipenting.data.repository.ChildMotherRepositoryImpl
 import com.bkkbnjabar.sipenting.data.repository.ChildRepository
 import com.bkkbnjabar.sipenting.data.repository.ChildRepositoryImpl
+import com.bkkbnjabar.sipenting.data.repository.SyncRepositoryImpl
+import com.bkkbnjabar.sipenting.domain.repository.SyncRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -90,5 +95,31 @@ object AppModule {
         childVisitsDao: ChildVisitsDao
     ): ChildRepository {
         return ChildRepositoryImpl(childDao, childVisitsDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChildMotherRepository(
+        childMotherDao: ChildMotherDao // Provided by DatabaseModule
+    ): ChildMotherRepository {
+        return ChildMotherRepositoryImpl(childMotherDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSyncRepository(
+        pregnantMotherRepository: PregnantMotherRepository,
+        breastfeedingMotherRepository: BreastfeedingMotherRepository,
+        childRepository: ChildRepository,
+        childMotherRepository: ChildMotherRepository,
+        lookupRepository: LookupRepository
+    ): SyncRepository {
+        return SyncRepositoryImpl(
+            pregnantMotherRepository,
+            breastfeedingMotherRepository,
+            childRepository,
+            childMotherRepository,
+            lookupRepository
+        )
     }
 }

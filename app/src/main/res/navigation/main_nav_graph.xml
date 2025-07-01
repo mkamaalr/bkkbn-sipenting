@@ -98,7 +98,7 @@
         android:label="Detail Ibu Hamil"
         tools:layout="@layout/fragment_child_detail" >
         <argument
-            android:name="motherId"
+            android:name="childId"
             app:argType="integer" />
         <action
             android:id="@+id/action_childDetailFragment_to_childRegistrationFragment2"

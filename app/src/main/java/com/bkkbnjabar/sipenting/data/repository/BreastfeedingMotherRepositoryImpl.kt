@@ -61,4 +61,12 @@ class BreastfeedingMotherRepositoryImpl @Inject constructor(
     override fun getAllMothersWithLatestStatus(): Flow<List<BreastfeedingMotherWithLatestStatus>> {
         return breastfeedingMotherDao.getAllMothersWithLatestStatus()
     }
+
+    override suspend fun uploadPendingData() {
+        // TODO: Implement logic to get pending mothers and visits from DAO and upload to API
+    }
+
+    override suspend fun syncFromServer() {
+        // TODO: Implement logic to fetch data from API and insert/update local database
+    }
 }

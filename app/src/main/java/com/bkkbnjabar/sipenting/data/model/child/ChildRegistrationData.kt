@@ -9,6 +9,7 @@ import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
  */
 data class ChildRegistrationData(
     val localId: Int? = null,
+    val motherId: Int? = null,
     val name: String? = null,
     val nik: String? = null,
     val dateOfBirth: String? = null,
