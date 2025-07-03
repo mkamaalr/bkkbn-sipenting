@@ -6,7 +6,7 @@ package com.bkkbnjabar.sipenting.data.model.breastfeedingmother
  */
 data class BreastfeedingMotherVisitData(
     val localVisitId: Int? = null,
-    val id: Int? = null,
+    val id: String? = null,
     val breastfeedingMotherId: Int? = null,
     val breastfeedingMotherStatusId: Int? = null,
     val visitDate: String? = null,

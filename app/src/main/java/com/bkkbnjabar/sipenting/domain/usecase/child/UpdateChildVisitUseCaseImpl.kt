@@ -14,6 +14,6 @@ class UpdateChildVisitUseCaseImpl @Inject constructor(
             return Resource.Error("ID Kunjungan tidak valid untuk diperbarui.")
         }
         val visitEntity = data.toEntity()
-        return repository.updateChildVisit(visitEntity)
+        return repository.updateVisit(visitEntity)
     }
 }

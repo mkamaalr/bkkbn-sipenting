@@ -1,6 +1,8 @@
 package com.bkkbnjabar.sipenting.di
 
 import com.bkkbnjabar.sipenting.data.remote.AuthApiService
+import com.bkkbnjabar.sipenting.data.remote.BreastfeedingMotherApiService
+import com.bkkbnjabar.sipenting.data.remote.ChildApiService
 import com.bkkbnjabar.sipenting.data.remote.LookupApiService
 import com.bkkbnjabar.sipenting.data.remote.PregnantMotherApiService
 import com.bkkbnjabar.sipenting.utils.AuthInterceptor
@@ -23,8 +25,8 @@ import javax.inject.Singleton
 object NetworkModule {
 
     // BASE URL hanya didefinisikan di sini
-    private const val BASE_URL = "http://192.168.1.15:8000/api/" // <<< GANTI DENGAN BASE URL API ANDA!
-//    private const val BASE_URL = "https://sipenting.bkkbnjabar.id/api/" // <<< GANTI DENGAN BASE URL API ANDA!
+//    private const val BASE_URL = "http://192.168.1.15:8000/api/" // <<< GANTI DENGAN BASE URL API ANDA!
+    private const val BASE_URL = "https://sipenting.bkkbnjabar.id/api/" // <<< GANTI DENGAN BASE URL API ANDA!
 
     @Provides
     @Singleton
@@ -100,5 +102,17 @@ object NetworkModule {
     @Singleton
     fun providePregnantMotherApiService(retrofit: Retrofit): PregnantMotherApiService {
         return retrofit.create(PregnantMotherApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChildApiService(retrofit: Retrofit): ChildApiService {
+        return retrofit.create(ChildApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBreastfeedingMotherApiService(retrofit: Retrofit): BreastfeedingMotherApiService {
+        return retrofit.create(BreastfeedingMotherApiService::class.java)
     }
 }

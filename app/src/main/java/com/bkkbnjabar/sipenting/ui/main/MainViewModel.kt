@@ -22,6 +22,9 @@ enum class SyncStatus {
     ERROR
 }
 
+data class PieChartData(val label: String, val value: Float)
+
+
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val sharedPrefsManager: SharedPrefsManager,
@@ -41,11 +44,24 @@ class MainViewModel @Inject constructor(
     private val _logoutEvent = MutableLiveData<Event<Unit>>()
     val logoutEvent: LiveData<Event<Unit>> = _logoutEvent
 
+    // LiveData to hold the last sync timestamp
+    private val _lastSyncTimestamp = MutableLiveData<Long>()
+    val lastSyncTimestamp: LiveData<Long> = _lastSyncTimestamp
+
+    private val _ageChartData = MutableLiveData<List<PieChartData>>()
+    val ageChartData: LiveData<List<PieChartData>> = _ageChartData
+
+    private val _immunizationChartData = MutableLiveData<List<PieChartData>>()
+    val immunizationChartData: LiveData<List<PieChartData>> = _immunizationChartData
+
+
     // LiveData to signal the MainActivity to open the navigation drawer
 
     init {
         // When the ViewModel is created, immediately load the user session from SharedPreferences
         loadUserSession()
+        loadDashboardData() // Load chart data
+        _lastSyncTimestamp.value = sharedPrefsManager.getLastSyncTimestamp()
     }
 
     private fun loadUserSession() {
@@ -53,26 +69,41 @@ class MainViewModel @Inject constructor(
     }
 
     /**
+     * Fetches dashboard data. In a real app, this would come from a repository.
+     */
+    private fun loadDashboardData() {
+        // Create dummy data that matches the screenshot
+        val dummyData = listOf(
+            PieChartData("Laki - Laki", 17f),
+            PieChartData("Perempuan", 83f)
+        )
+        _ageChartData.value = dummyData
+
+        val dummyImmunizationData = listOf(
+            PieChartData("Tidak Lengkap", 30f),
+            PieChartData("Lengkap", 70f)
+        )
+        _immunizationChartData.value = dummyImmunizationData
+    }
+
+    /**
      * Called when the user clicks the "Sync Data" button on the HomeFragment.
      * This function orchestrates the entire two-way sync process.
      */
     fun startSync() = viewModelScope.launch {
-        // Don't start a new sync if one is already in progress
         if (_syncStatus.value == SyncStatus.IN_PROGRESS) return@launch
-
         _syncStatus.postValue(SyncStatus.IN_PROGRESS)
-
         try {
-            // Step 1: Upload all pending local data to the server.
             syncRepository.uploadPendingData()
-
-            // Step 2: After uploading, download the latest data from the server.
             syncRepository.downloadAllData()
 
-            // If both steps succeed, update the status
+            // On success, save the current time and update LiveData
+            val currentTime = System.currentTimeMillis()
+            sharedPrefsManager.saveLastSyncTimestamp(currentTime)
+            _lastSyncTimestamp.postValue(currentTime)
+
             _syncStatus.postValue(SyncStatus.SUCCESS)
         } catch (e: Exception) {
-            // If anything goes wrong, set the status to Error
             _syncStatus.postValue(SyncStatus.ERROR)
         }
     }

@@ -61,7 +61,7 @@ fun BreastfeedingMotherVisitsEntity.toData(): BreastfeedingMotherVisitData {
 fun BreastfeedingMotherVisitData.toEntity(): BreastfeedingMotherVisitsEntity {
     return BreastfeedingMotherVisitsEntity(
         localVisitId = this.localVisitId ?: 0,
-        id = this.id ?: 0,
+        id = this.id ?: "",
         breastfeedingMotherId = this.breastfeedingMotherId ?: 0,
         breastfeedingMotherStatusId = this.breastfeedingMotherStatusId,
         visitDate = this.visitDate ?: "",

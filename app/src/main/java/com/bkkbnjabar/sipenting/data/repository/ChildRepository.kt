@@ -7,7 +7,9 @@ import com.bkkbnjabar.sipenting.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface ChildRepository {
-    suspend fun insertChild(childEntity: ChildEntity): Resource<Long>
+    suspend fun insertChild(child: ChildEntity): Resource<Long?>
+    suspend fun insertVisit(visit: ChildVisitsEntity): Resource<Unit>
+    suspend fun updateVisit(visit: ChildVisitsEntity): Resource<Unit>
     suspend fun insertChildVisit(visitEntity: ChildVisitsEntity): Resource<Unit>
     fun getAllChilds(): Flow<List<ChildEntity>>
     fun getChildById(localId: Int): Flow<ChildEntity?>

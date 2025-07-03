@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.view.WindowCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -78,6 +79,15 @@ class PregnantMotherRegistrationFragment1 : Fragment() {
 
         // Listener untuk menampilkan date picker
         binding.etDateOfBirth.setOnClickListener { showDatePickerDialog(it as TextInputEditText) }
+//
+//        binding.etFullAddress.setOnFocusChangeListener { v, hasFocus ->
+//            if (hasFocus) {
+//                binding.scrollView.post {
+//                    binding.scrollView.fullScroll(View.FOCUS_DOWN)
+//                }
+//            }
+//        }
+
     }
 
     private fun observeViewModel() {
@@ -193,7 +203,10 @@ class PregnantMotherRegistrationFragment1 : Fragment() {
 
         // 4. Validate RW
         if (binding.etPhoneNumber.text.isNullOrBlank()) {
-            binding.tilPhoneNumber.error = "Nomor Telepon tidak boleh kosong"
+            binding.tilPhoneNumber.error = "Nomor Handphone tidak boleh kosong"
+            isValid = false
+        } else if (binding.etPhoneNumber.text.toString().length != 12) {
+            binding.tilPhoneNumber.error = "Nomor Handphone harus 12 digit"
             isValid = false
         }
 

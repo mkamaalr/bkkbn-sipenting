@@ -15,7 +15,7 @@
     <string name="menu_gallery">Galeri</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="menu_pregnant_mother">Ibu Hamil</string>
-    <string name="menu_child">Anak</string>
+    <string name="menu_child">Balita</string>
     <string name="menu_breastfeeding_mother">Ibu Menyusui</string>
     <string name="menu_profile">Profil</string>
 
@@ -31,7 +31,7 @@
     <string name="hint_mother_name">Nama Ibu Hamil</string>
     <string name="hint_nik">Nomor Induk Kependudukan (NIK)</string>
     <string name="hint_date_of_birth">Tanggal Lahir (DD/MM/YYYY)</string>
-    <string name="hint_phone_number">Nomor Telepon</string>
+    <string name="hint_phone_number">Nomor Handphone (08xxx)</string>
     <string name="hint_province">Provinsi</string>
     <string name="hint_regency">Kabupaten/Kota</string>
     <string name="hint_district">Kecamatan</string>
@@ -40,9 +40,9 @@
     <string name="hint_rt">RT</string>
     <string name="hint_full_address">Alamat Lengkap (Jl, No Rumah)</string>
     <string name="hint_registration_date">Tanggal Pendaftaran</string>
-    <string name="button_next">Lanjut</string>
-    <string name="button_save">Simpan</string>
-    <string name="button_previous">Kembali</string>
+    <string name="button_next">SELANJUTNYA</string>
+    <string name="button_save">SIMPAN</string>
+    <string name="button_previous">KEMBALI</string>
 
     <!-- Child -->
     <string name="form_title_child_data">Pendaftaran Anak (Data Anak)</string>

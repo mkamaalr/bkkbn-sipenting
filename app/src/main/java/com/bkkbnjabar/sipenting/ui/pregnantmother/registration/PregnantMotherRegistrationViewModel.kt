@@ -66,7 +66,6 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
 
     // LiveData untuk semua dropdown di Halaman 2
     val counselingTypes: LiveData<List<LookupItem>> = lookupRepository.getLookupOptions("counseling-types").asLiveData()
-    val deliveryPlaces: LiveData<List<LookupItem>> = lookupRepository.getLookupOptions("delivery-places").asLiveData()
     val birthAssistants: LiveData<List<LookupItem>> = lookupRepository.getLookupOptions("birth-assistants").asLiveData()
     val contraceptionOptions: LiveData<List<LookupItem>> = lookupRepository.getLookupOptions("contraception-options").asLiveData()
     val givenBirthStatuses: LiveData<List<LookupItem>> = lookupRepository.getLookupOptions("given-birth-statuses").asLiveData()
@@ -221,8 +220,6 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
         isGivenBirth: Boolean? = null,
         givenBirthStatusId: Int? = null,
         pregnantMotherStatusId: Int? = null,
-        deliveryPlaceId: Int? = null,
-        birthAssistantId: Int? = null,
         contraceptionOptionId: Int? = null,
         diseaseHistory: List<String>? = null,
         mainSourceOfDrinkingWater: List<String>? = null,
@@ -269,8 +266,6 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
             isGivenBirth = isGivenBirth ?: currentData.isGivenBirth,
             givenBirthStatusId = givenBirthStatusId ?: currentData.givenBirthStatusId,
             pregnantMotherStatusId = pregnantMotherStatusId ?: currentData.pregnantMotherStatusId,
-            deliveryPlaceId = deliveryPlaceId ?: currentData.deliveryPlaceId,
-            birthAssistantId = birthAssistantId ?: currentData.birthAssistantId,
             contraceptionOptionId = contraceptionOptionId ?: currentData.contraceptionOptionId,
             diseaseHistory = diseaseHistory ?: currentData.diseaseHistory,
             mainSourceOfDrinkingWater = mainSourceOfDrinkingWater ?: currentData.mainSourceOfDrinkingWater,
@@ -355,5 +350,30 @@ class PregnantMotherRegistrationViewModel @Inject constructor(
             R.id.chip_group_defecation_facility -> updatePregnantMotherVisitData(defecationFacility = newSelection)
             R.id.chip_group_social_assistance -> updatePregnantMotherVisitData(socialAssistanceFacilitationOptions = newSelection)
         }
+    }
+
+    fun clearOngoingPregnancyData() {
+        val currentData = _currentPregnantMotherVisit.value ?: return
+        _currentPregnantMotherVisit.value = currentData.copy(
+            pregnancyWeekAge = null,
+            weightTrimester1 = null,
+            isHbChecked = false,
+            hemoglobinLevel = null,
+            hemoglobinLevelReason = "",
+            upperArmCircumference = null,
+            isTwin = false,
+            numberOfTwins = null,
+            isEstimatedFetalWeightChecked = false,
+            tbj = null,
+            isTfuMeasured = null,
+            tfu = null
+        )
+    }
+
+    fun clearBirthData() {
+        val currentData = _currentPregnantMotherVisit.value ?: return
+        _currentPregnantMotherVisit.value = currentData.copy(
+            givenBirthStatusId = null
+        )
     }
 }

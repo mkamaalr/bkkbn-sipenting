@@ -56,7 +56,7 @@ class BreastfeedingMotherDetailViewModel @Inject constructor(
     }
 
     fun calculateAllInterpretations() {
-        val latestVisit = _visitHistory.value?.maxByOrNull { it.visitDate } ?: return
+        val latestVisit = _visitHistory.value?.maxByOrNull { it.visitDate?: "" } ?: return
 
         interpretationComplication.value = if (latestVisit.isPostpartumComplication == true) {
             InterpretationResult("Beresiko", R.color.risk_red)

@@ -17,35 +17,25 @@ class SyncRepositoryImpl @Inject constructor(
 ) : SyncRepository {
 
     override suspend fun uploadPendingData() {
-        // coroutineScope allows us to launch multiple async tasks and wait for all of them
-        // to complete. If one fails, the whole scope is cancelled.
         coroutineScope {
-            // Create a list of deferred tasks for each upload operation
-            val uploadTasks = listOf(
+            listOf(
                 async { pregnantMotherRepository.uploadPendingData() },
-                async { breastfeedingMotherRepository.uploadPendingData() },
-                async { childRepository.uploadPendingData() },
-                async { childMotherRepository.uploadPendingData() }
-                // Add other upload tasks here
-            )
-            // awaitAll() will suspend until all async tasks are complete
-            uploadTasks.awaitAll()
+//                async { breastfeedingMotherRepository.uploadPendingData() },
+//                async { childRepository.uploadPendingData() },
+//                async { childMotherRepository.uploadPendingData() }
+            ).forEach { it.await() }
         }
     }
 
     override suspend fun downloadAllData() {
         coroutineScope {
-            // Create a list of deferred tasks for each download/sync operation
-            val downloadTasks = listOf(
+            listOf(
                 async { lookupRepository.preloadAllLookupData() },
                 async { pregnantMotherRepository.syncFromServer() },
-                async { breastfeedingMotherRepository.syncFromServer() },
-                async { childRepository.syncFromServer() },
-                async { childMotherRepository.syncFromServer() }
-                // Add other download/sync tasks here
-            )
-            // awaitAll() will suspend until all async tasks are complete
-            downloadTasks.awaitAll()
+//                async { breastfeedingMotherRepository.syncFromServer() },
+//                async { childRepository.syncFromServer() },
+//                async { childMotherRepository.syncFromServer() }
+            ).forEach { it.await() }
         }
     }
 }

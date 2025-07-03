@@ -13,14 +13,19 @@ class CreateChildVisitUseCaseImpl @Inject constructor(
     private val repository: ChildRepository
 ) : CreateChildVisitUseCase {
 
-    override suspend fun execute(data: ChildVisitData): Resource<Unit> {
-        // Validate that the visit is linked to a mother.
-        if (data.childId == null || data.childId == 0) {
-            return Resource.Error("Data kunjungan tidak terhubung dengan data ibu.")
+    override suspend fun execute(visitData: ChildVisitData): Resource<Unit> {
+        if (visitData.visitDate.isNullOrBlank()) {
+            return Resource.Error("Tanggal kunjungan tidak boleh kosong.")
+        }
+        if (visitData.childId == 0) {
+            return Resource.Error("Data anak tidak terhubung, gagal menyimpan kunjungan.")
         }
 
-        // Convert the visit form data to a database entity and insert it.
-        val visitEntity = data.toEntity()
-        return repository.insertChildVisit(visitEntity)
+        return try {
+            repository.insertVisit(visitData.toEntity())
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error("Gagal menyimpan data kunjungan: ${e.message}")
+        }
     }
 }

@@ -339,6 +339,14 @@ class BreastfeedingMotherRegistrationFragment2 : Fragment() {
         binding.etNextVisitDate.setText(data.nextVisitDate)
 
         binding.rgIsTwin.check(if (data.isTwin == true) R.id.rb_is_twin_yes else R.id.rb_is_twin_no)
+        val isTwin = data.isTwin == true
+        binding.tilBabyStatusTwin.isVisible = isTwin
+        binding.tilBabyStatusSingleton.isVisible = !isTwin
+        if (isTwin) {
+            binding.etBabyStatusTwin.setText(data.babyStatus ?: "", false)
+        } else {
+            binding.etBabyStatusSingleton.setText(data.babyStatus ?: "", false)
+        }
         binding.rgIsCounselingReceived.check(if (data.isCounselingReceived == true) R.id.rb_is_counseling_received_yes else R.id.rb_is_counseling_received_no)
         binding.tilCounselingType.isVisible = data.isCounselingReceived == true
         binding.rgIsIronReceived.check(if (data.isIronTablesReceived == true) R.id.rb_is_iron_received_yes else R.id.rb_is_iron_received_no)
@@ -389,6 +397,12 @@ class BreastfeedingMotherRegistrationFragment2 : Fragment() {
             } catch (_: Exception) { /* Do nothing */ }
         }
 
+        val babyStatusValue = if (binding.rgIsTwin.checkedRadioButtonId == R.id.rb_is_twin_yes) {
+            binding.etBabyStatusTwin.text.toString()
+        } else {
+            binding.etBabyStatusSingleton.text.toString()
+        }
+
         viewModel.updateBreastfeedingMotherVisitData(
             visitDate = binding.etVisitDate.text.toString().trim(),
             lastBirthDate = binding.etLastBirthDate.text.toString().trim(),
@@ -396,6 +410,7 @@ class BreastfeedingMotherRegistrationFragment2 : Fragment() {
             currentHeight = binding.etCurrentHeight.text.toString().toDoubleOrNull(),
             currentWeight = binding.etCurrentWeight.text.toString().toDoubleOrNull(),
             isTwin = binding.rgIsTwin.checkedRadioButtonId == R.id.rb_is_twin_yes,
+            babyStatus = babyStatusValue,
             isExposedToCigarettes = binding.rgIsExposedToSmoke.checkedRadioButtonId == R.id.rb_is_exposed_to_smoke_yes,
             isCounselingReceived = binding.rgIsCounselingReceived.checkedRadioButtonId == R.id.rb_is_counseling_received_yes,
             isIronTablesReceived = binding.rgIsIronReceived.checkedRadioButtonId == R.id.rb_is_iron_received_yes,

@@ -61,7 +61,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:hint="Status Ibu Saat Ini"
+                    android:hint="Status Ibu Hamil Saat Ini"
                     app:layout_constraintTop_toBottomOf="@id/til_visit_date"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
@@ -72,20 +72,158 @@
                         android:inputType="none"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/group_mother_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="
+                        tv_is_given_birth_label,
+                        rg_is_given_birth,
+                        til_given_birth_status,
+                        til_child_number,
+                        til_date_of_birth_last_child,
+                        layout_pregnancy_data,
+                        layout_current_measures,
+                        til_lila,
+                        tv_hb_check_label,
+                        rg_is_hb_checked,
+                        til_hb,
+                        til_hb_reason,
+                        barrier_hb_section,
+                        tv_tfu_label,
+                        rg_tfu_status,
+                        til_tfu,
+                        til_contraception_option,
+                        til_facilitating_referral_service,
+                        til_facilitating_social_assistance,
+                        tv_checkbox_title,
+                        tv_is_alive_label,
+                        rg_is_alive,
+                        tv_is_twin_label,
+                        rg_is_twin,
+                        til_number_of_twins,
+                        tv_is_tbj_checked_label,
+                        rg_is_tbj_checked,
+                        til_tbj,
+                        tv_is_counseling_received_label,
+                        rg_is_counseling_received,
+                        til_counseling_type,
+                        tv_is_iron_received_label,
+                        rg_is_iron_received,
+                        tv_is_iron_taken_label,
+                        rg_is_iron_taken,
+                        tv_is_exposed_to_smoke_label,
+                        rg_is_exposed_to_smoke,
+                        tv_is_mbg_received_label,
+                        rg_is_mbg_received,
+                        tv_disease_history_label,
+                        chip_group_disease_history,
+                        tv_drinking_water_label,
+                        chip_group_drinking_water,
+                        til_drinking_water_other,
+                        tv_defecation_facility_label,
+                        chip_group_defecation_facility,
+                        til_defecation_facility_other,
+                        tv_social_assistance_label,
+                        chip_group_social_assistance,
+                        til_social_assistance_other,
+                        til_tpk_notes,
+                        til_next_visit_date,
+                        tv_attachment_title,
+                        layout_images
+                        " />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/group_pregnancy_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="
+                        til_child_number,
+                        til_date_of_birth_last_child,
+                        layout_pregnancy_data,
+                        layout_current_measures,
+                        til_lila,
+                        tv_hb_check_label,
+                        rg_is_hb_checked,
+                        til_hb,
+                        til_hb_reason,
+                        barrier_hb_section,
+                        tv_tfu_label,
+                        rg_tfu_status,
+                        til_tfu,
+                        til_contraception_option,
+                        til_facilitating_referral_service,
+                        til_facilitating_social_assistance,
+                        tv_checkbox_title,
+                        tv_is_alive_label,
+                        rg_is_alive,
+                        tv_is_twin_label,
+                        rg_is_twin,
+                        til_number_of_twins,
+                        tv_is_tbj_checked_label,
+                        rg_is_tbj_checked,
+                        til_tbj,
+                        tv_is_counseling_received_label,
+                        rg_is_counseling_received,
+                        til_counseling_type,
+                        tv_is_iron_received_label,
+                        rg_is_iron_received,
+                        tv_is_iron_taken_label,
+                        rg_is_iron_taken,
+                        tv_is_exposed_to_smoke_label,
+                        rg_is_exposed_to_smoke,
+                        tv_is_mbg_received_label,
+                        rg_is_mbg_received,
+                        tv_disease_history_label,
+                        chip_group_disease_history,
+                        tv_drinking_water_label,
+                        chip_group_drinking_water,
+                        til_drinking_water_other,
+                        tv_defecation_facility_label,
+                        chip_group_defecation_facility,
+                        til_defecation_facility_other,
+                        tv_social_assistance_label,
+                        chip_group_social_assistance,
+                        til_social_assistance_other,
+                        til_tpk_notes,
+                        til_next_visit_date,
+                        tv_attachment_title,
+                        layout_images
+                        " />
+
                 <TextView
                     android:id="@+id/tv_is_given_birth_label"
                     style="@style/FormLabel"
                     android:text="Sudah Melahirkan?"
                     app:layout_constraintTop_toBottomOf="@id/til_pregnant_mother_status"
                     app:layout_constraintStart_toStartOf="parent" />
-                <RadioGroup
-                    android:id="@+id/rg_is_given_birth"
-                    style="@style/FormRadioGroup"
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_is_given_birth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="true"
+                    app:singleLine="true"
+                    app:selectionRequired="true"
                     app:layout_constraintTop_toBottomOf="@id/tv_is_given_birth_label"
                     app:layout_constraintStart_toStartOf="parent">
-                    <RadioButton android:id="@+id/rb_is_given_birth_yes" android:text="Ya" style="@style/FormRadioButton"/>
-                    <RadioButton android:id="@+id/rb_is_given_birth_no" android:text="Tidak" style="@style/FormRadioButton"/>
-                </RadioGroup>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_is_given_birth_yes"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ya"
+                        android:checkable="true" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_is_given_birth_no"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tidak"
+                        android:checkable="true" />
+                </com.google.android.material.chip.ChipGroup>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_given_birth_status"
@@ -96,7 +234,7 @@
                     android:hint="Status Kelahiran"
                     android:visibility="gone"
                     tools:visibility="visible"
-                    app:layout_constraintTop_toBottomOf="@id/rg_is_given_birth"
+                    app:layout_constraintTop_toBottomOf="@id/chip_group_is_given_birth"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
                     <AutoCompleteTextView
@@ -347,47 +485,14 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_delivery_place"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:hint="Rencana Tempat Persalinan"
-                    app:layout_constraintTop_toBottomOf="@id/til_tfu"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
-                    <AutoCompleteTextView
-                        android:id="@+id/et_delivery_place"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="none"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_birth_assistant"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:hint="Rencana Penolong Kelahiran"
-                    app:layout_constraintTop_toBottomOf="@id/til_delivery_place"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
-                    <AutoCompleteTextView
-                        android:id="@+id/et_birth_assistant"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="none"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_contraception_option"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:visibility="gone"
                     android:hint="Metode KB Setelah Melahirkan"
-                    app:layout_constraintTop_toBottomOf="@id/til_birth_assistant"
+                    app:layout_constraintTop_toBottomOf="@id/til_tfu"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
                     <AutoCompleteTextView

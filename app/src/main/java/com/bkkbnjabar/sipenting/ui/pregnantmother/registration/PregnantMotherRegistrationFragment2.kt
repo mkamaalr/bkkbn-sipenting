@@ -49,8 +49,6 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
     private var pregnantMotherStatusOptions: List<LookupItem> = emptyList()
     private var givenBirthStatusOptions: List<LookupItem> = emptyList()
     private var counselingTypeOptions: List<LookupItem> = emptyList()
-    private var deliveryPlaceOptions: List<LookupItem> = emptyList()
-    private var birthAssistantOptions: List<LookupItem> = emptyList()
     private var contraceptionOptions: List<LookupItem> = emptyList()
     private var referralStatusOptions: List<String> = emptyList()
     private var socialAssistanceStatusOptions: List<String> = emptyList()
@@ -106,13 +104,28 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             viewModel.saveAllData()
         }
 
-        binding.rgIsGivenBirth.setOnCheckedChangeListener { _, checkedId ->
-            val isGivenBirth = (checkedId == R.id.rb_is_given_birth_yes)
-            binding.tilGivenBirthStatus.isVisible = isGivenBirth
-            if (!isGivenBirth) {
-                binding.etGivenBirthStatus.setText("", false)
-            }
+//        binding.rgIsGivenBirth.setOnCheckedStateChangeListener { group, checkedIds ->
+//            val isGivenBirth = checkedIds.contains(R.id.rb_is_given_birth_yes)
+//            binding.tilGivenBirthStatus.isVisible = isGivenBirth
+//
+//            if (!isGivenBirth) {
+//                binding.etGivenBirthStatus.setText("", false)
+//            }
+//        }
+
+        binding.chipGroupIsGivenBirth.setOnCheckedStateChangeListener { group, checkedIds ->
+            // The listener gives us a list of checked IDs. Since it's single-selection,
+            // it will have at most one ID.
+            toggleFormVisibility()
         }
+
+//        binding.rgIsGivenBirth.setOnCheckedChangeListener { _, checkedId ->
+//            val isGivenBirth = (checkedId == R.id.rb_is_given_birth_yes)
+//            binding.tilGivenBirthStatus.isVisible = isGivenBirth
+//            if (!isGivenBirth) {
+//                binding.etGivenBirthStatus.setText("", false)
+//            }
+//        }
         binding.rgIsHbChecked.setOnCheckedChangeListener { _, checkedId ->
             val isChecked = (checkedId == R.id.rb_hb_checked_yes)
             binding.tilHb.isVisible = isChecked
@@ -161,6 +174,21 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         setupDateField(binding.tilVisitDate, binding.etVisitDate)
         setupDateField(binding.tilDateOfBirthLastChild, binding.etDateOfBirthLastChild)
         setupDateField(binding.tilNextVisitDate, binding.etNextVisitDate)
+
+        binding.etPregnantMotherStatus.setOnItemClickListener { parent, _, position, _ ->
+            val selectedStatus = parent.getItemAtPosition(position).toString()
+            toggleFieldsVisibility(selectedStatus)
+        }
+//        binding.etPregnantMotherStatus.onItemClickListener =
+//            AdapterView.OnItemClickListener { _, _, _, _ ->
+//                toggleFormVisibility()
+//            }
+//
+//        // Listener for the "Sudah Melahirkan?" radio group
+//        binding.rgIsGivenBirth.setOnCheckedChangeListener { _, _ ->
+//            toggleFormVisibility()
+//        }
+
     }
 
     private fun observeViewModel() {
@@ -193,16 +221,6 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         viewModel.counselingTypes.observe(viewLifecycleOwner) {
             counselingTypeOptions = it ?: emptyList()
             binding.etCounselingType.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, counselingTypeOptions.map { it.name }))
-            updateFormFromData(viewModel.currentPregnantMotherVisit.value)
-        }
-        viewModel.deliveryPlaces.observe(viewLifecycleOwner) {
-            deliveryPlaceOptions = it ?: emptyList()
-            binding.etDeliveryPlace.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, deliveryPlaceOptions.map { it.name }))
-            updateFormFromData(viewModel.currentPregnantMotherVisit.value)
-        }
-        viewModel.birthAssistants.observe(viewLifecycleOwner) {
-            birthAssistantOptions = it ?: emptyList()
-            binding.etBirthAssistant.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, birthAssistantOptions.map { it.name }))
             updateFormFromData(viewModel.currentPregnantMotherVisit.value)
         }
         viewModel.contraceptionOptions.observe(viewLifecycleOwner) {
@@ -270,7 +288,12 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         binding.etTfu.setText(data.tfu?.toString() ?: "")
 
         binding.rgIsAlive.check(if (data.isAlive == true) R.id.rb_is_alive_yes else R.id.rb_is_alive_no)
-        binding.rgIsGivenBirth.check(if (data.isGivenBirth == true) R.id.rb_is_given_birth_yes else R.id.rb_is_given_birth_no)
+        if (data.isGivenBirth == true) {
+            binding.chipIsGivenBirthYes.isChecked = true
+        } else {
+            binding.chipIsGivenBirthNo.isChecked = true
+        }
+//        binding.rgIsGivenBirth.check(if (data.isGivenBirth == true) R.id.rb_is_given_birth_yes else R.id.rb_is_given_birth_no)
         binding.rgIsHbChecked.check(if (data.isHbChecked == true) R.id.rb_hb_checked_yes else R.id.rb_hb_checked_no)
         binding.rgIsTwin.check(if (data.isTwin == true) R.id.rb_is_twin_yes else R.id.rb_is_twin_no)
         binding.rgIsTbjChecked.check(if (data.isEstimatedFetalWeightChecked == true) R.id.rb_is_tbj_checked_yes else R.id.rb_is_tbj_checked_no)
@@ -286,8 +309,6 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         binding.tilGivenBirthStatus.isVisible = (data.isGivenBirth == true)
         binding.etGivenBirthStatus.setText(givenBirthStatusOptions.find { it.id == data.givenBirthStatusId }?.name ?: "", false)
         binding.etCounselingType.setText(counselingTypeOptions.find { it.id == data.counselingTypeId }?.name ?: "", false)
-        binding.etDeliveryPlace.setText(deliveryPlaceOptions.find { it.id == data.deliveryPlaceId }?.name ?: "", false)
-        binding.etBirthAssistant.setText(birthAssistantOptions.find { it.id == data.birthAssistantId }?.name ?: "", false)
         binding.etContraceptionOption.setText(contraceptionOptions.find { it.id == data.contraceptionOptionId }?.name ?: "", false)
         binding.etFacilitatingReferralService.setText(data.facilitatingReferralServiceStatus ?: "", false)
         binding.etFacilitatingSocialAssistance.setText(data.facilitatingSocialAssistanceStatus ?: "", false)
@@ -308,6 +329,8 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
         } else {
             binding.tvLocationResult.text = ""
         }
+
+        toggleFormVisibility()
     }
 
     private fun saveUIToViewModel() {
@@ -347,15 +370,13 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             nextVisitDate = binding.etNextVisitDate.text.toString().trim(),
             tpkNotes = binding.etTpkNotes.text.toString().trim(),
             isAlive = binding.rgIsAlive.checkedRadioButtonId == R.id.rb_is_alive_yes,
-            isGivenBirth = binding.rgIsGivenBirth.checkedRadioButtonId == R.id.rb_is_given_birth_yes,
+            isGivenBirth = binding.chipGroupIsGivenBirth.checkedChipId == R.id.rb_is_given_birth_yes,
             tfu = binding.etTfu.text.toString().toDoubleOrNull(),
             isReceivedMbg = binding.rgIsMbgReceived.checkedRadioButtonId == R.id.rb_is_mbg_received_yes,
             isTfuMeasured = binding.rgTfuStatus.checkedRadioButtonId == R.id.rb_tfu_diukur,
             pregnantMotherStatusId = pregnantMotherStatusOptions.find { it.name == binding.etPregnantMotherStatus.text.toString() }?.id,
             givenBirthStatusId = givenBirthStatusOptions.find { it.name == binding.etGivenBirthStatus.text.toString() }?.id,
             counselingTypeId = counselingTypeOptions.find { it.name == binding.etCounselingType.text.toString() }?.id,
-            deliveryPlaceId = deliveryPlaceOptions.find { it.name == binding.etDeliveryPlace.text.toString() }?.id,
-            birthAssistantId = birthAssistantOptions.find { it.name == binding.etBirthAssistant.text.toString() }?.id,
             contraceptionOptionId = contraceptionOptions.find { it.name == binding.etContraceptionOption.text.toString() }?.id,
             facilitatingReferralServiceStatus = binding.etFacilitatingReferralService.text.toString(),
             facilitatingSocialAssistanceStatus = binding.etFacilitatingSocialAssistance.text.toString(),
@@ -555,6 +576,43 @@ class PregnantMotherRegistrationFragment2 : Fragment() {
             textInputLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear_text)
         }
     }
+
+    /**
+     * A single function to handle all conditional visibility logic.
+     */
+    private fun toggleFormVisibility() {
+        val selectedStatus = binding.etPregnantMotherStatus.text.toString()
+        val hasEnded = (selectedStatus == "Pindah" || selectedStatus == "Meninggal")
+
+        binding.groupMotherStatus.isVisible = !hasEnded
+
+        if (!hasEnded) {
+            // ============================ THE CHANGE IS HERE ============================
+            // The logic now checks the ChipGroup's checked ID
+            val hasGivenBirth = binding.chipGroupIsGivenBirth.checkedChipId == R.id.chip_is_given_birth_yes
+            // ===========================================================================
+
+            binding.tilGivenBirthStatus.isVisible = hasGivenBirth
+            binding.groupPregnancyStatus.isVisible = !hasGivenBirth
+
+            if (hasGivenBirth) {
+                viewModel.clearOngoingPregnancyData()
+            } else {
+                viewModel.clearBirthData()
+            }
+        }
+    }
+
+    /**
+     * A new helper function to show or hide the group of fields.
+     */
+    private fun toggleFieldsVisibility(status: String?) {
+        val shouldHideDetails = (status == "Pindah" || status == "Meninggal")
+        binding.groupMotherStatus.isVisible = !shouldHideDetails
+    }
+
+
+
 
     override fun onPause() {
         super.onPause()

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.bkkbnjabar.sipenting.data.local.entity.ChildVisitsEntity
 import kotlinx.coroutines.flow.Flow
@@ -41,4 +42,30 @@ interface ChildVisitsDao {
      */
     @Query("SELECT * FROM child_visits WHERE localVisitId = :localVisitId")
     fun getVisitById(localVisitId: Int): Flow<ChildVisitsEntity?>
+
+    /**
+     * Retrieves a list of all child visits that have been saved locally but not yet
+     * synced to the server.
+     * @return A list of ChildVisitsEntity with a 'PENDING' sync status.
+     */
+    @Query("SELECT * FROM child_visits WHERE syncStatus = 'PENDING'")
+    suspend fun getPendingVisits(): List<ChildVisitsEntity>
+
+    /**
+     * A transactional function that first deletes all existing child visit records
+     * and then inserts a fresh list from the server. Using @Transaction ensures this
+     * operation is atomic and safe.
+     * @param visits The new list of visits fetched from the server.
+     */
+    @Transaction
+    suspend fun clearAndInsertAll(visits: List<ChildVisitsEntity>) {
+        deleteAll()
+        insertAll(visits)
+    }
+
+    @Query("DELETE FROM child_visits")
+    suspend fun deleteAll()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(visits: List<ChildVisitsEntity>)
 }

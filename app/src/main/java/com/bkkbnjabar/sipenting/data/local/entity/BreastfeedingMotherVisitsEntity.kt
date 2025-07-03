@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.bkkbnjabar.sipenting.data.model.pregnantmother.SyncStatus
 
 @Entity(
     tableName = "breastfeeding_mother_visits",
@@ -20,17 +21,17 @@ import androidx.room.PrimaryKey
 data class BreastfeedingMotherVisitsEntity(
     @PrimaryKey(autoGenerate = true)
     val localVisitId: Int = 0,
-    val id: Int = 0,
+    val id: String? = null, // Server ID
     val breastfeedingMotherId: Int,
-    val visitDate: String,
+    val visitDate: String?,
     val breastfeedingMotherStatusId: Int?,
-    val lastBirthDate: String,
+    val lastBirthDate: String?,
     val deliveryPlaceId: Int?,
     val birthAssistantId: Int?,
     val modeOfDelivery: String?,
-    val isTwin: Boolean,
+    val isTwin: Boolean?,
     val babyStatus: String?, // e.g., "Hidup", "Meninggal"
-    val isPostpartumComplication: Boolean,
+    val isPostpartumComplication: Boolean?,
     val postpartumComplication: List<String>?,
     val postpartumComplicationOther: String?,
     val isExposedToCigarettes: Boolean,
@@ -56,6 +57,7 @@ data class BreastfeedingMotherVisitsEntity(
     val imagePath2: String?,
     val latitude: Double?,
     val longitude: Double?,
+    val syncStatus: SyncStatus = SyncStatus.PENDING,
     val createdAt: Long = System.currentTimeMillis(),
     val onContraception: Boolean,
     val contraceptionTypeId: Int?,

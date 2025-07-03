@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherVisitsEntity
 import kotlinx.coroutines.flow.Flow
@@ -31,4 +32,22 @@ interface PregnantMotherVisitsDao {
 
     @Query("SELECT * FROM pregnant_mother_visits WHERE localVisitId = :visitId")
     fun getVisitById(visitId: Int): Flow<PregnantMotherVisitsEntity?>
+
+    @Query("SELECT * FROM pregnant_mother_visits WHERE id = :serverId LIMIT 1")
+    suspend fun findByServerId(serverId: String): PregnantMotherVisitsEntity?
+
+    @Query("SELECT * FROM pregnant_mother_visits WHERE syncStatus = 'PENDING'")
+    suspend fun getPendingVisits(): List<PregnantMotherVisitsEntity>
+
+    @Transaction
+    suspend fun clearAndInsertAll(visit: List<PregnantMotherVisitsEntity>) {
+        deleteAll()
+        insertAll(visit)
+    }
+
+    @Query("DELETE FROM pregnant_mother_visits")
+    suspend fun deleteAll()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(visit: List<PregnantMotherVisitsEntity>)
 }

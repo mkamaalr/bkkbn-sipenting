@@ -1,5 +1,6 @@
 package com.bkkbnjabar.sipenting.ui.home
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,13 +8,25 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.bkkbnjabar.sipenting.R
 import com.bkkbnjabar.sipenting.databinding.FragmentHomeBinding
 import com.bkkbnjabar.sipenting.ui.main.MainViewModel
+import com.bkkbnjabar.sipenting.ui.main.PieChartData
+import com.bkkbnjabar.sipenting.ui.main.SyncStatus
+import com.github.mikephil.charting.charts.PieChart
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -36,7 +49,10 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupClickListeners()
+        setupPieChart(binding.pieChartAge)
+        setupPieChart(binding.pieChartImmunization)
         observeViewModel()
+
     }
 
     private fun setupClickListeners() {
@@ -44,6 +60,10 @@ class HomeFragment : Fragment() {
         binding.ivHomeIcon.setOnClickListener { view ->
             // Show the popup menu, anchored to the icon itself
             showOverflowMenu(view)
+        }
+
+        binding.cardSyncData.setOnClickListener {
+            mainViewModel.startSync()
         }
 
         // Pregnant Mother Menu
@@ -77,8 +97,112 @@ class HomeFragment : Fragment() {
 //                binding.tvLocation2.text = "${it.kecamatanName} - ${it.kelurahanName}"
             }
         }
+
+//        mainViewModel.logoutEvent.observe(viewLifecycleOwner) { event ->
+//            event.getContentIfNotHandled()?.let {
+//                if (it) {
+//                    findNavController().navigate(R.id.action_global_to_auth_nav_graph)
+//                }
+//            }
+//        }
+
+        // Observe the sync status to provide visual feedback to the user
+        mainViewModel.syncStatus.observe(viewLifecycleOwner) { status ->
+            when (status) {
+                SyncStatus.IN_PROGRESS -> {
+                    binding.cardSyncData.isEnabled = false
+                    binding.tvSyncText.text = "Sinkronisasi..."
+                    binding.ivSyncIcon.setImageResource(R.drawable.ic_sync_pending)
+                }
+                SyncStatus.SUCCESS -> {
+                    binding.cardSyncData.isEnabled = true
+                    binding.tvSyncText.text = "Sync Data Berhasil"
+                    binding.ivSyncIcon.setImageResource(R.drawable.ic_sync_done)
+                    Toast.makeText(context, "Sinkronisasi data berhasil!", Toast.LENGTH_SHORT).show()
+                }
+                SyncStatus.ERROR -> {
+                    binding.cardSyncData.isEnabled = true
+                    binding.tvSyncText.text = "Gagal, Coba Lagi"
+                    binding.ivSyncIcon.setImageResource(R.drawable.ic_sync_error)
+                    Toast.makeText(context, "Sinkronisasi gagal, silakan coba lagi.", Toast.LENGTH_LONG).show()
+                }
+                else -> { // IDLE
+                    binding.cardSyncData.isEnabled = true
+                    binding.tvSyncText.text = "Sync Data"
+                    binding.ivSyncIcon.setImageResource(R.drawable.ic_sync_pending)
+                }
+            }
+        }
+
+        // Observer for the last sync timestamp
+        mainViewModel.lastSyncTimestamp.observe(viewLifecycleOwner) { timestamp ->
+            if (timestamp > 0) {
+                // Format the timestamp into a readable date and time
+                val sdf = SimpleDateFormat("d MMM yyyy, HH:mm", Locale("id", "ID"))
+                binding.tvLastSync.text = "Terakhir sinkron: ${sdf.format(Date(timestamp))}"
+                binding.tvLastSync.visibility = View.VISIBLE
+            } else {
+                // If the timestamp is 0, it means no sync has happened yet
+                binding.tvLastSync.text = "Belum pernah sinkronisasi"
+                binding.tvLastSync.visibility = View.VISIBLE
+            }
+        }
+
+        mainViewModel.ageChartData.observe(viewLifecycleOwner) { data ->
+            if (data.isNotEmpty()) {
+                val colors = listOf(
+                    ContextCompat.getColor(requireContext(), R.color.chart_green),
+                    ContextCompat.getColor(requireContext(), R.color.chart_yellow)
+                )
+                updatePieChartData(binding.pieChartAge, data, colors)
+            }
+        }
+
+        mainViewModel.immunizationChartData.observe(viewLifecycleOwner) { data ->
+            if (data.isNotEmpty()) {
+                // Define the colors for this specific chart
+                val colors = listOf(
+                    ContextCompat.getColor(requireContext(), R.color.chart_green), // Tidak Lengkap
+                    ContextCompat.getColor(requireContext(), R.color.chart_yellow) // Lengkap
+                )
+                updatePieChartData(binding.pieChartImmunization, data, colors)
+            }
+        }
+
     }
 
+    private fun setupPieChart(chart: PieChart) {
+        chart.apply {
+            setUsePercentValues(true)
+            description.isEnabled = false
+            isDrawHoleEnabled = true
+            holeRadius = 58f
+            transparentCircleRadius = 61f
+            setEntryLabelColor(Color.BLACK)
+            setEntryLabelTextSize(12f)
+            legend.isEnabled = true
+        }
+    }
+
+    private fun updatePieChartData(chart: PieChart, data: List<PieChartData>, colors: List<Int>) {
+        val entries = ArrayList<PieEntry>()
+        for (item in data) {
+            entries.add(PieEntry(item.value, item.label))
+        }
+
+        val dataSet = PieDataSet(entries, "")
+        dataSet.sliceSpace = 3f
+        dataSet.selectionShift = 5f
+        dataSet.colors = colors
+
+        val pieData = PieData(dataSet)
+        pieData.setValueFormatter(PercentFormatter(chart))
+        pieData.setValueTextSize(14f)
+        pieData.setValueTextColor(Color.BLACK)
+
+        chart.data = pieData
+        chart.invalidate() // Refresh the chart
+    }
     /**
      * Creates and shows a PopupMenu that mimics the Toolbar's overflow menu.
      * @param anchorView The view (the icon) to which the popup will be anchored.

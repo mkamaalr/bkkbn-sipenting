@@ -5,13 +5,14 @@ import com.bkkbnjabar.sipenting.data.model.child.ChildRegistrationData
 import com.bkkbnjabar.sipenting.utils.Resource
 
 /**
- * Interface for the use case that creates a new pregnant mother record.
+ * Use case for creating a new child record in the local database.
  */
 interface CreateChildUseCase {
     /**
-     * Executes the use case to save a new pregnant mother's data.
-     * @param data The registration data from the form.
-     * @return A Resource containing the new row ID (Long) from the database if successful.
+     * Executes the use case.
+     * @param childData The child's data to be saved.
+     * @return A Resource containing the new localId of the child, or an error.
      */
-    suspend fun execute(data: ChildData): Resource<Long>
+    suspend fun execute(childData: ChildData): Resource<Long?>
+
 }

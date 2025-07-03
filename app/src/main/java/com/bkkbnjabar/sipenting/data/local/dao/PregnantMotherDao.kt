@@ -5,7 +5,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import com.bkkbnjabar.sipenting.data.local.entity.ChildEntity
 import com.bkkbnjabar.sipenting.data.local.entity.PregnantMotherEntity
 import com.bkkbnjabar.sipenting.data.model.pregnantmother.PregnantMotherWithLatestStatus
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +21,9 @@ interface PregnantMotherDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPregnantMother(pregnantMother: PregnantMotherEntity): Long
+
+    @Update
+    suspend fun updatePregnantMother(pregnantMother: PregnantMotherEntity)
 
     /**
      * Gets all pregnant mother records from the database, ordered by creation date.
@@ -53,4 +58,21 @@ interface PregnantMotherDao {
     """)
     fun getAllMothersWithLatestStatus(): Flow<List<PregnantMotherWithLatestStatus>>
 
+    @Query("SELECT * FROM pregnant_mother WHERE id = :serverId LIMIT 1")
+    suspend fun findByServerId(serverId: String): PregnantMotherEntity?
+
+    @Query("SELECT * FROM pregnant_mother WHERE syncStatus = 'PENDING'")
+    suspend fun getPendingPregnantMother(): List<PregnantMotherEntity>
+
+    @Transaction
+    suspend fun clearAndInsertAll(pregnantMother: List<PregnantMotherEntity>) {
+        deleteAll()
+        insertAll(pregnantMother)
+    }
+
+    @Query("DELETE FROM pregnant_mother")
+    suspend fun deleteAll()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(pregnantMother: List<PregnantMotherEntity>)
 }

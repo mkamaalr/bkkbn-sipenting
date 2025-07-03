@@ -26,6 +26,8 @@ import com.bkkbnjabar.sipenting.data.local.dao.LookupDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherDao
 import com.bkkbnjabar.sipenting.data.local.dao.PregnantMotherVisitsDao
 import com.bkkbnjabar.sipenting.data.local.db.AppDatabase
+import com.bkkbnjabar.sipenting.data.remote.BreastfeedingMotherApiService
+import com.bkkbnjabar.sipenting.data.remote.ChildApiService
 import com.bkkbnjabar.sipenting.data.repository.BreastfeedingMotherRepository
 import com.bkkbnjabar.sipenting.data.repository.BreastfeedingMotherRepositoryImpl
 import com.bkkbnjabar.sipenting.data.repository.ChildMotherRepository
@@ -39,18 +41,16 @@ import com.bkkbnjabar.sipenting.domain.repository.SyncRepository
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    // --- Shared Preferences Manager ---
     @Provides
     @Singleton
     fun provideSharedPrefsManager(@ApplicationContext context: Context): SharedPrefsManager {
         return SharedPrefsManager(context)
     }
 
-    // --- Repositories ---
     @Provides
     @Singleton
     fun provideAuthRepository(
-        authApiService: AuthApiService, // Disediakan dari NetworkModule
+        authApiService: AuthApiService,
         sharedPrefsManager: SharedPrefsManager
     ): AuthRepository {
         return AuthRepositoryImpl(authApiService, sharedPrefsManager)
@@ -59,8 +59,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideLookupRepository(
-        lookupApiService: LookupApiService, // Disediakan dari NetworkModule
-        lookupDao: LookupDao,               // Disediakan dari DatabaseModule
+        lookupApiService: LookupApiService,
+        lookupDao: LookupDao,
         database: AppDatabase
     ): LookupRepository {
         return LookupRepositoryImpl(
@@ -73,36 +73,41 @@ object AppModule {
     @Provides
     @Singleton
     fun providePregnantMotherRepository(
-        pregnantMotherDao: PregnantMotherDao,           // Disediakan dari DatabaseModule
-        pregnantMotherVisitsDao: PregnantMotherVisitsDao // Disediakan dari DatabaseModule
+        motherDao: PregnantMotherDao,
+        visitsDao: PregnantMotherVisitsDao,
+        apiService: PregnantMotherApiService
     ): PregnantMotherRepository {
-        return PregnantMotherRepositoryImpl(pregnantMotherDao, pregnantMotherVisitsDao)
+        return PregnantMotherRepositoryImpl(motherDao, visitsDao, apiService)
     }
 
     @Provides
     @Singleton
     fun provideBreastfeedingMotherRepository(
-        breastfeedingMotherDao: BreastfeedingMotherDao,
-        breastfeedingMotherVisitsDao: BreastfeedingMotherVisitsDao
+        motherDao: BreastfeedingMotherDao,
+        visitsDao: BreastfeedingMotherVisitsDao,
+        apiService: BreastfeedingMotherApiService
     ): BreastfeedingMotherRepository {
-        return BreastfeedingMotherRepositoryImpl(breastfeedingMotherDao, breastfeedingMotherVisitsDao)
+        return BreastfeedingMotherRepositoryImpl(motherDao, visitsDao, apiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChildMotherRepository(
+        dao: ChildMotherDao,
+        apiService: ChildApiService
+    ): ChildMotherRepository {
+        return ChildMotherRepositoryImpl(dao, apiService)
     }
 
     @Provides
     @Singleton
     fun provideChildRepository(
         childDao: ChildDao,
-        childVisitsDao: ChildVisitsDao
+        childMotherDao: ChildMotherDao,
+        visitsDao: ChildVisitsDao,
+        apiService: ChildApiService
     ): ChildRepository {
-        return ChildRepositoryImpl(childDao, childVisitsDao)
-    }
-
-    @Provides
-    @Singleton
-    fun provideChildMotherRepository(
-        childMotherDao: ChildMotherDao // Provided by DatabaseModule
-    ): ChildMotherRepository {
-        return ChildMotherRepositoryImpl(childMotherDao)
+        return ChildRepositoryImpl(childDao, childMotherDao, visitsDao, apiService)
     }
 
     @Provides

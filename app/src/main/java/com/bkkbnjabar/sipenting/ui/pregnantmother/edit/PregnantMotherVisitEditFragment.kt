@@ -52,7 +52,6 @@ class PregnantMotherVisitEditFragment : Fragment() {
     private var pregnantMotherStatusOptions: List<LookupItem> = emptyList()
     private var givenBirthStatusOptions: List<LookupItem> = emptyList()
     private var counselingTypeOptions: List<LookupItem> = emptyList()
-    private var deliveryPlaceOptions: List<LookupItem> = emptyList()
     private var birthAssistantOptions: List<LookupItem> = emptyList()
     private var contraceptionOptions: List<LookupItem> = emptyList()
     private var referralStatusOptions: List<String> = emptyList()
@@ -194,14 +193,6 @@ class PregnantMotherVisitEditFragment : Fragment() {
             counselingTypeOptions = it ?: emptyList()
             binding.etCounselingType.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, counselingTypeOptions.map { it.name }))
         }
-        viewModel.deliveryPlaces.observe(viewLifecycleOwner) {
-            deliveryPlaceOptions = it ?: emptyList()
-            binding.etDeliveryPlace.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, deliveryPlaceOptions.map { it.name }))
-        }
-        viewModel.birthAssistants.observe(viewLifecycleOwner) {
-            birthAssistantOptions = it ?: emptyList()
-            binding.etBirthAssistant.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, birthAssistantOptions.map { it.name }))
-        }
         viewModel.contraceptionOptions.observe(viewLifecycleOwner) {
             contraceptionOptions = it ?: emptyList()
             binding.etContraceptionOption.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, contraceptionOptions.map { it.name }))
@@ -277,8 +268,6 @@ class PregnantMotherVisitEditFragment : Fragment() {
         binding.tilGivenBirthStatus.isVisible = (data.isGivenBirth == true)
         binding.etGivenBirthStatus.setText(givenBirthStatusOptions.find { it.id == data.givenBirthStatusId }?.name ?: "", false)
         binding.etCounselingType.setText(counselingTypeOptions.find { it.id == data.counselingTypeId }?.name ?: "", false)
-        binding.etDeliveryPlace.setText(deliveryPlaceOptions.find { it.id == data.deliveryPlaceId }?.name ?: "", false)
-        binding.etBirthAssistant.setText(birthAssistantOptions.find { it.id == data.birthAssistantId }?.name ?: "", false)
         binding.etContraceptionOption.setText(contraceptionOptions.find { it.id == data.contraceptionOptionId }?.name ?: "", false)
         binding.etFacilitatingReferralService.setText(data.facilitatingReferralServiceStatus ?: "", false)
         binding.etFacilitatingSocialAssistance.setText(data.facilitatingSocialAssistanceStatus ?: "", false)
@@ -345,8 +334,6 @@ class PregnantMotherVisitEditFragment : Fragment() {
             pregnantMotherStatusId = pregnantMotherStatusOptions.find { it.name == binding.etPregnantMotherStatus.text.toString() }?.id,
             givenBirthStatusId = givenBirthStatusOptions.find { it.name == binding.etGivenBirthStatus.text.toString() }?.id,
             counselingTypeId = counselingTypeOptions.find { it.name == binding.etCounselingType.text.toString() }?.id,
-            deliveryPlaceId = deliveryPlaceOptions.find { it.name == binding.etDeliveryPlace.text.toString() }?.id,
-            birthAssistantId = birthAssistantOptions.find { it.name == binding.etBirthAssistant.text.toString() }?.id,
             contraceptionOptionId = contraceptionOptions.find { it.name == binding.etContraceptionOption.text.toString() }?.id,
             facilitatingReferralServiceStatus = binding.etFacilitatingReferralService.text.toString(),
             facilitatingSocialAssistanceStatus = binding.etFacilitatingSocialAssistance.text.toString(),

@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import com.bkkbnjabar.sipenting.data.local.entity.ChildEntity
 import com.bkkbnjabar.sipenting.data.model.child.ChildWithLatestStatus
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +21,10 @@ interface ChildDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertChild(child: ChildEntity): Long
+
+    @Update
+    suspend fun updateChild(child: ChildEntity)
+
 
     /**
      * Retrieves a single child by their local ID.
@@ -55,4 +61,22 @@ interface ChildDao {
             pm.createdAt DESC
     """)
     fun getAllChildsWithLatestStatus(): Flow<List<ChildWithLatestStatus>>
+
+    @Query("SELECT * FROM child WHERE syncStatus = 'PENDING'")
+    suspend fun getPendingChildren(): List<ChildEntity>
+
+    @Query("SELECT * FROM child WHERE id = :serverId LIMIT 1")
+    suspend fun findByServerId(serverId: String): ChildEntity?
+
+    @Transaction
+    suspend fun clearAndInsertAll(children: List<ChildEntity>) {
+        deleteAll()
+        insertAll(children)
+    }
+
+    @Query("DELETE FROM child")
+    suspend fun deleteAll()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(children: List<ChildEntity>)
 }

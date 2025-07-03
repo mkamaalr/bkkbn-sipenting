@@ -19,6 +19,8 @@ class SharedPrefsManager @Inject constructor(@ApplicationContext context: Contex
     companion object {
         private const val PREFS_NAME = "sipenting_prefs"
         private const val KEY_USER_SESSION = "user_session"
+        private const val KEY_LAST_SYNC = "last_sync_timestamp" // Key for sync time
+
         // Kunci untuk menyimpan daftar opsi dari Lookup API
         const val KEY_DISEASE_HISTORY_OPTIONS = "disease_history_options"
         const val KEY_DRINKING_WATER_OPTIONS = "drinking_water_options"
@@ -61,6 +63,21 @@ class SharedPrefsManager @Inject constructor(@ApplicationContext context: Contex
             return gson.fromJson(json, type)
         }
         return emptyList()
+    }
+
+    /**
+     * Saves the timestamp of the last successful sync.
+     */
+    fun saveLastSyncTimestamp(timestamp: Long) {
+        sharedPreferences.edit().putLong(KEY_LAST_SYNC, timestamp).apply()
+    }
+
+    /**
+     * Retrieves the timestamp of the last successful sync.
+     * Returns 0 if no sync has ever been performed.
+     */
+    fun getLastSyncTimestamp(): Long {
+        return sharedPreferences.getLong(KEY_LAST_SYNC, 0L)
     }
 
     /**

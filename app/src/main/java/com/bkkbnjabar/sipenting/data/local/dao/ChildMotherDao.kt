@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import com.bkkbnjabar.sipenting.data.local.entity.ChildMotherEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -19,6 +21,9 @@ interface ChildMotherDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMother(mother: ChildMotherEntity): Long
 
+    @Update
+    suspend fun updateMother(mother: ChildMotherEntity)
+
     /**
      * Retrieves a single mother by her local ID.
      * @param localId The primary key of the mother.
@@ -33,4 +38,23 @@ interface ChildMotherDao {
      */
     @Query("SELECT * FROM child_mother ORDER BY createdAt DESC")
     fun getAllMothers(): Flow<List<ChildMotherEntity>>
+
+    // --- ADD THESE FUNCTIONS FOR SYNCING ---
+    @Query("SELECT * FROM child_mother WHERE syncStatus = 'PENDING'")
+    suspend fun getPendingMothers(): List<ChildMotherEntity>
+
+    @Query("SELECT * FROM child_mother WHERE id = :serverId LIMIT 1")
+    suspend fun findByServerId(serverId: String): ChildMotherEntity?
+
+    @Transaction
+    suspend fun clearAndInsertAll(mothers: List<ChildMotherEntity>) {
+        deleteAll()
+        insertAll(mothers)
+    }
+
+    @Query("DELETE FROM child_mother")
+    suspend fun deleteAll()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(mothers: List<ChildMotherEntity>)
 }

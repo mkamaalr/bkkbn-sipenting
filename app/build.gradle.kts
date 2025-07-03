@@ -24,6 +24,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            isDebuggable = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -83,6 +86,11 @@ dependencies {
     kapt("com.squareup.moshi:moshi-kotlin-codegen:1.15.1") // For Moshi code generation
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("androidx.work:work-runtime-ktx:2.10.2")
+    implementation("androidx.hilt:hilt-work:1.2.0")
+    // When using Kotlin.
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
     // Room (Persistence Library) - Tambahkan ini
     implementation("androidx.room:room-runtime:2.7.2")
@@ -106,4 +114,12 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+
+
+    // Charts
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+}
+
+kapt {
+    correctErrorTypes = true
 }
